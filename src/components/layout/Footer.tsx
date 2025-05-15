@@ -55,7 +55,7 @@ const Footer: React.FC = () => {
     >
       <Container maxWidth="lg">
         <Grid container spacing={4}>
-          <Grid item sx={{ width: { xs: '100%', sm: '50%', md: '25%' } }}>
+          <Grid sx={{ width: { xs: '100%', sm: '50%', md: '25%' } }}>
             <Typography variant="h6" color="textPrimary" gutterBottom>
               DevAI Companion
             </Typography>
@@ -99,7 +99,7 @@ const Footer: React.FC = () => {
             </Stack>
           </Grid>
           
-          <Grid item sx={{ width: { xs: '100%', sm: '50%', md: '25%' } }}>
+          <Grid sx={{ width: { xs: '100%', sm: '50%', md: '25%' } }}>
             <Typography variant="h6" color="textPrimary" gutterBottom>
               Navigation
             </Typography>
@@ -116,7 +116,7 @@ const Footer: React.FC = () => {
             </Stack>
           </Grid>
           
-          <Grid item sx={{ width: { xs: '100%', sm: '50%', md: '25%' } }}>
+          <Grid sx={{ width: { xs: '100%', sm: '50%', md: '25%' } }}>
             <Typography variant="h6" color="textPrimary" gutterBottom>
               Legal
             </Typography>
@@ -133,7 +133,7 @@ const Footer: React.FC = () => {
             </Stack>
           </Grid>
           
-          <Grid item sx={{ width: { xs: '100%', sm: '50%', md: '25%' } }}>
+          <Grid sx={{ width: { xs: '100%', sm: '50%', md: '25%' } }}>
             <Typography variant="h6" color="textPrimary" gutterBottom>
               Newsletter
             </Typography>
@@ -166,12 +166,12 @@ const Footer: React.FC = () => {
         <Divider sx={{ mt: 4, mb: 4 }} />
         
         <Grid container justifyContent="space-between" alignItems="center">
-          <Grid item>
+          <Grid>
             <Typography variant="body2" color="textSecondary">
               © {new Date().getFullYear()} DevAI Companion. All rights reserved.
             </Typography>
           </Grid>
-          <Grid item>
+          <Grid>
             <Button 
               variant="text" 
               size="small"

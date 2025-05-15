@@ -8,9 +8,9 @@ export const getDesignTokens = (mode: PaletteMode) => ({
       ? {
           // Light mode
           primary: {
-            main: '#9b87f5',
-            light: '#b5a6f8',
-            dark: '#7e69ab',
+            main: '#5B2C6F', // Updated to the requested deep purple
+            light: '#7e52a0',
+            dark: '#3e1f4c',
             contrastText: '#ffffff',
           },
           secondary: {
@@ -31,9 +31,9 @@ export const getDesignTokens = (mode: PaletteMode) => ({
       : {
           // Dark mode
           primary: {
-            main: '#9b87f5',
-            light: '#b5a6f8',
-            dark: '#7e69ab',
+            main: '#7e52a0', // Slightly lighter purple for dark mode
+            light: '#9b6eca',
+            dark: '#5B2C6F',
             contrastText: '#ffffff',
           },
           secondary: {
@@ -118,6 +118,14 @@ export const getDesignTokens = (mode: PaletteMode) => ({
           '& .MuiOutlinedInput-root': {
             borderRadius: 8,
           },
+        },
+      },
+    },
+    MuiFocusVisible: {
+      styleOverrides: {
+        root: {
+          outline: '2px solid #5B2C6F',
+          outlineOffset: 2,
         },
       },
     },
