@@ -113,7 +113,7 @@ const About = () => {
       <Box sx={{ py: 8, bgcolor: 'background.default' }}>
         <Container maxWidth="md">
           <Grid container spacing={4}>
-            <Grid item sx={{ width: '100%' }}>
+            <Grid sx={{ width: '100%' }}>
               <Typography variant="h4" component="h2" gutterBottom color="primary">
                 Our Mission
               </Typography>
@@ -146,7 +146,7 @@ const About = () => {
 
           <Grid container spacing={4}>
             {teamMembers.map((member) => (
-              <Grid item key={member.name} sx={{ width: { xs: '100%', sm: '50%', md: '25%' } }}>
+              <Grid key={member.name} sx={{ width: { xs: '100%', sm: '50%', md: '25%' } }}>
                 <Card 
                   sx={{ 
                     height: '100%', 
@@ -219,7 +219,7 @@ const About = () => {
 
           <Grid container spacing={4}>
             {values.map((value) => (
-              <Grid item key={value.title} sx={{ width: { xs: '100%', sm: '50%' } }}>
+              <Grid key={value.title} sx={{ width: { xs: '100%', sm: '50%' } }}>
                 <Paper
                   elevation={0}
                   sx={{
@@ -255,7 +255,7 @@ const About = () => {
       <Box sx={{ py: 8, bgcolor: 'background.paper' }}>
         <Container maxWidth="lg">
           <Grid container spacing={4} justifyContent="center">
-            <Grid item sx={{ width: { xs: '100%', sm: '33.33%' } }}>
+            <Grid sx={{ width: { xs: '100%', sm: '33.33%' } }}>
               <Box textAlign="center">
                 <Typography variant="h2" component="p" color="primary" fontWeight="bold">
                   5,000+
@@ -265,7 +265,7 @@ const About = () => {
                 </Typography>
               </Box>
             </Grid>
-            <Grid item sx={{ width: { xs: '100%', sm: '33.33%' } }}>
+            <Grid sx={{ width: { xs: '100%', sm: '33.33%' } }}>
               <Box textAlign="center">
                 <Typography variant="h2" component="p" color="primary" fontWeight="bold">
                   50,000+
@@ -275,7 +275,7 @@ const About = () => {
                 </Typography>
               </Box>
             </Grid>
-            <Grid item sx={{ width: { xs: '100%', sm: '33.33%' } }}>
+            <Grid sx={{ width: { xs: '100%', sm: '33.33%' } }}>
               <Box textAlign="center">
                 <Typography variant="h2" component="p" color="primary" fontWeight="bold">
                   1,200+

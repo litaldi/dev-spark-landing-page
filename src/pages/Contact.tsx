@@ -2,7 +2,6 @@
 import React, { useState } from 'react';
 import {
   Container,
-  Grid,
   Typography,
   TextField,
   Button,
@@ -16,6 +15,7 @@ import {
   Divider,
   Stack
 } from '@mui/material';
+import Grid from '@mui/material/Grid';
 import { Mail, Phone, LocationOn } from '@mui/icons-material';
 import Layout from '../components/layout/Layout';
 
@@ -154,7 +154,7 @@ const Contact: React.FC = () => {
       {/* Contact Form Section */}
       <Container maxWidth="lg" sx={{ py: 8 }}>
         <Grid container spacing={6}>
-          <Grid item xs={12} md={7}>
+          <Grid sx={{ width: { xs: '100%', md: '58.33%' } }}>
             <Paper 
               elevation={0} 
               sx={{ 
@@ -169,7 +169,7 @@ const Contact: React.FC = () => {
               
               <Box component="form" onSubmit={handleSubmit} noValidate>
                 <Grid container spacing={3}>
-                  <Grid item xs={12} sm={6}>
+                  <Grid sx={{ width: { xs: '100%', sm: '50%' } }}>
                     <TextField
                       required
                       fullWidth
@@ -183,7 +183,7 @@ const Contact: React.FC = () => {
                       aria-describedby="name-helper-text"
                     />
                   </Grid>
-                  <Grid item xs={12} sm={6}>
+                  <Grid sx={{ width: { xs: '100%', sm: '50%' } }}>
                     <TextField
                       required
                       fullWidth
@@ -199,7 +199,7 @@ const Contact: React.FC = () => {
                       aria-describedby="email-helper-text"
                     />
                   </Grid>
-                  <Grid item xs={12}>
+                  <Grid sx={{ width: '100%' }}>
                     <TextField
                       required
                       fullWidth
@@ -213,7 +213,7 @@ const Contact: React.FC = () => {
                       aria-describedby="subject-helper-text"
                     />
                   </Grid>
-                  <Grid item xs={12}>
+                  <Grid sx={{ width: '100%' }}>
                     <TextField
                       required
                       fullWidth
@@ -229,7 +229,7 @@ const Contact: React.FC = () => {
                       aria-describedby="message-helper-text"
                     />
                   </Grid>
-                  <Grid item xs={12}>
+                  <Grid sx={{ width: '100%' }}>
                     <Button
                       type="submit"
                       variant="contained"
@@ -248,7 +248,7 @@ const Contact: React.FC = () => {
             </Paper>
           </Grid>
           
-          <Grid item xs={12} md={5}>
+          <Grid sx={{ width: { xs: '100%', md: '41.67%' } }}>
             <Card 
               elevation={0}
               sx={{ 
