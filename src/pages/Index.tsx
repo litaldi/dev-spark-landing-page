@@ -35,6 +35,12 @@ const Index = () => {
         <WhyItWorks />
         <HowItWorksSection />
         
+        {/* App preview and community stats */}
+        <div id="demo" className="scroll-mt-20">
+          <AppPreview />
+        </div>
+        <CommunityStats />
+        
         {/* Motivation quote */}
         <div className="py-10 bg-white">
           <div className="container">
@@ -42,28 +48,24 @@ const Index = () => {
           </div>
         </div>
         
-        {/* App preview and metrics */}
-        <AppPreview />
-        <CommunityStats />
-        
         {/* Features and testimonials */}
-        <div id="features">
+        <div id="features" className="scroll-mt-20">
           <FeatureGrid />
         </div>
         <TestimonialCard />
         <ForWhomSection />
         
         {/* Product comparison and FAQ */}
-        <FeatureComparisonTable />
-        <div id="faq">
+        <div id="pricing" className="scroll-mt-20">
+          <FeatureComparisonTable />
+        </div>
+        <div id="faq" className="scroll-mt-20">
           <FaqAccordion />
         </div>
         
         {/* Call to action */}
         <NewsletterSignup />
-        <div id="pricing">
-          <JoinNowSection />
-        </div>
+        <JoinNowSection />
       </main>
       <Footer />
       <StickyCTABar />

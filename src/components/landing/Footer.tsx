@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { Github, Linkedin, Twitter, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import LoginModal from "@/components/auth/LoginModal";
+import { Link } from "react-router-dom";
 
 const Footer: React.FC = () => {
   const [loginModalOpen, setLoginModalOpen] = useState(false);
@@ -54,6 +55,11 @@ const Footer: React.FC = () => {
             </div>
           </div>
           <div className="flex flex-col items-center md:items-end">
+            <div className="flex flex-wrap justify-center md:justify-end gap-4 mb-4">
+              <Link to="/terms" className="text-gray-500 hover:text-brand-500 text-sm transition-colors">Terms of Use</Link>
+              <Link to="/privacy" className="text-gray-500 hover:text-brand-500 text-sm transition-colors">Privacy Policy</Link>
+              <Link to="/accessibility" className="text-gray-500 hover:text-brand-500 text-sm transition-colors">Accessibility</Link>
+            </div>
             <p className="text-gray-500 text-sm mb-2">
               🔒 Secure · Powered by GPT-4 · Built with Tailwind & ShadCn · RTL & LTR Support
             </p>
