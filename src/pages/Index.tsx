@@ -14,10 +14,16 @@ const Index = () => {
       <Navbar />
       <main>
         <HeroSection />
-        <FeatureGrid />
+        <div id="features">
+          <FeatureGrid />
+        </div>
         <ForWhomSection />
-        <TestimonialCard />
-        <JoinNowSection />
+        <div id="testimonials">
+          <TestimonialCard />
+        </div>
+        <div id="pricing">
+          <JoinNowSection />
+        </div>
       </main>
       <Footer />
     </div>

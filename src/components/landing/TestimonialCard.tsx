@@ -1,45 +1,108 @@
 
 import React from "react";
+import { 
+  Carousel,
+  CarouselContent,
+  CarouselItem, 
+  CarouselNext,
+  CarouselPrevious
+} from "@/components/ui/carousel";
 import { Card, CardContent } from "@/components/ui/card";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+
+const testimonials = [
+  {
+    quote: "I landed my first frontend job in 6 weeks thanks to this app. I finally felt ready.",
+    name: "Dana",
+    position: "Junior Developer",
+    location: "Tel Aviv",
+    initial: "D",
+  },
+  {
+    quote: "The AI feedback on my resume was incredible. Three interviews within a week of updating it.",
+    name: "Michael",
+    position: "Full Stack Developer",
+    location: "Berlin",
+    initial: "M",
+  },
+  {
+    quote: "The interview simulator prepared me for questions I never thought I'd be asked. Lifesaver!",
+    name: "Priya",
+    position: "Frontend Engineer",
+    location: "Toronto",
+    initial: "P",
+  }
+];
 
 const TestimonialCard: React.FC = () => {
   return (
-    <section className="py-16 md:py-24">
+    <section className="py-16 md:py-24 bg-gradient-to-br from-brand-50/50 to-white">
       <div className="container">
-        <div className="max-w-4xl mx-auto">
-          <Card className="border-brand-200 shadow-md bg-white">
-            <CardContent className="p-8 md:p-10">
-              <div className="flex flex-col items-center text-center">
-                <svg 
-                  xmlns="http://www.w3.org/2000/svg" 
-                  width="48" 
-                  height="48" 
-                  viewBox="0 0 24 24" 
-                  fill="none" 
-                  stroke="currentColor" 
-                  strokeWidth="1" 
-                  strokeLinecap="round" 
-                  strokeLinejoin="round" 
-                  className="text-brand-400 mb-6"
-                >
-                  <path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z" />
-                  <path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z" />
-                </svg>
-                <p className="text-xl md:text-2xl font-medium mb-6 text-brand-800">
-                  "I landed my first frontend job in 6 weeks thanks to this app. I finally felt ready."
-                </p>
-                <div className="flex items-center justify-center">
-                  <div className="w-12 h-12 rounded-full bg-brand-100 flex items-center justify-center mr-3">
-                    <span className="text-brand-600 font-bold text-xl">D</span>
-                  </div>
-                  <div className="text-left">
-                    <p className="font-medium">Dana</p>
-                    <p className="text-sm text-gray-500">Junior Developer, Tel Aviv</p>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+        <div className="max-w-5xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-brand-800">
+            Success <span className="text-brand-500">Stories</span>
+          </h2>
+          
+          <Carousel className="w-full">
+            <CarouselContent>
+              {testimonials.map((testimonial, index) => (
+                <CarouselItem key={index} className="md:basis-4/5 lg:basis-3/4">
+                  <Card className="border-brand-200 shadow-md bg-white mx-4">
+                    <CardContent className="p-8 md:p-10">
+                      <div className="flex flex-col items-center text-center">
+                        <svg 
+                          xmlns="http://www.w3.org/2000/svg" 
+                          width="48" 
+                          height="48" 
+                          viewBox="0 0 24 24" 
+                          fill="none" 
+                          stroke="currentColor" 
+                          strokeWidth="1" 
+                          strokeLinecap="round" 
+                          strokeLinejoin="round" 
+                          className="text-brand-400 mb-6"
+                        >
+                          <path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z" />
+                          <path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z" />
+                        </svg>
+                        <p className="text-xl md:text-2xl font-medium mb-6 text-brand-800">
+                          "{testimonial.quote}"
+                        </p>
+                        <div className="flex items-center justify-center">
+                          <Avatar className="h-12 w-12 mr-3">
+                            <AvatarFallback className="bg-brand-100 text-brand-600">
+                              {testimonial.initial}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="text-left">
+                            <p className="font-medium">{testimonial.name}</p>
+                            <p className="text-sm text-gray-500">
+                              {testimonial.position}, {testimonial.location}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <div className="hidden md:flex">
+              <CarouselPrevious className="relative left-0" />
+              <CarouselNext className="relative right-0" />
+            </div>
+          </Carousel>
+          
+          <div className="flex justify-center gap-2 mt-6">
+            {testimonials.map((_, index) => (
+              <div 
+                key={index}
+                className={`h-2 w-2 rounded-full cursor-pointer transition-colors ${
+                  index === 0 ? "bg-brand-500" : "bg-brand-200"
+                }`}
+              ></div>
+            ))}
+          </div>
         </div>
       </div>
     </section>
