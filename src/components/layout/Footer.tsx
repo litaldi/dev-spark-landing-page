@@ -55,7 +55,7 @@ const Footer: React.FC = () => {
     >
       <Container maxWidth="lg">
         <Grid container spacing={4}>
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid xs={12} sm={6} md={3}>
             <Typography variant="h6" color="textPrimary" gutterBottom>
               DevAI Companion
             </Typography>
@@ -99,7 +99,7 @@ const Footer: React.FC = () => {
             </Stack>
           </Grid>
           
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid xs={12} sm={6} md={3}>
             <Typography variant="h6" color="textPrimary" gutterBottom>
               Navigation
             </Typography>
@@ -116,7 +116,7 @@ const Footer: React.FC = () => {
             </Stack>
           </Grid>
           
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid xs={12} sm={6} md={3}>
             <Typography variant="h6" color="textPrimary" gutterBottom>
               Legal
             </Typography>
@@ -133,7 +133,7 @@ const Footer: React.FC = () => {
             </Stack>
           </Grid>
           
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid xs={12} sm={6} md={3}>
             <Typography variant="h6" color="textPrimary" gutterBottom>
               Newsletter
             </Typography>
@@ -166,12 +166,12 @@ const Footer: React.FC = () => {
         <Divider sx={{ mt: 4, mb: 4 }} />
         
         <Grid container justifyContent="space-between" alignItems="center">
-          <Grid item>
+          <Grid>
             <Typography variant="body2" color="textSecondary">
               © {new Date().getFullYear()} DevAI Companion. All rights reserved.
             </Typography>
           </Grid>
-          <Grid item>
+          <Grid>
             <Button 
               variant="text" 
               size="small"

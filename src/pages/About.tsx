@@ -104,7 +104,7 @@ const About: React.FC = () => {
       <Box sx={{ py: 8, bgcolor: 'background.default' }}>
         <Container maxWidth="md">
           <Grid container spacing={4}>
-            <Grid item xs={12}>
+            <Grid xs={12}>
               <Typography variant="h4" component="h2" gutterBottom color="primary">
                 Our Mission
               </Typography>
@@ -152,7 +152,7 @@ const About: React.FC = () => {
 
           <Grid container spacing={4}>
             {teamMembers.map((member) => (
-              <Grid item key={member.name} xs={12} sm={6} md={3}>
+              <Grid key={member.name} xs={12} sm={6} md={3}>
                 <Card 
                   sx={{ 
                     height: '100%', 
@@ -214,7 +214,7 @@ const About: React.FC = () => {
 
           <Grid container spacing={4}>
             {values.map((value) => (
-              <Grid item key={value.title} xs={12} sm={6}>
+              <Grid key={value.title} xs={12} sm={6}>
                 <Paper
                   elevation={0}
                   sx={{
@@ -243,7 +243,7 @@ const About: React.FC = () => {
       <Box sx={{ py: 8, bgcolor: 'background.paper' }}>
         <Container maxWidth="lg">
           <Grid container spacing={4} justifyContent="center">
-            <Grid item xs={12} sm={4} md={4}>
+            <Grid xs={12} sm={4} md={4}>
               <Box textAlign="center">
                 <Typography variant="h2" component="p" color="primary" fontWeight="bold">
                   5,000+
@@ -253,7 +253,7 @@ const About: React.FC = () => {
                 </Typography>
               </Box>
             </Grid>
-            <Grid item xs={12} sm={4} md={4}>
+            <Grid xs={12} sm={4} md={4}>
               <Box textAlign="center">
                 <Typography variant="h2" component="p" color="primary" fontWeight="bold">
                   50,000+
@@ -263,7 +263,7 @@ const About: React.FC = () => {
                 </Typography>
               </Box>
             </Grid>
-            <Grid item xs={12} sm={4} md={4}>
+            <Grid xs={12} sm={4} md={4}>
               <Box textAlign="center">
                 <Typography variant="h2" component="p" color="primary" fontWeight="bold">
                   1,200+
