@@ -72,7 +72,7 @@ const HowItWorksSection: React.FC = () => {
               </CardContent>
               
               {index < steps.length - 1 && (
-                <div className="hidden lg:block absolute -right-4 top-1/2 transform -translate-y-1/2 text-brand-300 text-2xl">
+                <div className="hidden lg:block absolute -right-4 top-1/2 transform -translate-y-1/2 text-brand-300 text-2xl" aria-hidden="true">
                   →
                 </div>
               )}

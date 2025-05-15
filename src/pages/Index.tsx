@@ -30,25 +30,36 @@ const Index = () => {
       
       <Navbar />
       <main id="main-content">
+        {/* Primary sections */}
         <HeroSection />
         <WhyItWorks />
         <HowItWorksSection />
+        
+        {/* Motivation quote */}
         <div className="py-10 bg-white">
           <div className="container">
             <MotivationQuote />
           </div>
         </div>
+        
+        {/* App preview and metrics */}
         <AppPreview />
         <CommunityStats />
+        
+        {/* Features and testimonials */}
         <div id="features">
           <FeatureGrid />
         </div>
         <TestimonialCard />
         <ForWhomSection />
+        
+        {/* Product comparison and FAQ */}
         <FeatureComparisonTable />
         <div id="faq">
           <FaqAccordion />
         </div>
+        
+        {/* Call to action */}
         <NewsletterSignup />
         <div id="pricing">
           <JoinNowSection />

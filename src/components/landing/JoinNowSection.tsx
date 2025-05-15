@@ -12,8 +12,9 @@ const JoinNowSection: React.FC = () => {
             <h2 id="cta-heading" className="text-3xl md:text-4xl font-bold mb-6 text-brand-800">
               Start Your <span className="text-brand-500">Journey Today</span>
             </h2>
-            <p className="text-xl text-gray-700 mb-8 md:mb-10">
-              Join hundreds of juniors already building skills and confidence with our AI-powered platform.
+            
+            <p className="text-xl text-gray-700 mb-8 md:mb-10 max-w-3xl mx-auto">
+              Join hundreds of junior developers already building skills and confidence with our AI-powered platform.
             </p>
             
             <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 md:p-10 shadow-lg border border-brand-100">
@@ -26,6 +27,7 @@ const JoinNowSection: React.FC = () => {
                   <span className="absolute inset-0 bg-gradient-to-r from-brand-500 to-brand-600 opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true"></span>
                   <span className="absolute top-0 left-0 w-full h-full bg-white opacity-20 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left" aria-hidden="true"></span>
                 </Button>
+                
                 <Button 
                   size="lg" 
                   variant="outline" 

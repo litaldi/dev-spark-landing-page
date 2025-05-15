@@ -12,7 +12,7 @@ interface FeatureCardProps {
 const FeatureCard: React.FC<FeatureCardProps> = ({ title, icon: Icon, description }) => {
   return (
     <Card 
-      className="hover:shadow-lg transition-all duration-500 border-brand-100 hover:border-brand-300 h-full group focus-within:ring-2 focus-within:ring-brand-400 focus-within:ring-offset-2"
+      className="h-full border-brand-100 hover:border-brand-300 hover:shadow-md transition-all duration-300 group focus-within:ring-2 focus-within:ring-brand-400 focus-within:ring-offset-2"
       tabIndex={0}
     >
       <CardContent className="flex flex-col items-center p-6 text-center h-full">
@@ -22,9 +22,17 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ title, icon: Icon, descriptio
         >
           <Icon className="h-8 w-8 text-brand-600 group-hover:text-brand-700 transition-colors" />
         </div>
-        <h3 className="text-xl font-medium mb-2 text-brand-800">{title}</h3>
-        {description && <p className="text-gray-600 text-sm mt-2">{description}</p>}
-        <div className="w-0 group-hover:w-1/2 group-focus-within:w-1/2 h-0.5 bg-brand-300 mt-3 transition-all duration-300 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100" aria-hidden="true"></div>
+        
+        <h3 className="text-xl font-medium mb-3 text-brand-800">{title}</h3>
+        
+        {description && (
+          <p className="text-gray-600 mt-2 leading-relaxed">{description}</p>
+        )}
+        
+        <div 
+          className="mt-auto w-0 group-hover:w-1/2 group-focus-within:w-1/2 h-0.5 bg-brand-300 mt-4 transition-all duration-300 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100" 
+          aria-hidden="true"
+        ></div>
       </CardContent>
     </Card>
   );
