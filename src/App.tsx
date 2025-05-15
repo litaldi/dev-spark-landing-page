@@ -17,6 +17,13 @@ import ForgotPasswordPage from "./pages/auth/ForgotPassword";
 import MagicLinkPage from "./pages/auth/MagicLink";
 import LogoutPage from "./pages/auth/Logout";
 import AuthErrorPage from "./pages/auth/AuthError";
+import Dashboard from "./pages/Dashboard";
+import Profile from "./pages/Profile";
+import Settings from "./pages/Settings";
+import About from "./pages/About";
+import Contact from "./pages/Contact";
+import Newsletter from "./pages/Newsletter";
+import FAQ from "./pages/FAQ";
 
 const queryClient = new QueryClient();
 
@@ -41,6 +48,17 @@ const App = () => (
             <Route path="/auth/magic-link" element={<MagicLinkPage />} />
             <Route path="/auth/logout" element={<LogoutPage />} />
             <Route path="/auth/error" element={<AuthErrorPage />} />
+            
+            {/* User Routes */}
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/settings" element={<Settings />} />
+            
+            {/* Site Pages */}
+            <Route path="/about" element={<About />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/newsletter" element={<Newsletter />} />
+            <Route path="/faq" element={<FAQ />} />
             
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
