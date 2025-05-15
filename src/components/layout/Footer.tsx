@@ -2,20 +2,20 @@
 import React, { useState } from 'react';
 import { 
   Container, 
-  Grid, 
+  Stack,
   Typography, 
   Link, 
   Box, 
   TextField, 
   Button, 
   IconButton,
-  Stack,
   Divider,
   useTheme
 } from '@mui/material';
 import { GitHub, LinkedIn, Twitter } from '@mui/icons-material';
 import { Link as RouterLink } from 'react-router-dom';
 import LoginModal from "@/components/auth/LoginModal";
+import Grid from '@mui/material/Grid';
 
 const Footer: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -55,7 +55,7 @@ const Footer: React.FC = () => {
     >
       <Container maxWidth="lg">
         <Grid container spacing={4}>
-          <Grid xs={12} sm={6} md={3}>
+          <Grid item sx={{ width: { xs: '100%', sm: '50%', md: '25%' } }}>
             <Typography variant="h6" color="textPrimary" gutterBottom>
               DevAI Companion
             </Typography>
@@ -99,7 +99,7 @@ const Footer: React.FC = () => {
             </Stack>
           </Grid>
           
-          <Grid xs={12} sm={6} md={3}>
+          <Grid item sx={{ width: { xs: '100%', sm: '50%', md: '25%' } }}>
             <Typography variant="h6" color="textPrimary" gutterBottom>
               Navigation
             </Typography>
@@ -116,7 +116,7 @@ const Footer: React.FC = () => {
             </Stack>
           </Grid>
           
-          <Grid xs={12} sm={6} md={3}>
+          <Grid item sx={{ width: { xs: '100%', sm: '50%', md: '25%' } }}>
             <Typography variant="h6" color="textPrimary" gutterBottom>
               Legal
             </Typography>
@@ -133,7 +133,7 @@ const Footer: React.FC = () => {
             </Stack>
           </Grid>
           
-          <Grid xs={12} sm={6} md={3}>
+          <Grid item sx={{ width: { xs: '100%', sm: '50%', md: '25%' } }}>
             <Typography variant="h6" color="textPrimary" gutterBottom>
               Newsletter
             </Typography>
@@ -166,12 +166,12 @@ const Footer: React.FC = () => {
         <Divider sx={{ mt: 4, mb: 4 }} />
         
         <Grid container justifyContent="space-between" alignItems="center">
-          <Grid>
+          <Grid item>
             <Typography variant="body2" color="textSecondary">
               © {new Date().getFullYear()} DevAI Companion. All rights reserved.
             </Typography>
           </Grid>
-          <Grid>
+          <Grid item>
             <Button 
               variant="text" 
               size="small"
