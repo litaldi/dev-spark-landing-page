@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { z } from "zod";
@@ -50,7 +49,7 @@ const RegisterPage = () => {
       email: "",
       password: "",
       persona: "junior",
-      acceptTerms: false,
+      acceptTerms: false as unknown as true,
     },
   });
 

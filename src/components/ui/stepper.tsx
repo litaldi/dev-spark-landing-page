@@ -30,7 +30,7 @@ export const Step = React.forwardRef<HTMLDivElement, StepProps>(
             {
               "border-muted bg-background": !active && !completed,
               "border-primary bg-primary text-primary-foreground": active,
-              "border-primary bg-primary text-primary-foreground": completed,
+              "border-primary bg-primary/90 text-primary-foreground": completed,
             }
           )}
         >
