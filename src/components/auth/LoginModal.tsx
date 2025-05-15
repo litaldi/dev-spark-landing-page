@@ -1,5 +1,6 @@
 
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Dialog,
   DialogContent,
@@ -13,6 +14,7 @@ import { Github, Mail } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "react-router-dom";
 import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -21,6 +23,7 @@ interface LoginModalProps {
 
 const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handleLogin = (provider: string) => {
     // This would be replaced with actual authentication logic
@@ -30,6 +33,17 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
       duration: 3000,
     });
     
+    onClose();
+  };
+
+  const handleDemoLogin = () => {
+    toast({
+      title: "Demo Login",
+      description: "Redirecting to the demo login...",
+      duration: 2000,
+    });
+    
+    navigate("/auth/login?demo=true");
     onClose();
   };
 
@@ -81,6 +95,16 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
           >
             <Mail className="w-5 h-5" aria-hidden="true" />
             <span>Sign in with Email</span>
+          </Button>
+
+          <Button 
+            variant="secondary"
+            className="flex items-center justify-center gap-2 w-full bg-brand-100 hover:bg-brand-200 dark:bg-brand-900/30 dark:hover:bg-brand-900/50 border border-brand-200 dark:border-brand-800 transition-all"
+            onClick={handleDemoLogin}
+            aria-label="Try demo account"
+          >
+            <span>Try Demo Account</span>
+            <Badge variant="outline" className="bg-brand-50 dark:bg-brand-900/50 text-xs">Demo</Badge>
           </Button>
 
           <Button 

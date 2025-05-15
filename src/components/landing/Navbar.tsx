@@ -10,9 +10,9 @@ import MobileMenu from "./MobileMenu";
 const Navbar: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  // In a real app, this would come from your auth provider
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userName, setUserName] = useState<string | null>(null);
+  const [isDemoUser, setIsDemoUser] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -30,21 +30,44 @@ const Navbar: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    // Demo only: simulate fetching user data
-    if (isLoggedIn && !userName) {
-      setUserName("Lital");
+    // Check login status from localStorage
+    const loginStatus = localStorage.getItem("isLoggedIn");
+    setIsLoggedIn(loginStatus === "true");
+    
+    // Get user name from localStorage
+    const storedUserName = localStorage.getItem("userName");
+    if (storedUserName) {
+      setUserName(storedUserName);
     }
-  }, [isLoggedIn, userName]);
+
+    // Check if demo user
+    const demoStatus = localStorage.getItem("isDemoUser");
+    setIsDemoUser(demoStatus === "true");
+  }, []);
 
   const handleLogout = () => {
-    // This would be replaced with actual logout logic
+    // Clear all authentication data
+    localStorage.removeItem("isLoggedIn");
+    localStorage.removeItem("userName");
+    localStorage.removeItem("isDemoUser");
     setIsLoggedIn(false);
     setUserName(null);
+    setIsDemoUser(false);
   };
 
   // For demo purposes only - toggle login state
   const toggleLoginState = () => {
     setIsLoggedIn(!isLoggedIn);
+    if (!isLoggedIn) {
+      setUserName("User");
+      localStorage.setItem("isLoggedIn", "true");
+      localStorage.setItem("userName", "User");
+    } else {
+      setUserName(null);
+      localStorage.removeItem("isLoggedIn");
+      localStorage.removeItem("userName");
+      localStorage.removeItem("isDemoUser");
+    }
   };
 
   return (
@@ -75,6 +98,7 @@ const Navbar: React.FC = () => {
             <AuthButtons 
               isLoggedIn={isLoggedIn} 
               userName={userName}
+              isDemoUser={isDemoUser}
               onLogout={handleLogout}
               toggleLoginState={toggleLoginState}
             />
@@ -96,6 +120,7 @@ const Navbar: React.FC = () => {
           isOpen={mobileMenuOpen}
           isLoggedIn={isLoggedIn}
           userName={userName}
+          isDemoUser={isDemoUser}
           onMenuClose={() => setMobileMenuOpen(false)}
           onLogout={handleLogout}
           toggleLoginState={toggleLoginState}

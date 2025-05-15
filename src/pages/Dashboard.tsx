@@ -1,13 +1,40 @@
 
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/landing/Navbar";
 import Footer from "@/components/landing/Footer";
+import DemoUserBanner from "@/components/demo/DemoUserBanner";
 
 const Dashboard = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  const [isDemoUser, setIsDemoUser] = useState<boolean>(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Check login status
+    const loginStatus = localStorage.getItem("isLoggedIn");
+    if (loginStatus !== "true") {
+      navigate("/auth/login");
+      return;
+    }
+
+    setIsLoggedIn(true);
+    
+    // Check if demo user
+    const demoStatus = localStorage.getItem("isDemoUser");
+    setIsDemoUser(demoStatus === "true");
+  }, [navigate]);
+
+  if (!isLoggedIn) {
+    return null; // Will redirect in useEffect
+  }
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
       <main className="flex-1 container py-16">
+        {isDemoUser && <DemoUserBanner />}
+        
         <section className="mb-10">
           <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-6">Dashboard</h1>
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
