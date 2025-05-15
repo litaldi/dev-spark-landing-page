@@ -83,7 +83,7 @@ const Index = () => {
         >
           <Container maxWidth="lg">
             <Grid container spacing={4} alignItems="center">
-              <Grid item xs={12} md={6}>
+              <Grid sx={{ width: { xs: '100%', md: '50%' } }}>
                 <Typography 
                   variant="h1" 
                   component="h1"
@@ -126,7 +126,7 @@ const Index = () => {
                   </Button>
                 </Stack>
               </Grid>
-              <Grid item xs={12} md={6}>
+              <Grid sx={{ width: { xs: '100%', md: '50%' } }}>
                 <Box 
                   component="img"
                   src="https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?ixlib=rb-1.2.1&auto=format&fit=crop&w=750&q=80"
@@ -204,7 +204,7 @@ const Index = () => {
             
             <Grid container spacing={4}>
               {features.map((feature, index) => (
-                <Grid item key={index} xs={12} sm={6} md={4}>
+                <Grid sx={{ width: { xs: '100%', sm: '50%', md: '33.333333%' } }} key={index}>
                   <Card 
                     sx={{ 
                       height: '100%',
@@ -245,7 +245,7 @@ const Index = () => {
             
             <Grid container spacing={4}>
               {testimonials.map((testimonial, index) => (
-                <Grid item key={index} xs={12} md={4}>
+                <Grid sx={{ width: { xs: '100%', md: '33.333333%' } }} key={index}>
                   <Paper
                     elevation={0}
                     sx={{

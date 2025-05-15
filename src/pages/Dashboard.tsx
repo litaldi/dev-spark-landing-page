@@ -40,13 +40,13 @@ const Dashboard: React.FC = () => {
 
           {/* Progress overview */}
           <Grid container spacing={4}>
-            <Grid item xs={12} md={8}>
+            <Grid sx={{ width: { xs: '100%', md: '66.666667%' } }}>
               <Paper sx={{ p: 3, mb: 4 }}>
                 <Typography variant="h6" gutterBottom>
                   Your Progress
                 </Typography>
                 <Grid container spacing={2}>
-                  <Grid item xs={12}>
+                  <Grid sx={{ width: '100%' }}>
                     <Box sx={{ mb: 1, display: 'flex', justifyContent: 'space-between' }}>
                       <Typography variant="body2">JavaScript Fundamentals</Typography>
                       <Typography variant="body2">75%</Typography>
@@ -58,7 +58,7 @@ const Dashboard: React.FC = () => {
                       sx={{ height: 8, borderRadius: 2, mb: 2 }}
                     />
                   </Grid>
-                  <Grid item xs={12}>
+                  <Grid sx={{ width: '100%' }}>
                     <Box sx={{ mb: 1, display: 'flex', justifyContent: 'space-between' }}>
                       <Typography variant="body2">React Components</Typography>
                       <Typography variant="body2">45%</Typography>
@@ -70,7 +70,7 @@ const Dashboard: React.FC = () => {
                       sx={{ height: 8, borderRadius: 2, mb: 2 }}
                     />
                   </Grid>
-                  <Grid item xs={12}>
+                  <Grid sx={{ width: '100%' }}>
                     <Box sx={{ mb: 1, display: 'flex', justifyContent: 'space-between' }}>
                       <Typography variant="body2">Interview Preparation</Typography>
                       <Typography variant="body2">30%</Typography>
@@ -124,7 +124,7 @@ const Dashboard: React.FC = () => {
               </Paper>
             </Grid>
 
-            <Grid item xs={12} md={4}>
+            <Grid sx={{ width: { xs: '100%', md: '33.333333%' } }}>
               {/* Next steps card */}
               <Card sx={{ mb: 4 }}>
                 <CardContent>
