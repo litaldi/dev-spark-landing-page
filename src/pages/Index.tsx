@@ -11,8 +11,16 @@ import Footer from "@/components/landing/Footer";
 const Index = () => {
   return (
     <div className="min-h-screen flex flex-col">
+      {/* Skip to content link for keyboard users */}
+      <a 
+        href="#main-content" 
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-brand-500 text-white px-4 py-2 z-50 focus:outline-none rounded-md"
+      >
+        Skip to content
+      </a>
+      
       <Navbar />
-      <main>
+      <main id="main-content">
         <HeroSection />
         <div id="features">
           <FeatureGrid />

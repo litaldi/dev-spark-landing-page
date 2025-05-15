@@ -38,10 +38,10 @@ const FeatureGrid: React.FC = () => {
   ];
 
   return (
-    <section className="py-16 md:py-24 relative">
+    <section className="py-16 md:py-24 relative" aria-labelledby="features-heading">
       <div className="absolute inset-0 bg-gradient-to-b from-white via-brand-50/30 to-white opacity-70 pointer-events-none"></div>
       <div className="container relative z-10">
-        <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-brand-800">
+        <h2 id="features-heading" className="text-3xl md:text-4xl font-bold text-center mb-12 text-brand-800">
           Features to <span className="text-brand-500">Boost Your Career</span>
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
