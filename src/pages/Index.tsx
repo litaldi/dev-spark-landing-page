@@ -10,6 +10,7 @@ import Footer from "@/components/landing/Footer";
 import FaqAccordion from "@/components/landing/FaqAccordion";
 import FeatureComparisonTable from "@/components/landing/FeatureComparisonTable";
 import StickyCTABar from "@/components/landing/StickyCTABar";
+import HowItWorksSection from "@/components/landing/HowItWorksSection";
 
 const Index = () => {
   return (
@@ -25,6 +26,7 @@ const Index = () => {
       <Navbar />
       <main id="main-content">
         <HeroSection />
+        <HowItWorksSection />
         <div id="features">
           <FeatureGrid />
         </div>

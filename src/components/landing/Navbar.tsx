@@ -1,11 +1,15 @@
 
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Menu, X } from "lucide-react";
+import { Menu, X, LogIn } from "lucide-react";
+import LoginModal from "@/components/auth/LoginModal";
 
 const Navbar: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [loginModalOpen, setLoginModalOpen] = useState(false);
+  // In a real app, this would come from your auth provider
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -21,6 +25,24 @@ const Navbar: React.FC = () => {
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
+
+  const openLoginModal = () => {
+    setLoginModalOpen(true);
+  };
+
+  const closeLoginModal = () => {
+    setLoginModalOpen(false);
+  };
+
+  const handleLogout = () => {
+    // This would be replaced with actual logout logic
+    setIsLoggedIn(false);
+  };
+
+  // For demo purposes only - toggle login state
+  const toggleLoginState = () => {
+    setIsLoggedIn(!isLoggedIn);
+  };
 
   return (
     <header 
@@ -49,18 +71,49 @@ const Navbar: React.FC = () => {
               Pricing
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-brand-400 group-hover:w-full group-focus:w-full transition-all duration-300" aria-hidden="true"></span>
             </a>
+            <a href="#faq" className="text-gray-600 hover:text-brand-500 transition-colors relative group focus:outline-none focus:ring-2 focus:ring-brand-300 rounded-sm px-1">
+              FAQ
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-brand-400 group-hover:w-full group-focus:w-full transition-all duration-300" aria-hidden="true"></span>
+            </a>
           </nav>
           
           <div className="flex items-center gap-4">
-            <Button 
-              variant="ghost" 
-              className="hidden md:inline-flex text-brand-600 hover:bg-brand-50 transition-all"
-            >
-              Log in
-            </Button>
-            <Button className="bg-brand-500 hover:bg-brand-600 text-white transition-all duration-300 hover:scale-105">
-              Sign up
-            </Button>
+            {isLoggedIn ? (
+              <>
+                <Button 
+                  className="hidden md:inline-flex bg-brand-500 hover:bg-brand-600 text-white transition-all duration-300"
+                >
+                  Go to Dashboard
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  className="hidden md:inline-flex text-brand-600 hover:bg-brand-50 transition-all"
+                  onClick={handleLogout}
+                >
+                  Log out
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button 
+                  variant="ghost" 
+                  className="hidden md:inline-flex text-brand-600 hover:bg-brand-50 transition-all"
+                  onClick={openLoginModal}
+                >
+                  <LogIn className="h-4 w-4 mr-2" />
+                  Log in
+                </Button>
+                <Button 
+                  className="bg-brand-500 hover:bg-brand-600 text-white transition-all duration-300 hover:scale-105"
+                  onClick={() => {
+                    // For demo purposes - toggle login state
+                    toggleLoginState();
+                  }}
+                >
+                  {isLoggedIn ? "Account" : "Sign up"}
+                </Button>
+              </>
+            )}
             
             <button 
               className="md:hidden text-gray-600" 
@@ -99,16 +152,50 @@ const Navbar: React.FC = () => {
               >
                 Pricing
               </a>
-              <Button 
-                variant="ghost" 
-                className="justify-start text-brand-600 hover:bg-brand-50 w-full"
+              <a 
+                href="#faq" 
+                className="text-gray-600 hover:text-brand-500 transition-colors px-2 py-1 focus:outline-none focus:ring-2 focus:ring-brand-300 rounded-sm"
+                onClick={() => setMobileMenuOpen(false)}
               >
-                Log in
-              </Button>
+                FAQ
+              </a>
+              {isLoggedIn ? (
+                <>
+                  <Button 
+                    className="justify-start text-white bg-brand-500 hover:bg-brand-600 w-full"
+                  >
+                    Go to Dashboard
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    className="justify-start text-brand-600 hover:bg-brand-50 w-full"
+                    onClick={handleLogout}
+                  >
+                    Log out
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button 
+                    variant="ghost" 
+                    className="justify-start text-brand-600 hover:bg-brand-50 w-full"
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      openLoginModal();
+                    }}
+                  >
+                    <LogIn className="h-4 w-4 mr-2" />
+                    Log in
+                  </Button>
+                </>
+              )}
             </nav>
           </div>
         )}
       </div>
+      
+      {/* Login Modal */}
+      <LoginModal isOpen={loginModalOpen} onClose={closeLoginModal} />
     </header>
   );
 };

@@ -1,8 +1,27 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Github, LogIn } from "lucide-react";
+import LoginModal from "@/components/auth/LoginModal";
 
 const HeroSection: React.FC = () => {
+  const [loginModalOpen, setLoginModalOpen] = useState(false);
+  // In a real app, this would come from your auth provider
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  const openLoginModal = () => {
+    setLoginModalOpen(true);
+  };
+
+  const closeLoginModal = () => {
+    setLoginModalOpen(false);
+  };
+
+  // For demo purposes only - toggle login state
+  const toggleLoginState = () => {
+    setIsLoggedIn(!isLoggedIn);
+  };
+
   return (
     <section className="py-16 md:py-24 bg-gradient-to-br from-brand-100 via-brand-50 to-white relative overflow-hidden" aria-labelledby="hero-heading">
       <div className="absolute inset-0 opacity-10" aria-hidden="true">
@@ -22,19 +41,67 @@ const HeroSection: React.FC = () => {
             <p className="text-xl md:text-2xl text-gray-700 mb-8 md:mb-10 max-w-3xl">
               Practice code, build your resume, and get interview-ready — all powered by AI.
             </p>
-            <div>
-              <Button 
-                size="lg" 
-                className="rounded-full bg-brand-500 hover:bg-brand-600 text-white px-8 py-6 text-lg transform transition-all duration-300 hover:scale-105 relative overflow-hidden group focus:outline-none focus:ring-2 focus:ring-brand-400 focus:ring-offset-4"
-              >
-                <span className="relative z-10">Get Started for Free</span>
-                <span className="absolute inset-0 bg-brand-600 opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true"></span>
-                <span className="absolute top-0 left-0 w-full h-full bg-white opacity-20 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left" aria-hidden="true"></span>
-              </Button>
-              <p className="mt-4 text-sm text-gray-500">
-                No credit card required · RTL Ready · Built for juniors
-              </p>
+            <div className="flex flex-col sm:flex-row gap-4 sm:items-center">
+              {isLoggedIn ? (
+                <Button 
+                  size="lg" 
+                  className="rounded-full bg-brand-500 hover:bg-brand-600 text-white px-8 py-6 text-lg transform transition-all duration-300 hover:scale-105 relative overflow-hidden group focus:outline-none focus:ring-2 focus:ring-brand-400 focus:ring-offset-4"
+                  onClick={toggleLoginState}
+                >
+                  <span className="relative z-10">Go to Dashboard</span>
+                  <span className="absolute inset-0 bg-brand-600 opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true"></span>
+                  <span className="absolute top-0 left-0 w-full h-full bg-white opacity-20 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left" aria-hidden="true"></span>
+                </Button>
+              ) : (
+                <>
+                  <Button 
+                    size="lg" 
+                    className="rounded-full bg-brand-500 hover:bg-brand-600 text-white px-8 py-6 text-lg transform transition-all duration-300 hover:scale-105 relative overflow-hidden group focus:outline-none focus:ring-2 focus:ring-brand-400 focus:ring-offset-4"
+                    onClick={toggleLoginState}
+                  >
+                    <span className="relative z-10">Start practicing today</span>
+                    <span className="absolute inset-0 bg-brand-600 opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true"></span>
+                    <span className="absolute top-0 left-0 w-full h-full bg-white opacity-20 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left" aria-hidden="true"></span>
+                  </Button>
+                  
+                  <div className="flex gap-2">
+                    <Button 
+                      variant="outline" 
+                      className="rounded-full border-brand-300 bg-white bg-opacity-70 backdrop-blur-sm hover:bg-brand-50 text-brand-700"
+                      onClick={openLoginModal}
+                    >
+                      <LogIn className="mr-2 h-4 w-4" />
+                      Sign in
+                    </Button>
+                    
+                    <Button 
+                      variant="outline" 
+                      className="rounded-full border-brand-300 bg-white bg-opacity-70 backdrop-blur-sm hover:bg-brand-50 text-brand-700"
+                      onClick={openLoginModal}
+                    >
+                      <Github className="mr-2 h-4 w-4" />
+                      Continue with GitHub
+                    </Button>
+                  </div>
+                </>
+              )}
             </div>
+            
+            <p className="mt-4 text-sm text-gray-500">
+              No credit card required · Start for free · No sign-up required for basic features
+            </p>
+            
+            {!isLoggedIn && (
+              <p className="mt-6 text-sm text-gray-600">
+                Already have an account?{" "}
+                <button 
+                  onClick={openLoginModal}
+                  className="text-brand-500 hover:text-brand-600 underline font-medium focus:outline-none focus:ring-2 focus:ring-brand-300 rounded-sm px-1"
+                >
+                  Sign in here
+                </button>
+              </p>
+            )}
           </div>
           
           <div className="md:w-2/5 mt-10 md:mt-0 animate-fade-up" style={{ animationDelay: "0.3s" }} aria-hidden="true">
@@ -62,6 +129,9 @@ const HeroSection: React.FC = () => {
           </div>
         </div>
       </div>
+      
+      {/* Login Modal */}
+      <LoginModal isOpen={loginModalOpen} onClose={closeLoginModal} />
     </section>
   );
 };
