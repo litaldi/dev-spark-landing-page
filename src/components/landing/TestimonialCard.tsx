@@ -5,7 +5,8 @@ import {
   CarouselContent,
   CarouselItem, 
   CarouselNext,
-  CarouselPrevious
+  CarouselPrevious,
+  type CarouselApi
 } from "@/components/ui/carousel";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -39,6 +40,20 @@ const testimonials = [
 
 const TestimonialCard: React.FC = () => {
   const [activeIndex, setActiveIndex] = useState(0);
+  const [carouselApi, setCarouselApi] = useState<CarouselApi | null>(null);
+
+  React.useEffect(() => {
+    if (!carouselApi) return;
+    
+    const onChange = () => {
+      setActiveIndex(carouselApi.selectedScrollSnap());
+    };
+    
+    carouselApi.on("select", onChange);
+    return () => {
+      carouselApi.off("select", onChange);
+    };
+  }, [carouselApi]);
 
   return (
     <section className="py-16 md:py-24 bg-gradient-to-br from-brand-50/50 to-white" aria-labelledby="testimonials-title">
@@ -48,7 +63,7 @@ const TestimonialCard: React.FC = () => {
             Success <span className="text-brand-500">Stories</span>
           </h2>
           
-          <Carousel className="w-full" onSelect={(api) => setActiveIndex(api?.selectedScrollSnap() || 0)}>
+          <Carousel className="w-full" setApi={setCarouselApi}>
             <CarouselContent>
               {testimonials.map((testimonial, index) => (
                 <CarouselItem key={index} className="md:basis-4/5 lg:basis-3/4">
@@ -116,6 +131,7 @@ const TestimonialCard: React.FC = () => {
                 role="tab"
                 aria-label={`Testimonial ${index + 1}`}
                 tabIndex={0}
+                onClick={() => carouselApi?.scrollTo(index)}
               ></button>
             ))}
           </div>
