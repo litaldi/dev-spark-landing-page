@@ -7,6 +7,9 @@ import ForWhomSection from "@/components/landing/ForWhomSection";
 import TestimonialCard from "@/components/landing/TestimonialCard";
 import JoinNowSection from "@/components/landing/JoinNowSection";
 import Footer from "@/components/landing/Footer";
+import FaqAccordion from "@/components/landing/FaqAccordion";
+import FeatureComparisonTable from "@/components/landing/FeatureComparisonTable";
+import StickyCTABar from "@/components/landing/StickyCTABar";
 
 const Index = () => {
   return (
@@ -25,15 +28,18 @@ const Index = () => {
         <div id="features">
           <FeatureGrid />
         </div>
+        <TestimonialCard />
         <ForWhomSection />
-        <div id="testimonials">
-          <TestimonialCard />
+        <FeatureComparisonTable />
+        <div id="faq">
+          <FaqAccordion />
         </div>
         <div id="pricing">
           <JoinNowSection />
         </div>
       </main>
       <Footer />
+      <StickyCTABar />
     </div>
   );
 };

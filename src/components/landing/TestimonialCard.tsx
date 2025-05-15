@@ -11,34 +11,7 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { QuoteIcon } from "lucide-react";
-
-// Move testimonials to a separate data file for better organization
-const testimonials = [
-  {
-    quote: "I landed my first frontend job in 6 weeks thanks to this app. I finally felt ready.",
-    name: "Dana",
-    position: "Junior Developer",
-    location: "Tel Aviv",
-    initial: "D",
-    image: null
-  },
-  {
-    quote: "The AI feedback on my resume was incredible. Three interviews within a week of updating it.",
-    name: "Michael",
-    position: "Full Stack Developer",
-    location: "Berlin",
-    initial: "M",
-    image: null
-  },
-  {
-    quote: "The interview simulator prepared me for questions I never thought I'd be asked. Lifesaver!",
-    name: "Priya",
-    position: "Frontend Engineer",
-    location: "Toronto",
-    initial: "P",
-    image: null
-  }
-];
+import { testimonials } from "@/data/landingPageData";
 
 const TestimonialCard: React.FC = () => {
   const [activeIndex, setActiveIndex] = useState(0);
