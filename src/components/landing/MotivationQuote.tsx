@@ -1,6 +1,8 @@
 
 import React, { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { RefreshCw } from "lucide-react";
 
 const quotes = [
   "Keep going. Every line of code counts.",
@@ -15,6 +17,7 @@ const quotes = [
 
 const MotivationQuote: React.FC = () => {
   const [currentQuote, setCurrentQuote] = useState("");
+  const [fadeIn, setFadeIn] = useState(true);
 
   useEffect(() => {
     // Get random quote on initial load
@@ -23,20 +26,43 @@ const MotivationQuote: React.FC = () => {
 
     // Optionally rotate quotes periodically
     const interval = setInterval(() => {
-      const newIndex = Math.floor(Math.random() * quotes.length);
-      setCurrentQuote(quotes[newIndex]);
+      setFadeIn(false);
+      setTimeout(() => {
+        const newIndex = Math.floor(Math.random() * quotes.length);
+        setCurrentQuote(quotes[newIndex]);
+        setFadeIn(true);
+      }, 300);
     }, 10000); // Change quote every 10 seconds
 
     return () => clearInterval(interval);
   }, []);
 
+  const handleRefreshQuote = () => {
+    setFadeIn(false);
+    setTimeout(() => {
+      const newIndex = Math.floor(Math.random() * quotes.length);
+      setCurrentQuote(quotes[newIndex]);
+      setFadeIn(true);
+    }, 300);
+  };
+
   return (
-    <Card className="bg-brand-50 border-brand-100 max-w-2xl mx-auto overflow-hidden">
-      <CardContent className="p-6 flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-lg md:text-xl italic font-medium text-brand-700">
+    <Card className="bg-gradient-to-r from-brand-50 to-white border-brand-100 max-w-2xl mx-auto overflow-hidden shadow-sm">
+      <CardContent className="p-6 md:p-8">
+        <div className={`text-center transition-opacity duration-300 ${fadeIn ? 'opacity-100' : 'opacity-0'}`}>
+          <p className="text-lg md:text-xl font-medium text-brand-700 italic mb-4 leading-relaxed">
             "{currentQuote}"
           </p>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="text-brand-500 hover:text-brand-600 hover:bg-brand-50 mt-2"
+            onClick={handleRefreshQuote}
+            aria-label="Get new motivation quote"
+          >
+            <RefreshCw className="h-4 w-4 mr-2" />
+            New quote
+          </Button>
         </div>
       </CardContent>
     </Card>
