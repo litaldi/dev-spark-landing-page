@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { 
   Carousel,
   CarouselContent,
@@ -10,7 +10,9 @@ import {
 } from "@/components/ui/carousel";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { QuoteIcon } from "lucide-react";
 
+// Move testimonials to a separate data file for better organization
 const testimonials = [
   {
     quote: "I landed my first frontend job in 6 weeks thanks to this app. I finally felt ready.",
@@ -42,24 +44,41 @@ const TestimonialCard: React.FC = () => {
   const [activeIndex, setActiveIndex] = useState(0);
   const [carouselApi, setCarouselApi] = useState<CarouselApi | null>(null);
 
-  React.useEffect(() => {
+  // Improved effect hook with proper cleanup and type safety
+  useEffect(() => {
     if (!carouselApi) return;
     
     const onChange = () => {
       setActiveIndex(carouselApi.selectedScrollSnap());
     };
     
+    // Add event listener
     carouselApi.on("select", onChange);
+    
+    // Clean up event listener on unmount or when API changes
     return () => {
       carouselApi.off("select", onChange);
     };
   }, [carouselApi]);
 
+  // Extract navigation functionality to a separate callback for better organization
+  const goToSlide = useCallback((index: number) => {
+    if (carouselApi) {
+      carouselApi.scrollTo(index);
+    }
+  }, [carouselApi]);
+
   return (
-    <section className="py-16 md:py-24 bg-gradient-to-br from-brand-50/50 to-white" aria-labelledby="testimonials-title">
+    <section 
+      className="py-16 md:py-24 bg-gradient-to-br from-brand-50/50 to-white" 
+      aria-labelledby="testimonials-title"
+    >
       <div className="container">
         <div className="max-w-5xl mx-auto">
-          <h2 id="testimonials-title" className="text-3xl md:text-4xl font-bold text-center mb-12 text-brand-800">
+          <h2 
+            id="testimonials-title" 
+            className="text-3xl md:text-4xl font-bold text-center mb-12 text-brand-800"
+          >
             Success <span className="text-brand-500">Stories</span>
           </h2>
           
@@ -70,23 +89,11 @@ const TestimonialCard: React.FC = () => {
                   <Card className="border-brand-200 shadow-md bg-white mx-4">
                     <CardContent className="p-8 md:p-10">
                       <div className="flex flex-col items-center text-center">
-                        <svg 
-                          xmlns="http://www.w3.org/2000/svg" 
-                          width="48" 
-                          height="48" 
-                          viewBox="0 0 24 24" 
-                          fill="none" 
-                          stroke="currentColor" 
-                          strokeWidth="1" 
-                          strokeLinecap="round" 
-                          strokeLinejoin="round" 
-                          className="text-brand-400 mb-6"
+                        <QuoteIcon 
+                          className="text-brand-400 mb-6 h-12 w-12"
                           aria-hidden="true"
-                        >
-                          <path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z" />
-                          <path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z" />
-                        </svg>
-                        <blockquote>
+                        />
+                        <blockquote className="mb-6">
                           <p className="text-xl md:text-2xl font-medium mb-6 text-brand-800">
                             "{testimonial.quote}"
                           </p>
@@ -94,7 +101,7 @@ const TestimonialCard: React.FC = () => {
                         <div className="flex items-center justify-center">
                           <Avatar className="h-12 w-12 mr-3">
                             {testimonial.image ? (
-                              <AvatarImage src={testimonial.image} alt={testimonial.name} />
+                              <AvatarImage src={testimonial.image} alt={`${testimonial.name}'s profile photo`} />
                             ) : (
                               <AvatarFallback className="bg-brand-100 text-brand-600">
                                 {testimonial.initial}
@@ -114,13 +121,26 @@ const TestimonialCard: React.FC = () => {
                 </CarouselItem>
               ))}
             </CarouselContent>
+            
+            {/* Improve nav button accessibility */}
             <div className="hidden md:flex">
-              <CarouselPrevious className="relative left-0" aria-label="Previous testimonial" />
-              <CarouselNext className="relative right-0" aria-label="Next testimonial" />
+              <CarouselPrevious 
+                className="relative left-0" 
+                aria-label="Previous testimonial" 
+              />
+              <CarouselNext 
+                className="relative right-0" 
+                aria-label="Next testimonial" 
+              />
             </div>
           </Carousel>
           
-          <div className="flex justify-center gap-2 mt-6" role="tablist" aria-label="Testimonials navigation">
+          {/* Enhance the dots navigation with proper accessibility */}
+          <div 
+            className="flex justify-center gap-2 mt-6" 
+            role="tablist" 
+            aria-label="Testimonials navigation"
+          >
             {testimonials.map((_, index) => (
               <button 
                 key={index}
@@ -130,8 +150,15 @@ const TestimonialCard: React.FC = () => {
                 aria-selected={index === activeIndex ? "true" : "false"}
                 role="tab"
                 aria-label={`Testimonial ${index + 1}`}
+                aria-controls={`testimonial-${index}`}
                 tabIndex={0}
-                onClick={() => carouselApi?.scrollTo(index)}
+                onClick={() => goToSlide(index)}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    goToSlide(index);
+                  }
+                }}
               ></button>
             ))}
           </div>
