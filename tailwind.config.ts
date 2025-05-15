@@ -63,18 +63,18 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				// Add custom colors for our landing page with adjusted deep purple
+				// Add custom colors for our landing page
 				brand: {
 					50: '#f5f3ff',
 					100: '#ede9fe',
 					200: '#ddd6fe',
 					300: '#c4b5fd',
 					400: '#a78bfa',
-					500: '#7e52a0', // Primary purple (adjusted to match MUI)
-					600: '#6E59A5', // Secondary purple
-					700: '#5B2C6F', // Deep purple (matches our MUI theme)
-					800: '#3e1f4c', // Darker purple
-					900: '#1a1f2c', // Dark background
+					500: '#9b87f5', // Primary purple
+					600: '#7e69ab', // Secondary purple
+					700: '#6e59a5', // Tertiary purple
+					800: '#1a1f2c', // Dark purple
+					900: '#0c0a15',
 				}
 			},
 			fontFamily: {
@@ -85,20 +85,6 @@ export default {
 				lg: 'var(--radius)',
 				md: 'calc(var(--radius) - 2px)',
 				sm: 'calc(var(--radius) - 4px)'
-			},
-			boxShadow: {
-				'mui-1': '0 2px 4px -1px rgba(0,0,0,0.1), 0 1px 10px 0 rgba(0,0,0,0.06)',
-				'mui-2': '0 4px 12px rgba(0,0,0,0.05)',
-				'mui-3': '0px 3px 5px -1px rgba(0,0,0,0.1), 0px 5px 8px 0px rgba(0,0,0,0.06)',
-				'mui-4': '0px 4px 10px rgba(0,0,0,0.08)',
-			},
-			spacing: {
-				'mui-1': '0.5rem',
-				'mui-2': '1rem',
-				'mui-3': '1.5rem', 
-				'mui-4': '2rem',
-				'mui-5': '2.5rem',
-				'mui-6': '3rem',
 			},
 			keyframes: {
 				'accordion-down': {
