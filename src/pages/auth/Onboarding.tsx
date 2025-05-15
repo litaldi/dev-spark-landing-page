@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { z } from "zod";
@@ -108,14 +109,14 @@ const OnboardingPage = () => {
 
   // Step 1: Stack Selection
   const StackSelectionStep = () => (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <FormField
         control={form.control}
         name="stack"
         render={() => (
           <FormItem>
             <div className="mb-4">
-              <FormLabel className="text-base">Select your tech stack</FormLabel>
+              <FormLabel className="text-base font-medium">Select your tech stack</FormLabel>
               <FormDescription>
                 Choose the technologies you're interested in learning or improving
               </FormDescription>
@@ -161,7 +162,12 @@ const OnboardingPage = () => {
       />
       
       <div className="flex justify-end">
-        <Button type="button" onClick={nextStep}>
+        <Button 
+          type="button" 
+          onClick={nextStep}
+          className="transition-all duration-300 hover:translate-x-1"
+          aria-label="Go to next step"
+        >
           Next
         </Button>
       </div>
@@ -176,7 +182,7 @@ const OnboardingPage = () => {
         name="weeklyGoal"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Weekly Learning Goal (hours)</FormLabel>
+            <FormLabel className="text-base font-medium">Weekly Learning Goal (hours)</FormLabel>
             <FormControl>
               <div className="space-y-4">
                 <Slider
@@ -185,6 +191,7 @@ const OnboardingPage = () => {
                   max={40}
                   min={1}
                   step={1}
+                  aria-label="Set weekly learning goal in hours"
                 />
                 <div className="flex justify-between">
                   <span className="text-muted-foreground text-sm">1 hour</span>
@@ -207,6 +214,7 @@ const OnboardingPage = () => {
               <Checkbox
                 checked={field.value}
                 onCheckedChange={field.onChange}
+                aria-label="Receive updates about new courses and features"
               />
             </FormControl>
             <div className="space-y-1 leading-none">
@@ -219,10 +227,21 @@ const OnboardingPage = () => {
       />
       
       <div className="flex justify-between">
-        <Button type="button" variant="outline" onClick={prevStep}>
+        <Button 
+          type="button" 
+          variant="outline" 
+          onClick={prevStep}
+          className="transition-all duration-300 hover:-translate-x-1"
+          aria-label="Go back to previous step"
+        >
           Back
         </Button>
-        <Button type="submit" disabled={isLoading}>
+        <Button 
+          type="submit" 
+          disabled={isLoading}
+          className="transition-all duration-300"
+          aria-label="Complete onboarding setup"
+        >
           {isLoading ? "Saving..." : "Complete Setup"}
         </Button>
       </div>
@@ -243,22 +262,22 @@ const OnboardingPage = () => {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-background p-4">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-background p-4 md:p-6 lg:p-8">
       <div className="absolute top-4 right-4">
         <ThemeToggle />
       </div>
       
       <div className="w-full max-w-md">
-        <Card className="w-full">
-          <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl font-bold">Complete your profile</CardTitle>
-            <CardDescription>
+        <Card className="w-full shadow-md border-opacity-40">
+          <CardHeader className="space-y-2">
+            <CardTitle className="text-2xl font-bold tracking-tight">Complete your profile</CardTitle>
+            <CardDescription className="text-base">
               Let's personalize your learning experience
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-6">
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                 <Stepper
                   activeStep={activeStep}
                   steps={steps}

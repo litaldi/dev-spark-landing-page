@@ -16,10 +16,11 @@ import CommunityStats from "@/components/landing/CommunityStats";
 import MotivationQuote from "@/components/landing/MotivationQuote";
 import AppPreview from "@/components/landing/AppPreview";
 import NewsletterSignup from "@/components/landing/NewsletterSignup";
+import { SearchBar } from "@/components/search/SearchBar";
 
 const Index = () => {
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-background">
       {/* Skip to content link for keyboard users */}
       <a 
         href="#main-content" 
@@ -32,6 +33,12 @@ const Index = () => {
       <main id="main-content">
         {/* Primary sections */}
         <HeroSection />
+        
+        {/* Search bar in hero section */}
+        <div className="container mx-auto -mt-8 mb-12 px-4 relative z-10">
+          <SearchBar variant="hero" />
+        </div>
+        
         <WhyItWorks />
         <HowItWorksSection />
         
@@ -42,7 +49,7 @@ const Index = () => {
         <CommunityStats />
         
         {/* Motivation quote */}
-        <div className="py-10 bg-white">
+        <div className="py-16 bg-white dark:bg-gray-900">
           <div className="container">
             <MotivationQuote />
           </div>

@@ -1,104 +1,85 @@
 
 import * as React from "react";
 import { cn } from "@/lib/utils";
-import { Check } from "lucide-react";
 
-export interface StepProps extends React.HTMLAttributes<HTMLDivElement> {
-  active?: boolean;
-  completed?: boolean;
-  index?: number;
+interface StepProps {
+  label: string;
+  description?: string;
+  content: React.ReactNode;
 }
 
-export const Step = React.forwardRef<HTMLDivElement, StepProps>(
-  ({ className, active, completed, index, ...props }, ref) => {
-    return (
-      <div
-        ref={ref}
-        className={cn(
-          "flex flex-col items-center",
-          {
-            "text-muted-foreground": !active && !completed,
-            "text-primary": active || completed,
-          },
-          className
-        )}
-        {...props}
-      >
-        <div
-          className={cn(
-            "flex h-8 w-8 items-center justify-center rounded-full border",
-            {
-              "border-muted bg-background": !active && !completed,
-              "border-primary bg-primary text-primary-foreground": active,
-              "border-primary bg-primary/90 text-primary-foreground": completed,
-            }
-          )}
-        >
-          {completed ? <Check className="h-4 w-4" /> : index}
-        </div>
-      </div>
-    );
-  }
-);
-Step.displayName = "Step";
-
-export interface StepperProps extends React.HTMLAttributes<HTMLDivElement> {
+interface StepperProps extends React.HTMLAttributes<HTMLDivElement> {
+  steps: StepProps[];
   activeStep: number;
-  steps: Array<{
-    label: string;
-    description?: string;
-    content?: React.ReactNode;
-  }>;
-  showLabels?: boolean;
 }
 
 export const Stepper = React.forwardRef<HTMLDivElement, StepperProps>(
-  ({ className, activeStep, steps, showLabels = true, ...props }, ref) => {
+  ({ steps, activeStep, className, ...props }, ref) => {
     return (
-      <div
-        ref={ref}
-        className={cn("", className)}
-        {...props}
-      >
-        <div className="mb-8 flex items-center justify-center">
-          {steps.map((step, index) => (
-            <React.Fragment key={index}>
-              <div className="flex flex-col items-center">
-                <Step
-                  index={index + 1}
-                  active={activeStep === index}
-                  completed={activeStep > index}
-                />
-                {showLabels && (
-                  <span
-                    className={cn("mt-2 text-sm", {
-                      "text-muted-foreground": activeStep !== index,
-                      "font-medium": activeStep === index,
-                    })}
+      <div ref={ref} className={cn("space-y-8", className)} {...props}>
+        <div className="overflow-hidden">
+          <div className="flex mb-4">
+            {steps.map((step, index) => (
+              <div key={index} className="flex-1">
+                <div className="flex items-center">
+                  <div
+                    className={cn(
+                      "w-8 h-8 rounded-full border flex items-center justify-center font-medium text-sm",
+                      index === activeStep
+                        ? "bg-primary text-primary-foreground border-primary"
+                        : index < activeStep
+                        ? "bg-primary/10 text-primary border-primary"
+                        : "bg-muted text-muted-foreground border-muted"
+                    )}
+                  >
+                    {index + 1}
+                  </div>
+                  <div
+                    className={cn(
+                      "flex-1 h-0.5 mx-2",
+                      index === steps.length - 1 && "hidden",
+                      index < activeStep
+                        ? "bg-primary"
+                        : "bg-muted"
+                    )}
+                  ></div>
+                </div>
+                <div className="mt-2 text-center">
+                  <div
+                    className={cn(
+                      "text-sm font-medium",
+                      index === activeStep
+                        ? "text-primary"
+                        : index < activeStep
+                        ? "text-muted-foreground"
+                        : "text-muted-foreground"
+                    )}
                   >
                     {step.label}
-                  </span>
-                )}
-                {step.description && (
-                  <span className="mt-1 hidden text-xs text-muted-foreground sm:block">
-                    {step.description}
-                  </span>
-                )}
+                  </div>
+                  {step.description && (
+                    <div
+                      className={cn(
+                        "text-xs mt-1",
+                        index === activeStep
+                          ? "text-foreground"
+                          : "text-muted-foreground"
+                      )}
+                    >
+                      {step.description}
+                    </div>
+                  )}
+                </div>
               </div>
-              {index < steps.length - 1 && (
-                <div
-                  className={cn("mx-2 h-px w-full flex-1", {
-                    "bg-muted": activeStep <= index,
-                    "bg-primary": activeStep > index,
-                  })}
-                />
-              )}
-            </React.Fragment>
-          ))}
+            ))}
+          </div>
         </div>
-        <div className="mt-4">{steps[activeStep]?.content}</div>
+        <div className="py-4">
+          {steps[activeStep]?.content || null}
+        </div>
       </div>
     );
   }
 );
+
 Stepper.displayName = "Stepper";
