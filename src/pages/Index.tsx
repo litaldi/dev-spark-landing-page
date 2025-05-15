@@ -11,6 +11,11 @@ import FaqAccordion from "@/components/landing/FaqAccordion";
 import FeatureComparisonTable from "@/components/landing/FeatureComparisonTable";
 import StickyCTABar from "@/components/landing/StickyCTABar";
 import HowItWorksSection from "@/components/landing/HowItWorksSection";
+import WhyItWorks from "@/components/landing/WhyItWorks";
+import CommunityStats from "@/components/landing/CommunityStats";
+import MotivationQuote from "@/components/landing/MotivationQuote";
+import AppPreview from "@/components/landing/AppPreview";
+import NewsletterSignup from "@/components/landing/NewsletterSignup";
 
 const Index = () => {
   return (
@@ -26,7 +31,15 @@ const Index = () => {
       <Navbar />
       <main id="main-content">
         <HeroSection />
+        <WhyItWorks />
         <HowItWorksSection />
+        <div className="py-10 bg-white">
+          <div className="container">
+            <MotivationQuote />
+          </div>
+        </div>
+        <AppPreview />
+        <CommunityStats />
         <div id="features">
           <FeatureGrid />
         </div>
@@ -36,6 +49,7 @@ const Index = () => {
         <div id="faq">
           <FaqAccordion />
         </div>
+        <NewsletterSignup />
         <div id="pricing">
           <JoinNowSection />
         </div>
