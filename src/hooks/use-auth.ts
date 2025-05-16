@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { useFormState } from "@/hooks/use-form-state";
 
 interface UseAuthOptions {
   redirectTo?: string;
@@ -12,6 +13,14 @@ export interface AuthUser {
   email: string;
   name: string;
   isDemoUser: boolean;
+}
+
+export type RegisterFormData = {
+  name: string;
+  email: string;
+  password: string;
+  persona: string;
+  acceptTerms: boolean;
 }
 
 export function useAuth(options: UseAuthOptions = {}) {
@@ -89,13 +98,7 @@ export function useAuth(options: UseAuthOptions = {}) {
   };
 
   // Register handler
-  const register = async (userData: {
-    name: string;
-    email: string;
-    password: string;
-    persona: string;
-    acceptTerms: boolean;
-  }) => {
+  const register = async (userData: RegisterFormData) => {
     setIsLoading(true);
     clearError();
     

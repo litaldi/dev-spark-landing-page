@@ -11,8 +11,9 @@ import { EnhancedStepper } from "@/components/ui/enhanced-stepper";
 import { AccountDetailsStep } from "@/components/auth/AccountDetailsStep";
 import { PersonaSelectionStep } from "@/components/auth/PersonaSelectionStep";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth, RegisterFormData } from "@/hooks/use-auth";
 import { motion, AnimatePresence } from "framer-motion";
+import { useFormState } from "@/hooks/use-form-state";
 
 // Form validation schema with stronger requirements
 const registerSchema = z.object({
@@ -92,7 +93,16 @@ export function RegisterForm({ onGoogleSignUp }: RegisterFormProps) {
     setSubmitCount(prev => prev + 1);
     setLastSubmitTime(now);
     
-    await registerUser(data);
+    // Make sure data is cast correctly to RegisterFormData
+    const formData: RegisterFormData = {
+      name: data.name,
+      email: data.email,
+      password: data.password,
+      persona: data.persona,
+      acceptTerms: data.acceptTerms
+    };
+    
+    await registerUser(formData);
   };
 
   // Define steps with their content
