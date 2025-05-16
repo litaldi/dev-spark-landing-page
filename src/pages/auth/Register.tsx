@@ -1,31 +1,28 @@
+
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { z } from "zod";
-import { useForm } from "react-hook-form";
+import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Checkbox } from "@/components/ui/checkbox";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Form } from "@/components/ui/form";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
-import { Stepper } from "@/components/ui/stepper";
+import { EnhancedStepper } from "@/components/ui/enhanced-stepper";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
+import { AccountDetailsStep } from "@/components/auth/AccountDetailsStep";
+import { PersonaSelectionStep } from "@/components/auth/PersonaSelectionStep";
 
-// Form validation schema
+// Form validation schema with stronger requirements
 const registerSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters" }),
   email: z.string().email({ message: "Please enter a valid email address" }),
-  password: z.string().min(8, { message: "Password must be at least 8 characters" }),
+  password: z.string()
+    .min(8, { message: "Password must be at least 8 characters" })
+    .refine(val => /[A-Z]/.test(val), { message: "Password must include at least one uppercase letter" })
+    .refine(val => /[0-9]/.test(val), { message: "Password must include at least one number" })
+    .refine(val => /[^A-Za-z0-9]/.test(val), { message: "Password must include at least one special character" }),
   persona: z.enum(["junior", "mentor", "instructor"], { 
     required_error: "Please select a role" 
   }),
@@ -36,7 +33,7 @@ const registerSchema = z.object({
 
 type RegisterFormValues = z.infer<typeof registerSchema>;
 
-const RegisterPage = () => {
+const RegisterPage: React.FC = () => {
   const [activeStep, setActiveStep] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
@@ -51,6 +48,7 @@ const RegisterPage = () => {
       persona: "junior",
       acceptTerms: false as unknown as true,
     },
+    mode: "onChange",
   });
 
   const nextStep = () => {
@@ -60,7 +58,7 @@ const RegisterPage = () => {
     
     form.trigger(fieldsToValidate as any).then((isValid) => {
       if (isValid) {
-        setActiveStep((prev) => (prev < 2 ? prev + 1 : prev));
+        setActiveStep((prev) => (prev < 1 ? prev + 1 : prev));
       }
     });
   };
@@ -110,169 +108,25 @@ const RegisterPage = () => {
     setIsLoading(false);
   };
 
-  // Step 1: Account Details
-  const AccountDetailsStep = () => (
-    <div className="space-y-4">
-      <FormField
-        control={form.control}
-        name="name"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Full Name</FormLabel>
-            <FormControl>
-              <Input placeholder="John Doe" {...field} className="bg-background" />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-      
-      <FormField
-        control={form.control}
-        name="email"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Email</FormLabel>
-            <FormControl>
-              <Input 
-                type="email" 
-                placeholder="your@email.com" 
-                {...field} 
-                className="bg-background"
-              />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-      
-      <FormField
-        control={form.control}
-        name="password"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Password</FormLabel>
-            <FormControl>
-              <Input 
-                type="password" 
-                placeholder="••••••••" 
-                {...field} 
-                className="bg-background"
-              />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-      
-      <div className="flex justify-end">
-        <Button type="button" onClick={nextStep}>
-          Next
-        </Button>
-      </div>
-    </div>
-  );
-
-  // Step 2: Persona Selection
-  const PersonaSelectionStep = () => (
-    <div className="space-y-4">
-      <FormField
-        control={form.control}
-        name="persona"
-        render={({ field }) => (
-          <FormItem className="space-y-3">
-            <FormLabel>I am a:</FormLabel>
-            <FormControl>
-              <RadioGroup
-                onValueChange={field.onChange}
-                defaultValue={field.value}
-                className="space-y-3"
-              >
-                <FormItem className="flex items-center space-x-3 space-y-0">
-                  <FormControl>
-                    <RadioGroupItem value="junior" />
-                  </FormControl>
-                  <FormLabel className="font-normal cursor-pointer">
-                    Junior Developer
-                  </FormLabel>
-                </FormItem>
-                <FormItem className="flex items-center space-x-3 space-y-0">
-                  <FormControl>
-                    <RadioGroupItem value="mentor" />
-                  </FormControl>
-                  <FormLabel className="font-normal cursor-pointer">
-                    Mentor
-                  </FormLabel>
-                </FormItem>
-                <FormItem className="flex items-center space-x-3 space-y-0">
-                  <FormControl>
-                    <RadioGroupItem value="instructor" />
-                  </FormControl>
-                  <FormLabel className="font-normal cursor-pointer">
-                    Instructor
-                  </FormLabel>
-                </FormItem>
-              </RadioGroup>
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-      
-      <FormField
-        control={form.control}
-        name="acceptTerms"
-        render={({ field }) => (
-          <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md p-4 border">
-            <FormControl>
-              <Checkbox
-                checked={field.value}
-                onCheckedChange={field.onChange}
-              />
-            </FormControl>
-            <div className="space-y-1 leading-none">
-              <FormLabel className="text-sm font-normal">
-                I agree to the{" "}
-                <Link to="/terms" className="text-primary hover:underline">
-                  Terms of Service
-                </Link>{" "}
-                and{" "}
-                <Link to="/privacy" className="text-primary hover:underline">
-                  Privacy Policy
-                </Link>
-              </FormLabel>
-              <FormMessage />
-            </div>
-          </FormItem>
-        )}
-      />
-      
-      <div className="flex justify-between">
-        <Button type="button" variant="outline" onClick={prevStep}>
-          Back
-        </Button>
-        <Button type="submit" disabled={isLoading}>
-          {isLoading ? "Creating Account..." : "Create Account"}
-        </Button>
-      </div>
-    </div>
-  );
-
+  // Define steps with their content
   const steps = [
     {
       label: "Account",
       description: "Your details",
-      content: <AccountDetailsStep />,
+      content: <AccountDetailsStep onNext={nextStep} />,
     },
     {
       label: "Persona",
       description: "Your role",
-      content: <PersonaSelectionStep />,
+      content: <PersonaSelectionStep onPrevious={prevStep} isLoading={isLoading} />,
     },
   ];
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-background p-4">
+    <div 
+      className="min-h-screen flex flex-col items-center justify-center bg-background p-4"
+      aria-labelledby="register-page-title"
+    >
       <div className="absolute top-4 right-4">
         <ThemeToggle />
       </div>
@@ -281,7 +135,7 @@ const RegisterPage = () => {
         <Card className="w-full">
           <CardHeader className="space-y-1">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-2xl font-bold">Create an account</CardTitle>
+              <CardTitle className="text-2xl font-bold" id="register-page-title">Create an account</CardTitle>
               <Button 
                 variant="ghost" 
                 size="sm" 
@@ -297,14 +151,16 @@ const RegisterPage = () => {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                <Stepper
-                  activeStep={activeStep}
-                  steps={steps}
-                />
-              </form>
-            </Form>
+            <FormProvider {...form}>
+              <Form>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                  <EnhancedStepper
+                    activeStep={activeStep}
+                    steps={steps}
+                  />
+                </form>
+              </Form>
+            </FormProvider>
             
             {activeStep === 0 && (
               <>
@@ -322,7 +178,7 @@ const RegisterPage = () => {
                     disabled={isLoading}
                     className="w-full"
                   >
-                    <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                       <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
                       <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
                       <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>

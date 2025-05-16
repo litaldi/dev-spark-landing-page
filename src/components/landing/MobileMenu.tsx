@@ -32,6 +32,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
       id="mobile-menu" 
       role="navigation" 
       aria-label="Mobile navigation"
+      tabIndex={0}
     >
       <div className="mb-4 px-2">
         <SearchBar />
