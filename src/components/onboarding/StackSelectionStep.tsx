@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { useFormContext } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { FormField, FormItem, FormLabel, FormControl, FormDescription, FormMessage } from "@/components/ui/form";
@@ -25,7 +25,29 @@ interface StackSelectionStepProps {
 }
 
 export const StackSelectionStep: React.FC<StackSelectionStepProps> = ({ onNext }) => {
-  const { control } = useFormContext();
+  const { control, watch } = useFormContext();
+  const selectedStacks = watch("stack") || [];
+  const firstCheckboxRef = useRef<HTMLButtonElement>(null);
+  
+  useEffect(() => {
+    // Focus on the first checkbox when component mounts
+    if (firstCheckboxRef.current) {
+      setTimeout(() => {
+        firstCheckboxRef.current?.focus();
+      }, 100);
+    }
+    
+    // Announce to screen readers that we're on the tech stack selection step
+    const announcement = document.createElement('div');
+    announcement.setAttribute('aria-live', 'polite');
+    announcement.classList.add('sr-only');
+    announcement.textContent = 'Technology stack selection step. Choose the technologies you want to learn.';
+    document.body.appendChild(announcement);
+    
+    return () => {
+      document.body.removeChild(announcement);
+    };
+  }, []);
 
   return (
     <div className="space-y-6">
@@ -35,13 +57,18 @@ export const StackSelectionStep: React.FC<StackSelectionStepProps> = ({ onNext }
         render={() => (
           <FormItem>
             <div className="mb-4">
-              <FormLabel className="text-base font-medium">Select your tech stack</FormLabel>
-              <FormDescription>
+              <FormLabel className="text-base font-medium" id="tech-stack-label">Select your tech stack</FormLabel>
+              <FormDescription id="tech-stack-description">
                 Choose the technologies you're interested in learning or improving
               </FormDescription>
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              {technologyStacks.map((item) => (
+            <div 
+              className="grid grid-cols-2 md:grid-cols-3 gap-4"
+              role="group" 
+              aria-labelledby="tech-stack-label" 
+              aria-describedby="tech-stack-description"
+            >
+              {technologyStacks.map((item, index) => (
                 <FormField
                   key={item.id}
                   control={control}
@@ -54,6 +81,7 @@ export const StackSelectionStep: React.FC<StackSelectionStepProps> = ({ onNext }
                       >
                         <FormControl>
                           <Checkbox
+                            ref={index === 0 ? firstCheckboxRef : undefined}
                             checked={field.value?.includes(item.id)}
                             onCheckedChange={(checked) => {
                               return checked
@@ -64,9 +92,15 @@ export const StackSelectionStep: React.FC<StackSelectionStepProps> = ({ onNext }
                                     )
                                   );
                             }}
+                            id={`stack-${item.id}`}
+                            aria-labelledby={`label-${item.id}`}
                           />
                         </FormControl>
-                        <FormLabel className="font-normal cursor-pointer">
+                        <FormLabel 
+                          className="font-normal cursor-pointer" 
+                          htmlFor={`stack-${item.id}`}
+                          id={`label-${item.id}`}
+                        >
                           {item.label}
                         </FormLabel>
                       </FormItem>
@@ -74,6 +108,13 @@ export const StackSelectionStep: React.FC<StackSelectionStepProps> = ({ onNext }
                   }}
                 />
               ))}
+            </div>
+            <div className="mt-2" aria-live="polite">
+              <span className="sr-only">
+                {selectedStacks.length > 0 
+                  ? `Selected technologies: ${selectedStacks.length}.` 
+                  : "No technologies selected yet."}
+              </span>
             </div>
             <FormMessage />
           </FormItem>

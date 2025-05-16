@@ -1,23 +1,21 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form } from "@/components/ui/form";
-import { useToast } from "@/hooks/use-toast";
-import { Stepper } from "@/components/ui/stepper";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { StackSelectionStep } from "@/components/onboarding/StackSelectionStep";
 import { WeeklyGoalsStep } from "@/components/onboarding/WeeklyGoalsStep";
 import { onboardingSchema, OnboardingFormValues } from "@/schemas/onboarding-schema";
+import { useFormState } from "@/hooks/use-form-state";
 
 const OnboardingPage = () => {
   const [activeStep, setActiveStep] = useState(0);
-  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { toast } = useToast();
-
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  
   const form = useForm<OnboardingFormValues>({
     resolver: zodResolver(onboardingSchema),
     defaultValues: {
@@ -25,6 +23,26 @@ const OnboardingPage = () => {
       weeklyGoal: 10,
       receiveUpdates: false,
     },
+  });
+  
+  // Setup form submission with enhanced form state hook
+  const { handleSubmit, isSubmitting, announceToScreenReader } = useFormState({
+    onSubmit: async (data: OnboardingFormValues) => {
+      // This would be replaced with actual onboarding logic
+      console.log("Onboarding form submitted:", data);
+      
+      // Simulate API call
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+      
+      // Navigate to dashboard
+      navigate("/dashboard");
+      return true;
+    },
+    successMessage: "Your preferences have been saved.",
+    errorMessage: "Something went wrong. Please try again.",
+    focusOptions: {
+      announceResult: true
+    }
   });
 
   const nextStep = () => {
@@ -42,36 +60,18 @@ const OnboardingPage = () => {
   const prevStep = () => {
     setActiveStep((prev) => (prev > 0 ? prev - 1 : prev));
   };
-
-  // Submit handler
-  const onSubmit = async (data: OnboardingFormValues) => {
-    setIsLoading(true);
-    
-    try {
-      // This would be replaced with actual onboarding logic
-      console.log("Onboarding form submitted:", data);
-      
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      
-      toast({
-        title: "Onboarding complete",
-        description: "Your preferences have been saved.",
-      });
-      
-      // Navigate to dashboard
-      navigate("/dashboard");
-    } catch (error) {
-      console.error("Onboarding error:", error);
-      toast({
-        title: "Error",
-        description: "Something went wrong. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
+  
+  // Announce step changes for screen readers
+  useEffect(() => {
+    // Focus on the heading when step changes
+    if (headingRef.current) {
+      headingRef.current.focus();
     }
-  };
+    
+    // Announce step change
+    const stepNames = ["technology selection", "weekly goals"];
+    announceToScreenReader(`Moving to step ${activeStep + 1}: ${stepNames[activeStep]}`);
+  }, [activeStep, announceToScreenReader]);
 
   const steps = [
     {
@@ -82,7 +82,7 @@ const OnboardingPage = () => {
     {
       label: "Goals",
       description: "Your commitment",
-      content: <WeeklyGoalsStep onPrevious={prevStep} isLoading={isLoading} />,
+      content: <WeeklyGoalsStep onPrevious={prevStep} isLoading={isSubmitting} />,
     },
   ];
 
@@ -92,21 +92,37 @@ const OnboardingPage = () => {
         <ThemeToggle />
       </div>
       
-      <div className="w-full max-w-md">
+      <div 
+        className="w-full max-w-md" 
+        role="main" 
+        aria-label="Onboarding process"
+      >
         <Card className="w-full shadow-md border-opacity-40">
           <CardHeader className="space-y-2">
-            <CardTitle className="text-2xl font-bold tracking-tight">Complete your profile</CardTitle>
+            <CardTitle 
+              className="text-2xl font-bold tracking-tight" 
+              ref={headingRef}
+              tabIndex={-1}
+            >
+              Complete your profile
+            </CardTitle>
             <CardDescription className="text-base">
               Let's personalize your learning experience
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                <Stepper
-                  activeStep={activeStep}
-                  steps={steps}
-                />
+              <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+                <div 
+                  role="region" 
+                  aria-label={`Step ${activeStep + 1} of ${steps.length}`}
+                >
+                  {steps[activeStep].content}
+                </div>
+                
+                <div className="sr-only" aria-live="polite">
+                  {isSubmitting ? "Submitting your preferences. Please wait." : ""}
+                </div>
               </form>
             </Form>
           </CardContent>
