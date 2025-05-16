@@ -1,5 +1,6 @@
 
-import '@testing-library/jest-dom/extend-expect';
+// Include the jest-dom matchers
+import '@testing-library/jest-dom';
 
 declare global {
   namespace NodeJS {
