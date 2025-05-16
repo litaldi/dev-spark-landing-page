@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { z } from "zod";
-import { useForm, FormProvider } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -150,16 +150,14 @@ const RegisterPage: React.FC = () => {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <FormProvider {...form}>
-              <Form>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                  <EnhancedStepper
-                    activeStep={activeStep}
-                    steps={steps}
-                  />
-                </form>
-              </Form>
-            </FormProvider>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <EnhancedStepper
+                  activeStep={activeStep}
+                  steps={steps}
+                />
+              </form>
+            </Form>
             
             {activeStep === 0 && (
               <>
