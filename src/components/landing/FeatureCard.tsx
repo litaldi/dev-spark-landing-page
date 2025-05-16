@@ -25,15 +25,15 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ title, icon: Icon, descriptio
     >
       <CardContent className="flex flex-col items-center p-6 text-center h-full">
         <div 
-          className="rounded-full bg-brand-100 dark:bg-brand-900/30 p-3 mb-4 group-hover:bg-brand-200 dark:group-hover:bg-brand-800/50 transition-colors duration-300 transform group-hover:scale-110 group-focus-within:bg-brand-200 group-focus-within:scale-110"
+          className="rounded-full bg-brand-100/80 dark:bg-brand-900/30 p-3.5 mb-5 group-hover:bg-brand-200 dark:group-hover:bg-brand-800/50 transition-colors duration-300 transform group-hover:scale-105 group-focus-within:bg-brand-200 group-focus-within:scale-105"
           aria-hidden="true"
         >
-          <Icon className="h-8 w-8 text-brand-600 dark:text-brand-400 group-hover:text-brand-700 dark:group-hover:text-brand-300 transition-colors" />
+          <Icon className="h-7 w-7 text-brand-600 dark:text-brand-400 group-hover:text-brand-700 dark:group-hover:text-brand-300 transition-colors" />
         </div>
         
         <h3 
           id={`${cardId}-title`}
-          className="text-xl font-medium mb-3 text-brand-800 dark:text-brand-200"
+          className="text-xl font-semibold mb-3 text-brand-800 dark:text-brand-200"
         >
           {title}
         </h3>
@@ -41,14 +41,14 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ title, icon: Icon, descriptio
         {description && (
           <p 
             id={`${cardId}-desc`}
-            className="text-gray-600 dark:text-gray-300 mt-2 leading-relaxed"
+            className="text-gray-600 dark:text-gray-300 mt-2.5 leading-relaxed"
           >
             {description}
           </p>
         )}
         
         <div 
-          className="mt-auto w-0 group-hover:w-1/2 group-focus-within:w-1/2 h-0.5 bg-brand-300 dark:bg-brand-700 mt-4 transition-all duration-300 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100" 
+          className="mt-auto w-0 group-hover:w-1/3 group-focus-within:w-1/3 h-0.5 bg-brand-300 dark:bg-brand-700 mt-4 transition-all duration-300 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100" 
           aria-hidden="true"
         ></div>
       </CardContent>

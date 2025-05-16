@@ -26,8 +26,8 @@ export function LoginFormInputs({ form, focusField, setFocusField }: LoginFormIn
         control={form.control}
         name="email"
         render={({ field }) => (
-          <FormItem>
-            <FormLabel>Email</FormLabel>
+          <FormItem className="space-y-1.5">
+            <FormLabel className="text-sm font-medium text-foreground">Email</FormLabel>
             <FormControl>
               <Input 
                 type="email" 
@@ -39,7 +39,7 @@ export function LoginFormInputs({ form, focusField, setFocusField }: LoginFormIn
                 autoComplete="email"
               />
             </FormControl>
-            <FormMessage />
+            <FormMessage className="text-xs font-medium" />
           </FormItem>
         )}
       />
@@ -48,12 +48,12 @@ export function LoginFormInputs({ form, focusField, setFocusField }: LoginFormIn
         control={form.control}
         name="password"
         render={({ field }) => (
-          <FormItem>
+          <FormItem className="space-y-1.5">
             <div className="flex items-center justify-between">
-              <FormLabel>Password</FormLabel>
+              <FormLabel className="text-sm font-medium text-foreground">Password</FormLabel>
               <Button
                 variant="link"
-                className="px-0 font-normal text-xs"
+                className="h-auto p-0 font-normal text-xs"
                 type="button"
                 asChild
               >
@@ -71,7 +71,7 @@ export function LoginFormInputs({ form, focusField, setFocusField }: LoginFormIn
                 autoComplete="current-password"
               />
             </FormControl>
-            <FormMessage />
+            <FormMessage className="text-xs font-medium" />
           </FormItem>
         )}
       />
