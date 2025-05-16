@@ -19,8 +19,10 @@ declare global {
   const afterEach: jest.Lifecycle;
   const beforeAll: jest.Lifecycle;
   const afterAll: jest.Lifecycle;
-  const jest: typeof import('jest');
 }
+
+// This is important - explicitly declare the jest namespace to avoid TS2503 errors
+declare const jest: typeof import('jest');
 
 // This exports an empty object to make the file a module
 export {};

@@ -5,7 +5,9 @@
     "jsx": "react-jsx",
     "esModuleInterop": true,
     "types": ["jest", "node", "@testing-library/jest-dom"],
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "isolatedModules": true
   },
   "include": [
     "src/**/*.ts",

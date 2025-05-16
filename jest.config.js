@@ -10,6 +10,7 @@ module.exports = {
   transform: {
     '^.+\\.(ts|tsx)$': ['ts-jest', {
       tsconfig: 'tsconfig.jest.json',
+      isolatedModules: true
     }],
   },
   testMatch: ['**/__tests__/**/*.+(ts|tsx|js)', '**/?(*.)+(spec|test).+(ts|tsx|js)'],
@@ -32,6 +33,7 @@ module.exports = {
   globals: {
     'ts-jest': {
       tsconfig: 'tsconfig.jest.json',
+      isolatedModules: true
     }
   }
 };
