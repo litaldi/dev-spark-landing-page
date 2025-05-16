@@ -1,0 +1,11 @@
+
+--- a/package.json
++++ b/package.json
+@@ -4,7 +4,8 @@
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+-   "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
++   "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
++   "test": "jest"
+  },
