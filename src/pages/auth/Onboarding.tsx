@@ -1,50 +1,16 @@
 
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-  FormDescription,
-} from "@/components/ui/form";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Form } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { Stepper } from "@/components/ui/stepper";
-import { Slider } from "@/components/ui/slider";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
-
-// Form validation schema
-const onboardingSchema = z.object({
-  stack: z.array(z.string()).min(1, { message: "Select at least one technology" }),
-  weeklyGoal: z.number().min(1).max(40),
-  receiveUpdates: z.boolean().default(false),
-});
-
-type OnboardingFormValues = z.infer<typeof onboardingSchema>;
-
-const technologyStacks = [
-  { id: "react", label: "React" },
-  { id: "vue", label: "Vue" },
-  { id: "angular", label: "Angular" },
-  { id: "nextjs", label: "Next.js" },
-  { id: "node", label: "Node.js" },
-  { id: "python", label: "Python" },
-  { id: "django", label: "Django" },
-  { id: "ruby", label: "Ruby" },
-  { id: "rails", label: "Rails" },
-  { id: "flutter", label: "Flutter" },
-  { id: "kotlin", label: "Kotlin" },
-  { id: "swift", label: "Swift" },
-];
+import { StackSelectionStep } from "@/components/onboarding/StackSelectionStep";
+import { WeeklyGoalsStep } from "@/components/onboarding/WeeklyGoalsStep";
+import { onboardingSchema, OnboardingFormValues } from "@/schemas/onboarding-schema";
 
 const OnboardingPage = () => {
   const [activeStep, setActiveStep] = useState(0);
@@ -107,157 +73,16 @@ const OnboardingPage = () => {
     }
   };
 
-  // Step 1: Stack Selection
-  const StackSelectionStep = () => (
-    <div className="space-y-6">
-      <FormField
-        control={form.control}
-        name="stack"
-        render={() => (
-          <FormItem>
-            <div className="mb-4">
-              <FormLabel className="text-base font-medium">Select your tech stack</FormLabel>
-              <FormDescription>
-                Choose the technologies you're interested in learning or improving
-              </FormDescription>
-            </div>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              {technologyStacks.map((item) => (
-                <FormField
-                  key={item.id}
-                  control={form.control}
-                  name="stack"
-                  render={({ field }) => {
-                    return (
-                      <FormItem
-                        key={item.id}
-                        className="flex flex-row items-start space-x-3 space-y-0"
-                      >
-                        <FormControl>
-                          <Checkbox
-                            checked={field.value?.includes(item.id)}
-                            onCheckedChange={(checked) => {
-                              return checked
-                                ? field.onChange([...field.value, item.id])
-                                : field.onChange(
-                                    field.value?.filter(
-                                      (value) => value !== item.id
-                                    )
-                                  );
-                            }}
-                          />
-                        </FormControl>
-                        <FormLabel className="font-normal cursor-pointer">
-                          {item.label}
-                        </FormLabel>
-                      </FormItem>
-                    );
-                  }}
-                />
-              ))}
-            </div>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-      
-      <div className="flex justify-end">
-        <Button 
-          type="button" 
-          onClick={nextStep}
-          className="transition-all duration-300 hover:translate-x-1"
-          aria-label="Go to next step"
-        >
-          Next
-        </Button>
-      </div>
-    </div>
-  );
-
-  // Step 2: Weekly Goals
-  const WeeklyGoalsStep = () => (
-    <div className="space-y-6">
-      <FormField
-        control={form.control}
-        name="weeklyGoal"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel className="text-base font-medium">Weekly Learning Goal (hours)</FormLabel>
-            <FormControl>
-              <div className="space-y-4">
-                <Slider
-                  value={[field.value]}
-                  onValueChange={(vals) => field.onChange(vals[0])}
-                  max={40}
-                  min={1}
-                  step={1}
-                  aria-label="Set weekly learning goal in hours"
-                />
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground text-sm">1 hour</span>
-                  <span className="font-medium">{field.value} hours</span>
-                  <span className="text-muted-foreground text-sm">40 hours</span>
-                </div>
-              </div>
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-      
-      <FormField
-        control={form.control}
-        name="receiveUpdates"
-        render={({ field }) => (
-          <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md p-4 border">
-            <FormControl>
-              <Checkbox
-                checked={field.value}
-                onCheckedChange={field.onChange}
-                aria-label="Receive updates about new courses and features"
-              />
-            </FormControl>
-            <div className="space-y-1 leading-none">
-              <FormLabel className="text-sm font-normal">
-                I want to receive updates about new courses, features and promotions
-              </FormLabel>
-            </div>
-          </FormItem>
-        )}
-      />
-      
-      <div className="flex justify-between">
-        <Button 
-          type="button" 
-          variant="outline" 
-          onClick={prevStep}
-          className="transition-all duration-300 hover:-translate-x-1"
-          aria-label="Go back to previous step"
-        >
-          Back
-        </Button>
-        <Button 
-          type="submit" 
-          disabled={isLoading}
-          className="transition-all duration-300"
-          aria-label="Complete onboarding setup"
-        >
-          {isLoading ? "Saving..." : "Complete Setup"}
-        </Button>
-      </div>
-    </div>
-  );
-
   const steps = [
     {
       label: "Technologies",
       description: "Your stack",
-      content: <StackSelectionStep />,
+      content: <StackSelectionStep onNext={nextStep} />,
     },
     {
       label: "Goals",
       description: "Your commitment",
-      content: <WeeklyGoalsStep />,
+      content: <WeeklyGoalsStep onPrevious={prevStep} isLoading={isLoading} />,
     },
   ];
 
