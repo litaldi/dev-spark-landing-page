@@ -2,17 +2,16 @@
 import React from "react";
 import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { useAuth } from "@/hooks/use-auth";
 
 interface DemoModeBannerProps {
   className?: string;
 }
 
 export function DemoModeBanner({ className }: DemoModeBannerProps) {
-  const { getCurrentUser } = useAuth();
-  const user = getCurrentUser();
+  // Check localStorage directly instead of using useAuth hook
+  const isDemoUser = localStorage.getItem("isDemoUser") === "true";
   
-  if (!user?.isDemoUser) {
+  if (!isDemoUser) {
     return null;
   }
   
