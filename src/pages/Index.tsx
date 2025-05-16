@@ -17,20 +17,16 @@ import MotivationQuote from "@/components/landing/MotivationQuote";
 import AppPreview from "@/components/landing/AppPreview";
 import NewsletterSignup from "@/components/landing/NewsletterSignup";
 import { SearchBar } from "@/components/search/SearchBar";
+import { SkipNavLink, SkipNavContent } from "@/components/a11y/skip-nav";
 
 const Index = () => {
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      {/* Skip to content link for keyboard users */}
-      <a 
-        href="#main-content" 
-        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-brand-500 text-white px-4 py-2 z-50 focus:outline-none rounded-md"
-      >
-        Skip to content
-      </a>
+      {/* Accessibility: Skip to content link for keyboard users */}
+      <SkipNavLink contentId="main-content">Skip to content</SkipNavLink>
       
       <Navbar />
-      <main id="main-content">
+      <SkipNavContent id="main-content">
         {/* Primary sections */}
         <HeroSection />
         
@@ -73,7 +69,7 @@ const Index = () => {
         {/* Call to action */}
         <NewsletterSignup />
         <JoinNowSection />
-      </main>
+      </SkipNavContent>
       <Footer />
       <StickyCTABar />
     </div>

@@ -72,7 +72,7 @@ const Navbar: React.FC = () => {
 
   return (
     <header 
-      className={`py-4 border-b border-gray-100 sticky top-0 z-50 transition-all duration-300 ${
+      className={`py-4 border-b border-gray-100 dark:border-gray-800 sticky top-0 z-50 transition-all duration-300 ${
         isScrolled ? "bg-white/95 dark:bg-gray-900/95 backdrop-blur-md shadow-sm" : "bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm"
       }`}
       role="banner"

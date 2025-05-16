@@ -31,7 +31,40 @@ export function useFormState<T = any>({
   // Reference for screen reader announcements
   const announceRef = useRef<HTMLDivElement | null>(null);
   
+  // Add rate limiting to prevent abuse
+  const [lastSubmitTime, setLastSubmitTime] = useState(0);
+  const [submitCount, setSubmitCount] = useState(0);
+  
   const handleSubmit = async (data?: T) => {
+    // Implement simple rate limiting
+    const now = Date.now();
+    const timeSinceLastSubmit = now - lastSubmitTime;
+    
+    // Prevent rapid form submissions (1 second cooldown)
+    if (timeSinceLastSubmit < 1000) {
+      toast({
+        title: "Please wait",
+        description: "You're submitting too quickly. Please wait a moment.",
+        variant: "destructive",
+      });
+      return false;
+    }
+    
+    // Limit number of submissions in a short period
+    if (submitCount > 10 && timeSinceLastSubmit < 60000) { // 10 submissions per minute
+      toast({
+        title: "Too many attempts",
+        description: "You've made too many submissions. Please try again later.",
+        variant: "destructive",
+      });
+      return false;
+    }
+    
+    // Update rate limiting state
+    setLastSubmitTime(now);
+    setSubmitCount(prev => prev + 1);
+    
+    // Begin actual submission
     setIsSubmitting(true);
     setError(null);
     
@@ -62,7 +95,18 @@ export function useFormState<T = any>({
       
       return result;
     } catch (err) {
-      const message = typeof err === 'string' ? err : errorMessage;
+      // Safely handle different error types
+      let message: string;
+      
+      if (typeof err === 'string') {
+        message = err;
+      } else if (err instanceof Error) {
+        message = err.message;
+      } else {
+        message = errorMessage;
+      }
+      
+      // Set a sanitized error message
       setError(message);
       
       toast({

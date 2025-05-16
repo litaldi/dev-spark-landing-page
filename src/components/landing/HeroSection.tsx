@@ -62,7 +62,12 @@ const HeroSection: React.FC = () => {
                 <Button 
                   size="lg" 
                   className="rounded-full bg-brand-500 hover:bg-brand-600 text-white px-8 py-6 text-lg transform transition-all duration-300 hover:scale-105 shadow-md hover:shadow-lg"
-                  onClick={() => window.location.href = "#demo"}
+                  onClick={() => {
+                    const demoSection = document.getElementById('demo');
+                    if (demoSection) {
+                      demoSection.scrollIntoView({ behavior: 'smooth' });
+                    }
+                  }}
                   aria-label="Try the demo"
                 >
                   Try Demo
@@ -89,7 +94,11 @@ const HeroSection: React.FC = () => {
       </div>
       
       {/* Login Modal */}
-      <LoginModal isOpen={loginModalOpen} onClose={closeLoginModal} />
+      <LoginModal 
+        isOpen={loginModalOpen} 
+        onClose={closeLoginModal}
+        aria-label="Login form"
+      />
     </section>
   );
 };

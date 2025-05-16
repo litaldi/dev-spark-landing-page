@@ -7,30 +7,48 @@ interface FeatureCardProps {
   title: string;
   icon: LucideIcon;
   description?: string;
+  id?: string;
 }
 
-const FeatureCard: React.FC<FeatureCardProps> = ({ title, icon: Icon, description }) => {
+const FeatureCard: React.FC<FeatureCardProps> = ({ title, icon: Icon, description, id }) => {
+  // Generate a unique ID if not provided
+  const cardId = id || `feature-card-${title.toLowerCase().replace(/\s+/g, '-')}`;
+  
   return (
     <Card 
-      className="h-full border-brand-100 hover:border-brand-300 hover:shadow-md transition-all duration-300 group focus-within:ring-2 focus-within:ring-brand-400 focus-within:ring-offset-2"
+      className="h-full border-brand-100 hover:border-brand-300 hover:shadow-md dark:hover:shadow-brand-900/30 transition-all duration-300 group focus-within:ring-2 focus-within:ring-brand-400 focus-within:ring-offset-2"
       tabIndex={0}
+      id={cardId}
+      role="article"
+      aria-labelledby={`${cardId}-title`}
+      aria-describedby={description ? `${cardId}-desc` : undefined}
     >
       <CardContent className="flex flex-col items-center p-6 text-center h-full">
         <div 
-          className="rounded-full bg-brand-100 p-3 mb-4 group-hover:bg-brand-200 transition-colors duration-300 transform group-hover:scale-110 group-focus-within:bg-brand-200 group-focus-within:scale-110"
+          className="rounded-full bg-brand-100 dark:bg-brand-900/30 p-3 mb-4 group-hover:bg-brand-200 dark:group-hover:bg-brand-800/50 transition-colors duration-300 transform group-hover:scale-110 group-focus-within:bg-brand-200 group-focus-within:scale-110"
           aria-hidden="true"
         >
-          <Icon className="h-8 w-8 text-brand-600 group-hover:text-brand-700 transition-colors" />
+          <Icon className="h-8 w-8 text-brand-600 dark:text-brand-400 group-hover:text-brand-700 dark:group-hover:text-brand-300 transition-colors" />
         </div>
         
-        <h3 className="text-xl font-medium mb-3 text-brand-800">{title}</h3>
+        <h3 
+          id={`${cardId}-title`}
+          className="text-xl font-medium mb-3 text-brand-800 dark:text-brand-200"
+        >
+          {title}
+        </h3>
         
         {description && (
-          <p className="text-gray-600 mt-2 leading-relaxed">{description}</p>
+          <p 
+            id={`${cardId}-desc`}
+            className="text-gray-600 dark:text-gray-300 mt-2 leading-relaxed"
+          >
+            {description}
+          </p>
         )}
         
         <div 
-          className="mt-auto w-0 group-hover:w-1/2 group-focus-within:w-1/2 h-0.5 bg-brand-300 mt-4 transition-all duration-300 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100" 
+          className="mt-auto w-0 group-hover:w-1/2 group-focus-within:w-1/2 h-0.5 bg-brand-300 dark:bg-brand-700 mt-4 transition-all duration-300 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100" 
           aria-hidden="true"
         ></div>
       </CardContent>
