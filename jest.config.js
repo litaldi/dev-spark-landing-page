@@ -9,7 +9,7 @@ module.exports = {
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
   transform: {
     '^.+\\.(ts|tsx)$': ['ts-jest', {
-      tsconfig: 'tsconfig.json',
+      tsconfig: 'tsconfig.jest.json',
     }],
   },
   testMatch: ['**/__tests__/**/*.+(ts|tsx|js)', '**/?(*.)+(spec|test).+(ts|tsx|js)'],
@@ -29,4 +29,9 @@ module.exports = {
       statements: 70,
     },
   },
+  globals: {
+    'ts-jest': {
+      tsconfig: 'tsconfig.jest.json',
+    }
+  }
 };
