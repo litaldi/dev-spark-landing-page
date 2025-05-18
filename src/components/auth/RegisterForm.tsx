@@ -12,11 +12,18 @@ import { useAuth, RegisterFormData } from "@/hooks/use-auth";
 import { motion, AnimatePresence } from "framer-motion";
 import { AlertError } from "@/components/auth/AlertError";
 import { GoogleSignUpButton } from "@/components/auth/GoogleSignUpButton";
+import { sanitizeInput } from "@/lib/security";
+import { useRateLimit } from "@/hooks/use-rate-limit";
+import { useToast } from "@/hooks/use-toast";
 
-// Form validation schema with stronger requirements
+// Form validation schema with stronger requirements and sanitization
 const registerSchema = z.object({
-  name: z.string().min(2, { message: "Name must be at least 2 characters" }),
-  email: z.string().email({ message: "Please enter a valid email address" }),
+  name: z.string()
+    .min(2, { message: "Name must be at least 2 characters" })
+    .transform(sanitizeInput),
+  email: z.string()
+    .email({ message: "Please enter a valid email address" })
+    .transform(sanitizeInput),
   password: z.string()
     .min(8, { message: "Password must be at least 8 characters" })
     .refine(val => /[A-Z]/.test(val), { message: "Password must include at least one uppercase letter" })
@@ -39,10 +46,18 @@ export interface RegisterFormProps {
 export function RegisterForm({ onGoogleSignUp }: RegisterFormProps) {
   const [activeStep, setActiveStep] = useState(0);
   const { register: registerUser, isLoading, errorMessage } = useAuth({ redirectTo: "/auth/onboarding" });
+  const { toast } = useToast();
 
-  // Rate limiting for form submissions (simple implementation)
-  const [submitCount, setSubmitCount] = useState(0);
-  const [lastSubmitTime, setLastSubmitTime] = useState(0);
+  // Rate limiting for registration
+  const {
+    isBlocked,
+    timeRemaining,
+    registerAttempt,
+  } = useRateLimit("register", {
+    maxAttempts: 3,            // Max 3 attempts
+    timeWindow: 60000 * 30,    // Within 30 minutes
+    blockDuration: 60000 * 60  // Block for 1 hour after exceeding
+  });
   
   const form = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
@@ -72,30 +87,34 @@ export function RegisterForm({ onGoogleSignUp }: RegisterFormProps) {
     setActiveStep((prev) => (prev > 0 ? prev - 1 : prev));
   };
 
-  // Submit handler with rate limiting
+  // Submit handler with security enhancements
   const onSubmit = async (data: RegisterFormValues) => {
-    // Basic rate limiting
-    const now = Date.now();
-    if (now - lastSubmitTime < 2000) { // 2 seconds cooldown
-      return;
-    }
-    
-    if (submitCount > 5) {
-      form.setError("root", {
-        type: "manual",
-        message: "Too many attempts. Please try again later."
+    // Check rate limiting
+    const { isAllowed } = registerAttempt();
+    if (!isBlocked && !isAllowed) {
+      const minutesRemaining = Math.ceil(timeRemaining / 60000);
+      toast({
+        title: "Too many registration attempts",
+        description: `For security reasons, please try again in ${minutesRemaining} minutes.`,
+        variant: "destructive",
       });
       return;
     }
     
-    setSubmitCount(prev => prev + 1);
-    setLastSubmitTime(now);
+    // Additional email validation for defence in depth
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
+      form.setError("email", { 
+        type: "manual", 
+        message: "Invalid email format" 
+      });
+      return;
+    }
     
-    // Make sure data is cast correctly to RegisterFormData
+    // Make sure data is sanitized and cast correctly to RegisterFormData
     const formData: RegisterFormData = {
-      name: data.name,
-      email: data.email,
-      password: data.password,
+      name: sanitizeInput(data.name),
+      email: sanitizeInput(data.email),
+      password: data.password, // Do not sanitize password as it may contain special chars
       persona: data.persona,
       acceptTerms: data.acceptTerms
     };
@@ -120,6 +139,15 @@ export function RegisterForm({ onGoogleSignUp }: RegisterFormProps) {
   return (
     <>
       <AlertError message={errorMessage} />
+      
+      {isBlocked && (
+        <div className="bg-destructive/10 border border-destructive text-destructive px-4 py-3 rounded-lg mb-4">
+          <p className="font-medium">Registration temporarily blocked</p>
+          <p className="text-sm">
+            Too many registration attempts. Please try again in {Math.ceil(timeRemaining / 60000)} minutes.
+          </p>
+        </div>
+      )}
       
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -146,7 +174,7 @@ export function RegisterForm({ onGoogleSignUp }: RegisterFormProps) {
             </div>
             
             <div className="grid gap-2 mt-4">
-              <GoogleSignUpButton onClick={onGoogleSignUp} disabled={isLoading} />
+              <GoogleSignUpButton onClick={onGoogleSignUp} disabled={isLoading || isBlocked} />
             </div>
           </motion.div>
         )}

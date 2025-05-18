@@ -10,11 +10,19 @@ import { useAuth } from "@/hooks/use-auth";
 import { AlertError } from "./AlertError";
 import { LoginFormInputs } from "./LoginFormInputs";
 import { LoginAlternatives } from "./LoginAlternatives";
+import { useRateLimit } from "@/hooks/use-rate-limit";
+import { sanitizeInput } from "@/lib/security";
+import { useToast } from "@/hooks/use-toast";
 
 // Form validation schema
 const loginSchema = z.object({
-  email: z.string().email({ message: "Please enter a valid email address" }),
-  password: z.string().min(8, { message: "Password must be at least 8 characters" }),
+  email: z.string()
+    .trim()
+    .email({ message: "Please enter a valid email address" })
+    .transform(sanitizeInput),
+  password: z.string()
+    .min(8, { message: "Password must be at least 8 characters" })
+    .transform(sanitizeInput),
 });
 
 export type LoginFormValues = z.infer<typeof loginSchema>;
@@ -31,9 +39,22 @@ const DEMO_USER = {
 
 export function LoginForm({ onGoogleLogin, onMagicLink }: LoginFormProps) {
   const { login, isLoading, errorMessage, clearError } = useAuth();
+  const { toast } = useToast();
   
   // For accessibility, track focus management during form interactions
   const [focusField, setFocusField] = useState<string | null>(null);
+  
+  // Implement rate limiting for login attempts
+  const {
+    isBlocked,
+    timeRemaining,
+    registerAttempt,
+    resetLimit,
+  } = useRateLimit("login", {
+    maxAttempts: 5,           // Max 5 attempts
+    timeWindow: 60000 * 10,   // Within 10 minutes
+    blockDuration: 60000 * 15 // Block for 15 minutes after exceeding
+  });
   
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -43,12 +64,51 @@ export function LoginForm({ onGoogleLogin, onMagicLink }: LoginFormProps) {
     },
   });
 
-  // Submit handler
+  // Submit handler with rate limiting
   const onSubmit = async (data: LoginFormValues) => {
-    await login(data.email, data.password);
+    clearError();
+    
+    // Check rate limiting before proceeding
+    const { isAllowed, remainingAttempts } = registerAttempt();
+    if (!isAllowed) {
+      const minutesRemaining = Math.ceil(timeRemaining / 60000);
+      toast({
+        title: "Too many login attempts",
+        description: `For security reasons, please try again in ${minutesRemaining} minutes.`,
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    // If we're running low on attempts, warn the user
+    if (remainingAttempts <= 2) {
+      toast({
+        title: "Login Attempt Limit",
+        description: `You have ${remainingAttempts} login attempts remaining before a temporary block.`,
+        variant: "warning",
+      });
+    }
+    
+    // Proceed with login attempt
+    const success = await login(data.email, data.password);
+    
+    // If login was successful, reset the rate limit
+    if (success) {
+      resetLimit();
+    }
   };
 
   const handleDemoLogin = () => {
+    if (isBlocked) {
+      const minutesRemaining = Math.ceil(timeRemaining / 60000);
+      toast({
+        title: "Too many login attempts",
+        description: `For security reasons, please try again in ${minutesRemaining} minutes.`,
+        variant: "destructive",
+      });
+      return;
+    }
+    
     form.setValue("email", DEMO_USER.email);
     form.setValue("password", DEMO_USER.password);
     
@@ -68,14 +128,35 @@ export function LoginForm({ onGoogleLogin, onMagicLink }: LoginFormProps) {
       return;
     }
 
+    // Apply rate limiting to magic link requests as well
+    const { isAllowed } = registerAttempt();
+    if (!isAllowed) {
+      const minutesRemaining = Math.ceil(timeRemaining / 60000);
+      toast({
+        title: "Too many login attempts",
+        description: `For security reasons, please try again in ${minutesRemaining} minutes.`,
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (onMagicLink) {
-      onMagicLink(email);
+      onMagicLink(sanitizeInput(email));
     }
   };
 
   return (
     <>
       <AlertError message={errorMessage} />
+      
+      {isBlocked && (
+        <div className="bg-destructive/10 border border-destructive text-destructive px-4 py-3 rounded-lg mb-4">
+          <p className="font-medium">Account protection activated</p>
+          <p className="text-sm">
+            Too many login attempts. Please try again in {Math.ceil(timeRemaining / 60000)} minutes.
+          </p>
+        </div>
+      )}
       
       <Form {...form}>
         <form 
@@ -92,7 +173,7 @@ export function LoginForm({ onGoogleLogin, onMagicLink }: LoginFormProps) {
           <Button 
             type="submit" 
             className="w-full" 
-            disabled={isLoading}
+            disabled={isLoading || isBlocked}
             aria-busy={isLoading}
           >
             {isLoading ? "Signing in..." : "Sign in"}
@@ -111,7 +192,7 @@ export function LoginForm({ onGoogleLogin, onMagicLink }: LoginFormProps) {
         onGoogleLogin={onGoogleLogin}
         onMagicLink={handleMagicLink}
         onDemoLogin={handleDemoLogin}
-        isLoading={isLoading}
+        isLoading={isLoading || isBlocked}
       />
     </>
   );
