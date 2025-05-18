@@ -16,7 +16,7 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ title, icon: Icon, descriptio
   
   return (
     <Card 
-      className="h-full border-brand-100 hover:border-brand-300 hover:shadow-md dark:hover:shadow-brand-900/30 transition-all duration-300 group focus-within:ring-2 focus-within:ring-brand-400 focus-within:ring-offset-2"
+      className="h-full border-brand-100 hover:border-brand-300 hover:shadow-md dark:border-brand-700 dark:hover:border-brand-500 transition-all duration-300 group focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-1"
       tabIndex={0}
       id={cardId}
       role="article"
@@ -25,15 +25,15 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ title, icon: Icon, descriptio
     >
       <CardContent className="flex flex-col items-center p-6 text-center h-full">
         <div 
-          className="rounded-full bg-brand-100/80 dark:bg-brand-900/30 p-3.5 mb-5 group-hover:bg-brand-200 dark:group-hover:bg-brand-800/50 transition-colors duration-300 transform group-hover:scale-105 group-focus-within:bg-brand-200 group-focus-within:scale-105"
+          className="rounded-full bg-brand-100/80 dark:bg-brand-900/30 p-3.5 mb-5 group-hover:bg-brand-200 dark:group-hover:bg-brand-800/50 transition-all duration-300 transform group-hover:scale-105 group-focus-within:bg-brand-200 group-focus-within:scale-105"
           aria-hidden="true"
         >
-          <Icon className="h-7 w-7 text-brand-600 dark:text-brand-400 group-hover:text-brand-700 dark:group-hover:text-brand-300 transition-colors" />
+          <Icon className="h-6 w-6 text-brand-600 dark:text-brand-400 group-hover:text-brand-700 dark:group-hover:text-brand-300 transition-colors" />
         </div>
         
         <h3 
           id={`${cardId}-title`}
-          className="text-xl font-semibold mb-3 text-brand-800 dark:text-brand-200"
+          className="text-xl font-semibold mb-3 text-brand-800 dark:text-brand-200 group-hover:text-brand-700 dark:group-hover:text-brand-100 transition-colors"
         >
           {title}
         </h3>
