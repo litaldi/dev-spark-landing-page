@@ -4,7 +4,10 @@ import { WelcomeSection } from "@/components/dashboard/WelcomeSection";
 import { ProgressSection } from "@/components/dashboard/ProgressSection";
 import { LearningPathSection } from "@/components/dashboard/LearningPathSection";
 import { RecentActivitySection } from "@/components/dashboard/RecentActivitySection";
+import { RecommendedContent } from "@/components/dashboard/RecommendedContent";
 import { useDashboardActions } from "@/hooks/dashboard/use-dashboard-actions";
+import { Button } from "@/components/ui/button";
+import { HelpCircle } from "lucide-react";
 
 interface DashboardContentProps {
   userName: string;
@@ -22,7 +25,8 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
   const { 
     startFirstLesson, 
     startSession, 
-    startLesson 
+    startLesson,
+    handleAction
   } = useDashboardActions(onError);
 
   return (
@@ -50,10 +54,28 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
             isLoading={isLoading}
             onStartLesson={startLesson}
           />
+          
+          <RecommendedContent 
+            isLoading={isLoading} 
+            onStartLesson={startLesson}
+          />
         </div>
         
-        <div className="lg:col-span-1">
+        <div className="lg:col-span-1 space-y-6">
           <RecentActivitySection isLoading={isLoading} />
+          
+          <div className="fixed bottom-6 right-6 md:static md:mt-4 md:flex md:justify-end">
+            <Button 
+              variant="outline"
+              size="sm"
+              className="rounded-full h-12 w-12 md:h-auto md:w-auto md:rounded-md md:px-4 shadow-lg md:shadow-none bg-white dark:bg-gray-800"
+              aria-label="Get help with dashboard features"
+              onClick={() => handleAction('help')}
+            >
+              <HelpCircle className="h-6 w-6 md:h-4 md:w-4 md:mr-2" />
+              <span className="hidden md:inline">Get Help</span>
+            </Button>
+          </div>
         </div>
       </div>
     </>

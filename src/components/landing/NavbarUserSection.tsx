@@ -5,6 +5,7 @@ import { AccessibilityMenu } from "@/components/a11y/AccessibilityMenu";
 import { Menu, X } from "lucide-react";
 import GetStartedButton from "./GetStartedButton";
 import AuthButtons from "./AuthButtons";
+import { DemoUserButton } from "@/components/auth/DemoUserButton";
 
 interface NavbarUserSectionProps {
   isLoggedIn: boolean;
@@ -27,7 +28,10 @@ const NavbarUserSection: React.FC<NavbarUserSectionProps> = ({
     <div className="flex items-center gap-3">
       <div className="hidden md:flex items-center gap-4">
         {!isLoggedIn && (
-          <GetStartedButton className="hidden lg:flex" />
+          <>
+            <DemoUserButton />
+            <GetStartedButton className="hidden lg:flex" />
+          </>
         )}
       </div>
       

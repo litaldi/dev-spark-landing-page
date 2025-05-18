@@ -1,95 +1,134 @@
 
 import React from "react";
-import NavLinks from "./NavLinks";
-import AuthButtons from "./AuthButtons";
-import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { NavigationMenu, NavigationMenuList, NavigationMenuItem, NavigationMenuLink } from "@/components/ui/navigation-menu";
+import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { AccessibilityMenu } from "@/components/a11y/AccessibilityMenu";
-import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { Mail } from "lucide-react";
-import GetStartedButton from "./GetStartedButton";
+import { DemoUserButton } from "@/components/auth/DemoUserButton";
 
 interface MobileMenuProps {
   isOpen: boolean;
   isLoggedIn: boolean;
   userName: string | null;
-  isDemoUser?: boolean;
+  isDemoUser: boolean;
   onMenuClose: () => void;
   onLogout: () => void;
-  toggleLoginState: () => void;
+  toggleLoginState?: () => void;
 }
 
-const MobileMenu: React.FC<MobileMenuProps> = ({ 
-  isOpen, 
-  isLoggedIn, 
+const MobileMenu: React.FC<MobileMenuProps> = ({
+  isOpen,
+  isLoggedIn,
   userName,
-  isDemoUser = false,
+  isDemoUser,
   onMenuClose,
   onLogout,
-  toggleLoginState
+  toggleLoginState,
 }) => {
-  if (!isOpen) return null;
-  
   return (
-    <div 
-      className="md:hidden fixed inset-x-0 top-[61px] bottom-0 z-40 pb-20 overflow-y-auto mt-2 py-4 border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-lg" 
-      id="mobile-menu" 
-      role="navigation" 
-      aria-label="Mobile navigation"
-      tabIndex={0}
-    >
-      <div className="px-4 pb-4">
-        {isLoggedIn && isDemoUser && (
-          <div className="mb-2">
-            <Badge variant="outline" className="bg-brand-50 dark:bg-brand-900/20 text-brand-700 dark:text-brand-300 border-brand-200 dark:border-brand-800">
-              Demo Mode
-            </Badge>
-          </div>
-        )}
+    <Sheet open={isOpen} onOpenChange={(open) => !open && onMenuClose()}>
+      <SheetContent side="left" className="w-[85vw] max-w-[400px] sm:w-[385px] pt-12">
+        <NavigationMenu className="w-full max-w-full" orientation="vertical">
+          <NavigationMenuList className="flex-col w-full items-start gap-2">
+            <NavigationMenuItem className="w-full">
+              <NavigationMenuLink
+                asChild
+                className={cn(
+                  "w-full flex py-3 px-4 hover:bg-accent rounded-md",
+                  "focus:bg-accent focus:text-accent-foreground focus:outline-none"
+                )}
+              >
+                <Link to="/" onClick={onMenuClose}>Home</Link>
+              </NavigationMenuLink>
+            </NavigationMenuItem>
+            <NavigationMenuItem className="w-full">
+              <NavigationMenuLink
+                asChild
+                className={cn(
+                  "w-full flex py-3 px-4 hover:bg-accent rounded-md",
+                  "focus:bg-accent focus:text-accent-foreground focus:outline-none"
+                )}
+              >
+                <Link to="/about" onClick={onMenuClose}>About</Link>
+              </NavigationMenuLink>
+            </NavigationMenuItem>
+            <NavigationMenuItem className="w-full">
+              <NavigationMenuLink
+                asChild
+                className={cn(
+                  "w-full flex py-3 px-4 hover:bg-accent rounded-md",
+                  "focus:bg-accent focus:text-accent-foreground focus:outline-none"
+                )}
+              >
+                <Link to="/contact" onClick={onMenuClose}>Contact</Link>
+              </NavigationMenuLink>
+            </NavigationMenuItem>
+            <NavigationMenuItem className="w-full">
+              <NavigationMenuLink
+                asChild
+                className={cn(
+                  "w-full flex py-3 px-4 hover:bg-accent rounded-md",
+                  "focus:bg-accent focus:text-accent-foreground focus:outline-none"
+                )}
+              >
+                <Link to="/faq" onClick={onMenuClose}>FAQ</Link>
+              </NavigationMenuLink>
+            </NavigationMenuItem>
+          </NavigationMenuList>
+        </NavigationMenu>
         
-        <nav className="flex flex-col space-y-2">
-          <NavLinks isMobile={true} onMobileMenuClose={onMenuClose} />
+        <div className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700 space-y-4">
+          {!isLoggedIn && (
+            <div className="space-y-2 px-2">
+              <DemoUserButton />
+              <div className="flex space-x-2 mt-4">
+                <Button asChild className="flex-1" onClick={onMenuClose}>
+                  <Link to="/auth/login">Log In</Link>
+                </Button>
+                <Button asChild className="flex-1" variant="secondary" onClick={onMenuClose}>
+                  <Link to="/auth/register">Sign Up</Link>
+                </Button>
+              </div>
+            </div>
+          )}
           
-          <div className="flex items-center justify-start gap-3 py-2 border-t border-gray-100 dark:border-gray-800 mt-2">
-            <AccessibilityMenu />
-            <ThemeToggle />
-            <span className="text-sm text-muted-foreground ml-2">Theme & Accessibility</span>
-          </div>
+          {isLoggedIn && (
+            <div className="space-y-4 px-2">
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Signed in as <span className="font-medium text-gray-900 dark:text-gray-200">{userName}</span>
+                {isDemoUser && <span className="ml-1 text-brand-600 dark:text-brand-400">(Demo)</span>}
+              </p>
+              <div className="flex space-x-2">
+                <Button asChild className="flex-1">
+                  <Link to="/dashboard" onClick={onMenuClose}>Dashboard</Link>
+                </Button>
+                <Button 
+                  className="flex-1" 
+                  variant="outline" 
+                  onClick={() => {
+                    onLogout();
+                    onMenuClose();
+                  }}
+                >
+                  Log Out
+                </Button>
+              </div>
+            </div>
+          )}
           
-          {/* New prominent CTA buttons */}
-          <div className="py-2 space-y-2 border-t border-gray-100 dark:border-gray-800">
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="text-muted-foreground hover:text-foreground w-full justify-start"
-              asChild
-              onClick={onMenuClose}
-            >
-              <Link to="/contact">
-                <Mail className="h-4 w-4 mr-2" />
-                Contact Sales
-              </Link>
-            </Button>
+          <div className="flex items-center justify-between px-2 pt-4">
+            <p className="text-sm text-gray-600 dark:text-gray-400">Preferences</p>
+            <div className="flex items-center gap-2">
+              <AccessibilityMenu />
+              <ThemeToggle />
+            </div>
           </div>
-          
-          <div className="py-2 space-y-2 border-t border-gray-100 dark:border-gray-800">
-            {!isLoggedIn && (
-              <GetStartedButton isMobile={true} onMenuClose={onMenuClose} />
-            )}
-            <AuthButtons 
-              isLoggedIn={isLoggedIn}
-              userName={userName}
-              isDemoUser={isDemoUser}
-              isMobile={true}
-              onMobileMenuClose={onMenuClose}
-              onLogout={onLogout}
-              toggleLoginState={toggleLoginState}
-            />
-          </div>
-        </nav>
-      </div>
-    </div>
+        </div>
+      </SheetContent>
+    </Sheet>
   );
 };
 
