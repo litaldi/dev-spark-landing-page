@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { DashboardContent } from '@/components/dashboard/DashboardContent';
@@ -40,8 +41,11 @@ jest.mock('@/components/dashboard/RecentActivitySection', () => ({
 }));
 
 jest.mock('@/components/dashboard/AIRecommendations', () => ({
-  AIRecommendations: ({ userName }) => (
-    <div data-testid="ai-recommendations">AI Recommendations for {userName}</div>
+  AIRecommendations: ({ userName, userTopics }) => (
+    <div data-testid="ai-recommendations">
+      AI Recommendations for {userName}
+      {userTopics && <p>Topics: {userTopics.join(', ')}</p>}
+    </div>
   ),
 }));
 
@@ -78,6 +82,7 @@ describe('DashboardContent Component', () => {
     // Mock localStorage
     Storage.prototype.getItem = jest.fn().mockImplementation((key) => {
       if (key === 'lastSessionDate') return '2025-05-15T10:30:00.000Z';
+      if (key === 'userTopics') return 'JavaScript, HTML, CSS';
       return null;
     });
   });

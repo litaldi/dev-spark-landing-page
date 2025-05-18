@@ -34,6 +34,7 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
 
   // Get last activity timestamp from localStorage
   const lastActivityDate = localStorage.getItem("lastSessionDate");
+  const userTopics = localStorage.getItem("userTopics") || "web development, JavaScript, React";
 
   return (
     <>
@@ -59,6 +60,7 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
           <AIRecommendations 
             userName={userName}
             isLoading={isLoading}
+            userTopics={userTopics.split(", ")}
           />
           
           <LearningPathSection 

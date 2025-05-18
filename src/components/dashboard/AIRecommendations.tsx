@@ -2,16 +2,23 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Lightbulb, Brain, TrendingUp } from "lucide-react";
+import { Lightbulb, Brain, TrendingUp, ThumbsUp, ThumbsDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLocalStorage } from "@/hooks/use-local-storage";
+import { useToast } from "@/hooks/use-toast";
 
 interface AIRecommendationsProps {
   userName: string;
   isLoading?: boolean;
+  userTopics?: string[];
 }
 
-export const AIRecommendations = ({ userName, isLoading = false }: AIRecommendationsProps) => {
+export const AIRecommendations = ({ 
+  userName, 
+  isLoading = false, 
+  userTopics = ['web development', 'JavaScript'] 
+}: AIRecommendationsProps) => {
+  const { toast } = useToast();
   // Mock data for AI-powered recommendations - would be replaced with actual API calls
   const [recommendations, setRecommendations] = useLocalStorage("aiRecommendations", [
     {
@@ -45,22 +52,51 @@ export const AIRecommendations = ({ userName, isLoading = false }: AIRecommendat
   ]);
 
   // Mock goal suggestion based on user behavior
-  const suggestedGoal = {
+  const [suggestedGoal, setSuggestedGoal] = useLocalStorage("aiSuggestedGoal", {
     currentGoal: 10,
     suggestedGoal: 12,
     reason: "You're consistently exceeding your current goal"
-  };
+  });
+
+  // Mock feedback collection
+  const [feedbackRatings, setFeedbackRatings] = useLocalStorage("aiFeedbackRatings", {
+    recommendations: null,
+    goalAdjustment: null,
+    insights: null
+  });
 
   // Function to handle accepting a recommendation
   const handleAcceptRecommendation = (index: number) => {
-    console.log("Accepted recommendation:", recommendations[index]);
-    // Here we would implement the actual logic for accepting a recommendation
+    toast({
+      title: "Recommendation Accepted",
+      description: `You've started: ${recommendations[index].title}`,
+    });
   };
 
   // Function to handle adjusting goals
   const handleAdjustGoal = () => {
-    console.log("Adjusting goal to:", suggestedGoal.suggestedGoal);
-    // Here we would implement the logic to adjust the user's goal
+    toast({
+      title: "Goal Adjusted",
+      description: `Your weekly goal is now ${suggestedGoal.suggestedGoal} hours`,
+    });
+    setSuggestedGoal({
+      ...suggestedGoal,
+      currentGoal: suggestedGoal.suggestedGoal,
+      suggestedGoal: suggestedGoal.suggestedGoal + 2,
+    });
+  };
+
+  // Handle feedback for AI features
+  const handleFeedback = (feature: keyof typeof feedbackRatings, isPositive: boolean) => {
+    setFeedbackRatings({
+      ...feedbackRatings,
+      [feature]: isPositive
+    });
+    
+    toast({
+      title: "Thank you for your feedback",
+      description: "We'll use this to improve our recommendations.",
+    });
   };
 
   return (
@@ -81,10 +117,38 @@ export const AIRecommendations = ({ userName, isLoading = false }: AIRecommendat
           <div className="space-y-6">
             {/* Smart Recommendations */}
             <div className="space-y-3">
-              <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 flex items-center gap-1">
-                <Lightbulb className="h-4 w-4 text-amber-500" />
-                Personalized Recommendations
-              </h3>
+              <div className="flex justify-between items-center">
+                <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                  <Lightbulb className="h-4 w-4 text-amber-500" />
+                  Personalized Recommendations
+                </h3>
+                <div className="flex space-x-1">
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => handleFeedback('recommendations', true)}
+                    className={cn(
+                      "h-6 w-6 p-0",
+                      feedbackRatings.recommendations === true && "text-emerald-500"
+                    )}
+                    aria-label="Mark recommendations as helpful"
+                  >
+                    <ThumbsUp className="h-3.5 w-3.5" />
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={() => handleFeedback('recommendations', false)}
+                    className={cn(
+                      "h-6 w-6 p-0",
+                      feedbackRatings.recommendations === false && "text-red-500"
+                    )}
+                    aria-label="Mark recommendations as not helpful"
+                  >
+                    <ThumbsDown className="h-3.5 w-3.5" />
+                  </Button>
+                </div>
+              </div>
               <div className="space-y-2">
                 {recommendations.map((rec, index) => (
                   <div 
@@ -125,10 +189,38 @@ export const AIRecommendations = ({ userName, isLoading = false }: AIRecommendat
 
             {/* Goal Adjustment Assistant */}
             <div className="space-y-3">
-              <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 flex items-center gap-1">
-                <TrendingUp className="h-4 w-4 text-emerald-500" />
-                Goal Adjustment
-              </h3>
+              <div className="flex justify-between items-center">
+                <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                  <TrendingUp className="h-4 w-4 text-emerald-500" />
+                  Goal Adjustment
+                </h3>
+                <div className="flex space-x-1">
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => handleFeedback('goalAdjustment', true)}
+                    className={cn(
+                      "h-6 w-6 p-0",
+                      feedbackRatings.goalAdjustment === true && "text-emerald-500"
+                    )}
+                    aria-label="Mark goal suggestion as helpful"
+                  >
+                    <ThumbsUp className="h-3.5 w-3.5" />
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={() => handleFeedback('goalAdjustment', false)}
+                    className={cn(
+                      "h-6 w-6 p-0",
+                      feedbackRatings.goalAdjustment === false && "text-red-500"
+                    )}
+                    aria-label="Mark goal suggestion as not helpful"
+                  >
+                    <ThumbsDown className="h-3.5 w-3.5" />
+                  </Button>
+                </div>
+              </div>
               <div className="p-3 border border-gray-100 dark:border-gray-800 rounded-md bg-gradient-to-r from-gray-50 to-white dark:from-gray-900 dark:to-gray-800/50">
                 <div className="flex justify-between items-start">
                   <div>
@@ -153,9 +245,37 @@ export const AIRecommendations = ({ userName, isLoading = false }: AIRecommendat
 
             {/* Learning Insights */}
             <div className="space-y-3">
-              <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                Learning Insights
-              </h3>
+              <div className="flex justify-between items-center">
+                <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                  Learning Insights
+                </h3>
+                <div className="flex space-x-1">
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => handleFeedback('insights', true)}
+                    className={cn(
+                      "h-6 w-6 p-0",
+                      feedbackRatings.insights === true && "text-emerald-500"
+                    )}
+                    aria-label="Mark insights as helpful"
+                  >
+                    <ThumbsUp className="h-3.5 w-3.5" />
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={() => handleFeedback('insights', false)}
+                    className={cn(
+                      "h-6 w-6 p-0",
+                      feedbackRatings.insights === false && "text-red-500"
+                    )}
+                    aria-label="Mark insights as not helpful"
+                  >
+                    <ThumbsDown className="h-3.5 w-3.5" />
+                  </Button>
+                </div>
+              </div>
               <ul className="space-y-1.5 text-sm">
                 {insights.map((insight, index) => (
                   <li 
@@ -168,6 +288,15 @@ export const AIRecommendations = ({ userName, isLoading = false }: AIRecommendat
                 ))}
               </ul>
             </div>
+            
+            {userTopics && userTopics.length > 0 && (
+              <div className="pt-2 text-xs text-gray-500 dark:text-gray-400 border-t border-gray-100 dark:border-gray-800">
+                <p>Based on your interests: {userTopics.join(", ")}</p>
+                <p className="mt-1">
+                  <span className="text-brand-500">Privacy note:</span> Your learning data is only used to personalize your experience.
+                </p>
+              </div>
+            )}
           </div>
         )}
       </CardContent>
