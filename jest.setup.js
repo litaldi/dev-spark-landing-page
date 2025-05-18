@@ -4,6 +4,31 @@ import '@testing-library/jest-dom';
 // Make sure jest is recognized before using it
 const mockFn = jest.fn;
 
+// Ensure our custom matchers are registered
+expect.extend({
+  toHaveAccessibleName: (element, expectedName) => {
+    const accessibleName = element.getAttribute('aria-label') || 
+                          element.getAttribute('aria-labelledby') ||
+                          element.textContent || '';
+                          
+    const hasName = accessibleName.trim() !== '';
+    const nameMatches = expectedName ? accessibleName.includes(expectedName) : true;
+    
+    return {
+      pass: hasName && nameMatches,
+      message: () => {
+        if (!hasName) {
+          return `Expected element to have an accessible name, but it doesn't have one.`;
+        }
+        if (!nameMatches) {
+          return `Expected element to have accessible name containing "${expectedName}", but got "${accessibleName}".`;
+        }
+        return `Expected element not to have accessible name, but it has "${accessibleName}".`;
+      },
+    };
+  }
+});
+
 // Mock for document.createElement for announceToScreenReader tests
 global.document.createElement = mockFn().mockImplementation(() => ({
   setAttribute: mockFn(),
@@ -50,11 +75,6 @@ Object.defineProperty(window, 'matchMedia', {
     removeEventListener: jest.fn(),
     dispatchEvent: jest.fn(),
   })),
-});
-
-// Set up custom Jest matchers
-expect.extend({
-  // Add any custom matchers here if needed
 });
 
 // Suppress React 18 console errors

@@ -20,6 +20,13 @@ declare global {
   const afterEach: jest.Lifecycle;
   const beforeAll: jest.Lifecycle;
   const afterAll: jest.Lifecycle;
+
+  // Add custom matcher interfaces
+  namespace jest {
+    interface Matchers<R> {
+      toHaveAccessibleName(expectedName?: string): R;
+    }
+  }
 }
 
 // This is important - explicitly declare the jest namespace to avoid TS2503 errors

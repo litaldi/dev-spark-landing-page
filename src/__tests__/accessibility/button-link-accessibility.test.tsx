@@ -41,7 +41,7 @@ describe('Button and Link Accessibility', () => {
     
     // Verify each button has an accessible name
     buttons.forEach(button => {
-      expect(button.getAttribute('aria-label') || button.textContent).not.toBe('');
+      expect(button).toHaveAccessibleName();
     });
   });
   
@@ -60,7 +60,7 @@ describe('Button and Link Accessibility', () => {
     // Check that links have proper attributes
     navLinks.forEach(link => {
       expect(link).toHaveAttribute('href');
-      expect(link.getAttribute('aria-label') || link.textContent).not.toBe('');
+      expect(link).toHaveAccessibleName();
     });
     
     // Make sure the first link can receive focus
