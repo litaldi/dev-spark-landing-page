@@ -5,7 +5,7 @@ import { Loader2 } from "lucide-react";
 
 interface LoadingProps extends React.HTMLAttributes<HTMLDivElement> {
   /** Size of the loading indicator */
-  size?: "sm" | "md" | "lg";
+  size?: "sm" | "md" | "lg" | "xl";
   /** Text to display below the spinner */
   text?: string;
   /** Whether to center the loading indicator */
@@ -26,6 +26,7 @@ export function Loading({
     sm: "h-4 w-4",
     md: "h-8 w-8",
     lg: "h-12 w-12",
+    xl: "h-16 w-16",
   };
 
   const containerClasses = cn(
@@ -33,7 +34,7 @@ export function Loading({
     { 
       "fixed inset-0 z-50 bg-background/80 backdrop-blur-sm": fullScreen,
       "h-full w-full": center && !fullScreen,
-      "py-8": !fullScreen && !center,
+      "py-6 md:py-8": !fullScreen && !center,
     },
     className
   );
@@ -41,10 +42,10 @@ export function Loading({
   return (
     <div className={containerClasses} role="status" {...props}>
       <div className="animate-spin" aria-hidden="true">
-        <Loader2 className={cn("text-muted-foreground/70", sizeMap[size])} />
+        <Loader2 className={cn("text-primary/70", sizeMap[size])} />
       </div>
       {text && (
-        <p className="mt-2 text-sm text-muted-foreground">{text}</p>
+        <p className="mt-3 text-sm md:text-base text-muted-foreground animate-pulse">{text}</p>
       )}
       <span className="sr-only">Loading{text ? `: ${text}` : ""}</span>
     </div>
@@ -56,6 +57,7 @@ interface SkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
   height?: string;
   rounded?: boolean;
   animated?: boolean;
+  repeat?: number;
 }
 
 export function Skeleton({
@@ -63,9 +65,28 @@ export function Skeleton({
   height = "1rem",
   rounded = true,
   animated = true,
+  repeat = 1,
   className,
   ...props
 }: SkeletonProps) {
+  if (repeat > 1) {
+    return (
+      <div className="space-y-2">
+        {Array.from({ length: repeat }).map((_, i) => (
+          <Skeleton 
+            key={i}
+            width={width}
+            height={height}
+            rounded={rounded}
+            animated={animated}
+            className={className}
+            {...props}
+          />
+        ))}
+      </div>
+    );
+  }
+
   return (
     <div 
       className={cn(

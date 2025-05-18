@@ -8,6 +8,9 @@ import MobileMenu from "./MobileMenu";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { AccessibilityMenu } from "@/components/a11y/AccessibilityMenu";
 import { SkipNavLink } from "@/components/a11y/skip-nav";
+import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const Navbar: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -15,6 +18,7 @@ const Navbar: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userName, setUserName] = useState<string | null>(null);
   const [isDemoUser, setIsDemoUser] = useState(false);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -74,7 +78,7 @@ const Navbar: React.FC = () => {
 
   return (
     <header 
-      className={`py-4 border-b border-gray-100 dark:border-gray-800 sticky top-0 z-50 transition-all duration-300 ${
+      className={`py-3 md:py-4 border-b border-gray-100 dark:border-gray-800 sticky top-0 z-50 transition-all duration-300 ${
         isScrolled ? "bg-white/95 dark:bg-gray-900/95 backdrop-blur-md shadow-sm" : "bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm"
       }`}
       role="banner"
@@ -87,13 +91,46 @@ const Navbar: React.FC = () => {
           </div>
           
           <nav 
-            className="hidden md:flex items-center space-x-10" 
+            className="hidden md:flex items-center space-x-8" 
             aria-label="Main navigation"
           >
             <NavLinks />
           </nav>
           
           <div className="flex items-center gap-3">
+            {/* New prominent CTA buttons inspired by Figma.com */}
+            <div className="hidden md:flex items-center gap-4">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="text-muted-foreground hover:text-foreground"
+                asChild
+              >
+                <Link to="/contact">Contact Sales</Link>
+              </Button>
+
+              {!isLoggedIn && (
+                <>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="hidden lg:flex"
+                    asChild
+                  >
+                    <Link to="/auth/login">Log In</Link>
+                  </Button>
+                  
+                  <Button 
+                    size="sm" 
+                    className="bg-brand-500 hover:bg-brand-600 text-white hidden lg:flex"
+                    asChild
+                  >
+                    <Link to="/auth/register">Get Started for Free</Link>
+                  </Button>
+                </>
+              )}
+            </div>
+            
             {/* Add accessibility menu and theme toggle to the right side */}
             <div className="hidden md:flex items-center gap-2">
               <AccessibilityMenu />

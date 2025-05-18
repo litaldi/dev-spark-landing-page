@@ -37,12 +37,23 @@ export function AlertError({
     <Alert 
       variant="destructive" 
       className={cn(
-        "animate-fade-in transition-all duration-300", 
+        "animate-fade-in transition-all duration-300 max-w-full sm:max-w-md mx-auto", 
         className
       )}
+      role="alert"
+      aria-live="assertive"
     >
-      <XCircle className="h-4 w-4" />
-      <AlertDescription>{message}</AlertDescription>
+      <XCircle className="h-4 w-4" aria-hidden="true" />
+      <AlertDescription className="text-sm md:text-base">{message}</AlertDescription>
+      {onClose && (
+        <button 
+          onClick={onClose}
+          className="ml-auto p-1 hover:bg-destructive/10 rounded-full transition-colors"
+          aria-label="Dismiss error"
+        >
+          <XCircle className="h-4 w-4" />
+        </button>
+      )}
     </Alert>
   );
 }
