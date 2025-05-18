@@ -1,37 +1,17 @@
 
-import React, { useState } from "react";
+import React from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import LoginModal from "@/components/auth/LoginModal";
 import { useIsMobile } from "@/hooks/use-mobile";
+import GetStartedButton from "./GetStartedButton";
 
 const HeroSection: React.FC = () => {
-  const [loginModalOpen, setLoginModalOpen] = useState(false);
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   
   // In a real app, this would come from your auth provider
-  const [isLoggedIn, setIsLoggedIn] = useState(
-    localStorage.getItem("isLoggedIn") === "true"
-  );
-
-  const openLoginModal = () => {
-    setLoginModalOpen(true);
-  };
-
-  const closeLoginModal = () => {
-    setLoginModalOpen(false);
-  };
-
-  // For demo purposes only - toggle login state
-  const toggleLoginState = () => {
-    setIsLoggedIn(!isLoggedIn);
-  };
-
-  const handleGetStarted = () => {
-    navigate("/auth/register");
-  };
+  const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
 
   const handleTryDemo = () => {
     const demoSection = document.getElementById('demo');
@@ -81,7 +61,7 @@ const HeroSection: React.FC = () => {
                 <Button 
                   size="lg" 
                   className={`rounded-full bg-brand-500 hover:bg-brand-600 text-white px-6 sm:px-8 py-5 sm:py-6 text-base sm:text-lg transform transition-all duration-300 hover:scale-105 shadow-md hover:shadow-lg ${isMobile ? 'w-full' : ''}`}
-                  onClick={handleGetStarted}
+                  onClick={() => navigate("/auth/register")}
                   aria-label="Sign up for an account"
                 >
                   Get Started for Free
@@ -106,13 +86,6 @@ const HeroSection: React.FC = () => {
           </p>
         </div>
       </div>
-      
-      {/* Login Modal */}
-      <LoginModal 
-        isOpen={loginModalOpen} 
-        onClose={closeLoginModal}
-        aria-label="Login form"
-      />
     </section>
   );
 };

@@ -1,10 +1,9 @@
 
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { Github, Linkedin, Twitter, LogIn, Info, Mail, MailPlus } from "lucide-react";
+import { Github, Linkedin, Twitter, Info, Mail, MailPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import LoginModal from "@/components/auth/LoginModal";
-import { ThemeToggle } from "@/components/theme/ThemeToggle";
 
 const Footer: React.FC = () => {
   const [loginModalOpen, setLoginModalOpen] = useState(false);
@@ -65,9 +64,6 @@ const Footer: React.FC = () => {
               >
                 <Twitter className="h-5 w-5" aria-hidden="true" />
               </a>
-              <div className="ml-2">
-                <ThemeToggle />
-              </div>
             </div>
           </div>
           
@@ -136,25 +132,21 @@ const Footer: React.FC = () => {
             </div>
             
             <div className="col-span-2 sm:col-span-1">
-              <h3 className="font-medium text-gray-800 dark:text-gray-200 mb-3">Account</h3>
+              <h3 className="font-medium text-gray-800 dark:text-gray-200 mb-3">Get Started</h3>
               <div className="flex flex-col space-y-2">
                 <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="text-gray-600 dark:text-gray-300 border-gray-300 dark:border-gray-700 hover:border-brand-300 dark:hover:border-brand-700 hover:text-brand-600 dark:hover:text-brand-400"
-                  onClick={openLoginModal}
-                >
-                  <LogIn className="h-3.5 w-3.5 mr-1" aria-hidden="true" />
-                  Sign in
-                </Button>
-                <Button 
-                  variant="default" 
-                  size="sm" 
-                  className="bg-brand-500 hover:bg-brand-600"
+                  className="bg-brand-500 hover:bg-brand-600 text-white"
+                  size="sm"
                   asChild
                 >
                   <Link to="/auth/register">Create account</Link>
                 </Button>
+                <Link 
+                  to="/dashboard"
+                  className="text-gray-500 dark:text-gray-400 hover:text-brand-500 dark:hover:text-brand-400 text-sm transition-colors"
+                >
+                  Visit Dashboard
+                </Link>
               </div>
             </div>
           </div>
@@ -165,7 +157,7 @@ const Footer: React.FC = () => {
         </div>
       </div>
       
-      {/* Login Modal */}
+      {/* Login Modal (kept for compatibility with other components) */}
       <LoginModal isOpen={loginModalOpen} onClose={closeLoginModal} />
     </footer>
   );
