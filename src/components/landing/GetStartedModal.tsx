@@ -196,14 +196,6 @@ const GetStartedModal: React.FC<GetStartedModalProps> = ({ isOpen, onClose }) =>
             <Button variant="link" className="px-0" asChild>
               <Link to="/auth/forgot-password">Forgot your password?</Link>
             </Button>
-
-            <div className="mt-4 pt-2 border-t border-border">
-              <p className="text-xs text-muted-foreground/80">
-                <strong className="font-medium">Demo User:</strong><br />
-                Email: demo@example.com<br />
-                Password: demo1234
-              </p>
-            </div>
           </div>
         </div>
       </DialogContent>

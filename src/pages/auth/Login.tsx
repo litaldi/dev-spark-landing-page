@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -10,7 +11,6 @@ import { LoginSuccess } from "@/components/auth/LoginSuccess";
 import { useAuth } from "@/hooks/auth";
 import { ArrowLeft } from "lucide-react";
 import { useBreakpoint } from "@/hooks/use-mobile";
-import { DemoUserCredentials } from "@/components/auth/DemoUserCredentials";
 
 const LoginPage = () => {
   const { toast } = useToast();

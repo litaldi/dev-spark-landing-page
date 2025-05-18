@@ -10,7 +10,6 @@ import { EnhancedDashboardContent } from "@/components/dashboard/EnhancedDashboa
 
 const Dashboard = () => {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
-  const [isDemoUser, setIsDemoUser] = useState<boolean>(false);
   const [userName, setUserName] = useState<string>("User");
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isFirstTimeUser, setIsFirstTimeUser] = useState<boolean>(false);
@@ -37,10 +36,6 @@ const Dashboard = () => {
     if (storedUserName) {
       setUserName(storedUserName);
     }
-    
-    // Check if demo user (leaving this for compatibility with existing data)
-    const demoStatus = localStorage.getItem("isDemoUser");
-    setIsDemoUser(demoStatus === "true");
     
     // Check if first-time user (no lessons completed)
     const onboardingComplete = localStorage.getItem("onboardingComplete");

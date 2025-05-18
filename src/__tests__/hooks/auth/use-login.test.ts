@@ -33,7 +33,7 @@ describe('useLogin hook', () => {
   
   test('initializes with correct default state', () => {
     const setCurrentUser = jest.fn();
-    const { result } = renderHook(() => useLogin(true, setCurrentUser));
+    const { result } = renderHook(() => useLogin(setCurrentUser));
     
     expect(result.current.isLoading).toBe(false);
     expect(result.current.errorMessage).toBeNull();
@@ -41,7 +41,7 @@ describe('useLogin hook', () => {
   
   test('handles successful login for regular user', async () => {
     const setCurrentUser = jest.fn();
-    const { result } = renderHook(() => useLogin(true, setCurrentUser));
+    const { result } = renderHook(() => useLogin(setCurrentUser));
     
     let success: boolean | undefined;
     
@@ -53,28 +53,6 @@ describe('useLogin hook', () => {
     expect(setCurrentUser).toHaveBeenCalled();
     expect(localStorage.getItem('isLoggedIn')).toBe('true');
     expect(localStorage.getItem('userEmail')).toBe('user@example.com');
-    expect(localStorage.getItem('isDemoUser')).toBe('false');
-  });
-  
-  test('handles demo user login', async () => {
-    const setCurrentUser = jest.fn();
-    const { result } = renderHook(() => useLogin(true, setCurrentUser));
-    
-    let success: boolean | undefined;
-    
-    await act(async () => {
-      success = await result.current.login('demo@looplist.app', 'Demo123!');
-    });
-    
-    expect(success).toBe(true);
-    expect(setCurrentUser).toHaveBeenCalledWith({
-      name: 'Demo User',
-      email: 'demo@looplist.app',
-      isDemoUser: true,
-      isFirstTimeUser: false
-    });
-    expect(localStorage.getItem('isLoggedIn')).toBe('true');
-    expect(localStorage.getItem('isDemoUser')).toBe('true');
   });
   
   test('handles login error states', async () => {
@@ -93,7 +71,7 @@ describe('useLogin hook', () => {
       }
     } as any;
     
-    const { result } = renderHook(() => useLogin(true, setCurrentUser));
+    const { result } = renderHook(() => useLogin(setCurrentUser));
     
     let success: boolean | undefined;
     
@@ -111,7 +89,7 @@ describe('useLogin hook', () => {
   
   test('clears error when clearError is called', async () => {
     const setCurrentUser = jest.fn();
-    const { result } = renderHook(() => useLogin(true, setCurrentUser));
+    const { result } = renderHook(() => useLogin(setCurrentUser));
     
     // Set an error manually
     await act(async () => {

@@ -9,12 +9,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Badge } from "@/components/ui/badge";
 
 interface AuthButtonsProps {
   isLoggedIn: boolean;
   userName: string | null;
-  isDemoUser?: boolean;
   isMobile?: boolean;
   onMobileMenuClose?: () => void;
   onLogout: () => void;
@@ -24,7 +22,6 @@ interface AuthButtonsProps {
 const AuthButtons: React.FC<AuthButtonsProps> = ({
   isLoggedIn,
   userName,
-  isDemoUser = false,
   isMobile = false,
   onMobileMenuClose = () => {},
   onLogout
@@ -50,14 +47,6 @@ const AuthButtons: React.FC<AuthButtonsProps> = ({
             <p className="text-brand-700 dark:text-brand-300 font-medium truncate max-w-[120px] lg:max-w-none">
               {userName}
             </p>
-            {isDemoUser && (
-              <Badge 
-                variant="outline" 
-                className="bg-brand-50 dark:bg-brand-900/20 text-brand-700 dark:text-brand-300 border-brand-200 dark:border-brand-800 hidden lg:inline-flex"
-              >
-                Demo
-              </Badge>
-            )}
           </div>
         </div>
       )}

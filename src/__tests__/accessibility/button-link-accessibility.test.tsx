@@ -5,7 +5,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { ThemeProvider } from '@/components/theme/ThemeProvider';
 import { axe } from 'jest-axe';
 
-// Since we removed the Index page, we'll test the Login page instead which is now our entry point
+// Since we're starting with the Login page as our entry point
 jest.mock('@/pages/auth/Login', () => ({
   __esModule: true,
   default: () => <div data-testid="login-page">Login Page</div>

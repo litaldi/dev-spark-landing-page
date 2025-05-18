@@ -10,7 +10,6 @@ import { AuthUser, RegisterFormData, UseAuthOptions } from "./types";
 export function useAuth(options: UseAuthOptions = {}) {
   const { 
     redirectTo = "/dashboard", 
-    isDemoEnabled = true, 
     showSuccessScreen = true 
   } = options;
   
@@ -25,7 +24,7 @@ export function useAuth(options: UseAuthOptions = {}) {
     isLoading: isLoginLoading,
     errorMessage: loginErrorMessage,
     clearError: clearLoginError
-  } = useLogin(isDemoEnabled, (user) => {
+  } = useLogin((user) => {
     setCurrentUser(user);
     if (showSuccessScreen) {
       setShowLoginSuccess(true);

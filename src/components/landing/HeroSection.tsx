@@ -16,13 +16,6 @@ const HeroSection: React.FC = () => {
     navigate("/auth/register");
   };
 
-  const handleTryDemo = () => {
-    const demoSection = document.getElementById('demo');
-    if (demoSection) {
-      demoSection.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
   const handleDashboard = () => {
     navigate("/dashboard");
   };
@@ -64,32 +57,20 @@ const HeroSection: React.FC = () => {
                 <ArrowRight className="ml-1 h-4 w-4" />
               </Button>
             ) : (
-              <>
-                <Button 
-                  size="lg" 
-                  className={`rounded-full bg-brand-500 hover:bg-brand-600 text-white px-4 sm:px-6 md:px-8 py-3 sm:py-4 md:py-5 text-sm sm:text-base transform transition-all duration-300 hover:scale-105 shadow-md hover:shadow-lg ${isMobile ? 'w-full' : ''}`}
-                  onClick={handleGetStarted}
-                  aria-label="Sign up for an account"
-                >
-                  Get Started for Free
-                  <ArrowRight className="ml-1 h-4 w-4" />
-                </Button>
-                
-                <Button 
-                  variant="outline" 
-                  size="lg" 
-                  className={`rounded-full border-brand-300 dark:border-brand-700 bg-white dark:bg-gray-900 bg-opacity-90 backdrop-blur-sm hover:bg-brand-50 dark:hover:bg-gray-800 px-4 sm:px-6 md:px-8 py-3 sm:py-4 md:py-5 text-sm sm:text-base text-brand-700 dark:text-brand-300 mt-2 sm:mt-0 ${isMobile ? 'w-full' : ''}`}
-                  onClick={handleTryDemo}
-                  aria-label="Try the demo"
-                >
-                  Try Demo
-                </Button>
-              </>
+              <Button 
+                size="lg" 
+                className={`rounded-full bg-brand-500 hover:bg-brand-600 text-white px-4 sm:px-6 md:px-8 py-3 sm:py-4 md:py-5 text-sm sm:text-base transform transition-all duration-300 hover:scale-105 shadow-md hover:shadow-lg ${isMobile ? 'w-full' : ''}`}
+                onClick={handleGetStarted}
+                aria-label="Sign up for an account"
+              >
+                Get Started for Free
+                <ArrowRight className="ml-1 h-4 w-4" />
+              </Button>
             )}
           </div>
           
           <p className="mt-3 sm:mt-4 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-            No credit card required · Start for free · No sign-up required for basic features
+            No credit card required · Start for free
           </p>
         </div>
       </div>

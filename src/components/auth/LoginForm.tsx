@@ -1,3 +1,4 @@
+
 import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -113,7 +114,7 @@ export function LoginForm({ onGoogleLogin, onGithubLogin, onMagicLink }: LoginFo
         isLoading={isLoading || isBlocked}
       />
       
-      <DemoUserCredentials />
+      {/* DemoUserCredentials component is imported but not rendered */}
     </div>
   );
 }

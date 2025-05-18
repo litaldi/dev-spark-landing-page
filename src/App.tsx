@@ -51,7 +51,7 @@ function App() {
             <Sonner />
             <Router>
               <Routes>
-                {/* Redirect from root to login or dashboard */}
+                {/* Redirect from root to login or dashboard based on authentication state */}
                 <Route path="/" element={
                   localStorage.getItem("isLoggedIn") === "true" 
                     ? <Navigate to="/dashboard" replace /> 
@@ -77,7 +77,7 @@ function App() {
                 <Route path="/auth/logout" element={<LogoutPage />} />
                 <Route path="/auth/error" element={<AuthErrorPage />} />
                 
-                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                {/* Catch-all route for 404 pages */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </Router>

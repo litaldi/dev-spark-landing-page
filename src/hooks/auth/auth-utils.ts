@@ -23,7 +23,7 @@ export function getCurrentUserFromStorage() {
   return {
     email: localStorage.getItem("userEmail") || "",
     name: localStorage.getItem("userName") || "",
-    isDemoUser: localStorage.getItem("isDemoUser") === "true",
+    isDemoUser: false,
     isFirstTimeUser
   };
 }
@@ -34,10 +34,8 @@ export function getCurrentUserFromStorage() {
 export function storeUserData(
   email: string, 
   name: string, 
-  isDemoUser: boolean, 
   skipOnboarding = false
 ): void {
-  localStorage.setItem("isDemoUser", isDemoUser ? "true" : "false");
   localStorage.setItem("userName", sanitizeInput(name));
   localStorage.setItem("userEmail", sanitizeInput(email));
   localStorage.setItem("isLoggedIn", "true");
@@ -54,5 +52,4 @@ export function clearUserData(): void {
   localStorage.removeItem("isLoggedIn");
   localStorage.removeItem("userName");
   localStorage.removeItem("userEmail");
-  localStorage.removeItem("isDemoUser");
 }

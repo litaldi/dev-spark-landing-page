@@ -6,7 +6,6 @@ export function useNavbarState() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userName, setUserName] = useState<string | null>(null);
-  const [isDemoUser, setIsDemoUser] = useState(false);
 
   // Handle scroll effect
   useEffect(() => {
@@ -31,20 +30,15 @@ export function useNavbarState() {
     if (storedUserName) {
       setUserName(storedUserName);
     }
-
-    // Check if demo user
-    const demoStatus = localStorage.getItem("isDemoUser");
-    setIsDemoUser(demoStatus === "true");
   }, []);
 
   const handleLogout = () => {
     // Clear all authentication data
     localStorage.removeItem("isLoggedIn");
     localStorage.removeItem("userName");
-    localStorage.removeItem("isDemoUser");
+    localStorage.removeItem("userEmail");
     setIsLoggedIn(false);
     setUserName(null);
-    setIsDemoUser(false);
   };
 
   const toggleLoginState = () => {
@@ -53,16 +47,12 @@ export function useNavbarState() {
     localStorage.setItem("isLoggedIn", String(newState));
     
     if (newState) {
-      // Mock user data for demo purposes
-      setUserName("Demo User");
-      setIsDemoUser(true);
-      localStorage.setItem("userName", "Demo User");
-      localStorage.setItem("isDemoUser", "true");
+      // Mock user data for testing purposes
+      setUserName("Test User");
+      localStorage.setItem("userName", "Test User");
     } else {
       setUserName(null);
-      setIsDemoUser(false);
       localStorage.removeItem("userName");
-      localStorage.removeItem("isDemoUser");
     }
   };
 
@@ -79,7 +69,7 @@ export function useNavbarState() {
     mobileMenuOpen,
     isLoggedIn,
     userName,
-    isDemoUser,
+    isDemoUser: false, // Always return false
     toggleMobileMenu,
     closeMobileMenu,
     handleLogout,
