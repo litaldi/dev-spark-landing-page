@@ -7,10 +7,16 @@ import { useToast } from "@/hooks/use-toast";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { SkipNavLink, SkipNavContent } from "@/components/a11y/skip-nav";
 import { LoginForm } from "@/components/auth/LoginForm";
+import { LoginSuccess } from "@/components/auth/LoginSuccess";
+import { useAuth } from "@/hooks/use-auth";
 
 const LoginPage = () => {
   const { toast } = useToast();
   const [isProcessing, setIsProcessing] = useState(false);
+  const { showLoginSuccess, currentUser, resetLoginSuccess } = useAuth({
+    showSuccessScreen: true,
+    redirectTo: "/dashboard"
+  });
 
   const handleGoogleLogin = () => {
     // Implementation would connect to Google OAuth
@@ -41,6 +47,17 @@ const LoginPage = () => {
     });
     setIsProcessing(false);
   };
+
+  // Show login success screen if user is logged in
+  if (showLoginSuccess && currentUser) {
+    return (
+      <LoginSuccess 
+        userName={currentUser.name} 
+        redirectTo={currentUser.isFirstTimeUser ? "/auth/onboarding" : "/dashboard"}
+        isFirstTimeUser={!!currentUser.isFirstTimeUser}
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-background p-4 bg-gradient-to-b from-background to-background/80">

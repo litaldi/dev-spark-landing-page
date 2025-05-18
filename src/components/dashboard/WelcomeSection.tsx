@@ -2,7 +2,7 @@
 import React from "react";
 import { useViewportSize } from "@/hooks/use-mobile";
 import { Button } from "@/components/ui/button";
-import { CalendarDays, BookOpen, Award, Bell, Clock } from "lucide-react";
+import { CalendarDays, BookOpen, Award, Bell, Clock, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 
@@ -37,20 +37,29 @@ export const WelcomeSection = ({
   const [preferredSessionTime, setPreferredSessionTime] = useLocalStorage<string>("preferredSessionTime", "morning");
   const [totalSessionsCompleted, setTotalSessionsCompleted] = useLocalStorage<number>("totalSessionsCompleted", 0);
   
+  // Calculate days since last visit
+  const getDaysSinceLastVisit = () => {
+    if (!lastSessionDate) return null;
+    const lastSession = new Date(lastSessionDate);
+    const today = new Date();
+    return Math.floor((today.getTime() - lastSession.getTime()) / (1000 * 60 * 60 * 24));
+  };
+  
+  const daysSinceLastVisit = getDaysSinceLastVisit();
+  
   // Get motivational message based on user pattern
   const getMotivationalMessage = () => {
     if (isFirstTimeUser) return "Ready to begin your learning journey?";
     
     if (!lastSessionDate) return "Let's start building your knowledge today!";
     
-    const lastSession = new Date(lastSessionDate);
-    const today = new Date();
-    const daysSinceLastSession = Math.floor((today.getTime() - lastSession.getTime()) / (1000 * 60 * 60 * 24));
+    const daysSince = getDaysSinceLastVisit();
     
-    if (daysSinceLastSession === 0) return "Great job continuing your learning today!";
-    if (daysSinceLastSession === 1) return "Welcome back! Ready to pick up where you left off?";
-    if (daysSinceLastSession <= 3) return "It's been a few days. Let's keep your momentum going!";
-    return "We've missed you! Let's get back to learning.";
+    if (daysSince === 0) return "Great job continuing your learning today!";
+    if (daysSince === 1) return "Welcome back! Ready to pick up where you left off?";
+    if (daysSince && daysSince <= 3) return "It's been a few days. Let's keep your momentum going!";
+    if (daysSince && daysSince > 3 && daysSince <= 7) return "We've missed you! Let's get back to learning.";
+    return "Welcome back! Excited to see you resume your learning journey.";
   };
   
   // Handle starting a session
@@ -65,6 +74,24 @@ export const WelcomeSection = ({
     else setPreferredSessionTime("evening");
     
     onStartTodaysSession();
+  };
+  
+  // Welcome back banner for returning users after absence
+  const WelcomeBackBanner = () => {
+    if (isFirstTimeUser || daysSinceLastVisit === null || daysSinceLastVisit <= 1) return null;
+    
+    return (
+      <div className="bg-brand-50/50 dark:bg-brand-900/10 border border-brand-100 dark:border-brand-800/50 rounded-md p-3 mb-4 animate-fade-in">
+        <p className="text-sm text-brand-700 dark:text-brand-300 flex items-center">
+          <span className="bg-brand-100 dark:bg-brand-800/70 rounded-full p-1 mr-2">
+            <ArrowRight className="h-3 w-3" />
+          </span>
+          {daysSinceLastVisit > 7 
+            ? "It's been a while! Welcome back to continue your learning journey."
+            : `Welcome back after ${daysSinceLastVisit} days! Pick up where you left off.`}
+        </p>
+      </div>
+    );
   };
 
   return (
@@ -81,6 +108,8 @@ export const WelcomeSection = ({
         </div>
       ) : (
         <>
+          <WelcomeBackBanner />
+          
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <h1 className="text-2xl md:text-3xl font-bold text-gray-800 dark:text-white">

@@ -8,10 +8,16 @@ import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { RegisterForm } from "@/components/auth/RegisterForm";
 import { SkipNavLink, SkipNavContent } from "@/components/a11y/skip-nav";
 import { ArrowLeft } from "lucide-react";
+import { LoginSuccess } from "@/components/auth/LoginSuccess";
+import { useAuth } from "@/hooks/use-auth";
 
 const RegisterPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const { showLoginSuccess, currentUser } = useAuth({
+    showSuccessScreen: true,
+    redirectTo: "/auth/onboarding"
+  });
 
   const handleGoogleSignUp = () => {
     setIsLoading(true);
@@ -27,6 +33,17 @@ const RegisterPage: React.FC = () => {
       setIsLoading(false);
     }, 800);
   };
+
+  // Show success screen if registration successful
+  if (showLoginSuccess && currentUser) {
+    return (
+      <LoginSuccess 
+        userName={currentUser.name} 
+        redirectTo="/auth/onboarding"
+        isFirstTimeUser={true}
+      />
+    );
+  }
 
   return (
     <div 
