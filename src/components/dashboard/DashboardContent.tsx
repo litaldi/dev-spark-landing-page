@@ -11,7 +11,7 @@ import { MotivationalPrompts } from "@/components/dashboard/MotivationalPrompts"
 import { useDashboardActions } from "@/hooks/dashboard/use-dashboard-actions";
 import { Button } from "@/components/ui/button";
 import { HelpCircle } from "lucide-react";
-import { useViewportSize } from "@/hooks/use-mobile";
+import { useViewportSize, useBreakpoint } from "@/hooks/use-mobile";
 
 interface DashboardContentProps {
   userName: string;
@@ -33,8 +33,9 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
     handleAction
   } = useDashboardActions(onError);
   
-  const { width } = useViewportSize();
-  const isSmallScreen = width < 640;
+  const breakpoint = useBreakpoint();
+  const isSmallScreen = breakpoint === "xs" || breakpoint === "mobile";
+  const isTabletScreen = breakpoint === "tablet";
 
   // Get last activity timestamp from localStorage
   const lastActivityDate = localStorage.getItem("lastSessionDate");
@@ -50,8 +51,8 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
         onStartTodaysSession={startSession}
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
-        <div className="lg:col-span-2 space-y-4 sm:space-y-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 xs:gap-4 sm:gap-6">
+        <div className="lg:col-span-2 space-y-3 xs:space-y-4 sm:space-y-6">
           <ProgressSection 
             weeklyGoalHours={10}
             currentHours={2}
@@ -78,19 +79,19 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
           />
         </div>
         
-        <div className="lg:col-span-1 space-y-4 sm:space-y-6">
+        <div className="lg:col-span-1 space-y-3 xs:space-y-4 sm:space-y-6">
           <RecentActivitySection isLoading={isLoading} />
           
-          <div className="fixed bottom-6 right-6 md:static md:mt-4 md:flex md:justify-end z-10">
+          <div className={`${isSmallScreen || isTabletScreen ? 'fixed bottom-6 right-6 z-10' : 'mt-4 flex justify-end'}`}>
             <Button 
               variant="outline"
               size={isSmallScreen ? "icon" : "sm"}
-              className="rounded-full h-12 w-12 md:h-auto md:w-auto md:rounded-md md:px-4 shadow-lg md:shadow-none bg-white dark:bg-gray-800"
+              className={`${isSmallScreen ? 'rounded-full h-12 w-12 shadow-lg bg-white dark:bg-gray-800' : 'rounded-md'}`}
               aria-label="Get help with dashboard features"
               onClick={() => handleAction('help')}
             >
-              <HelpCircle className="h-6 w-6 md:h-4 md:w-4 md:mr-2" />
-              <span className="hidden md:inline">Get Help</span>
+              <HelpCircle className={`${isSmallScreen ? 'h-6 w-6' : 'h-4 w-4 mr-2'}`} />
+              {!isSmallScreen && <span>Get Help</span>}
             </Button>
           </div>
         </div>

@@ -1,3 +1,4 @@
+
 import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -11,6 +12,7 @@ import { RateLimitWarning } from "./RateLimitWarning";
 import { DemoUserCredentials } from "./DemoUserCredentials";
 import { useLoginForm, loginSchema, LoginFormValues } from "@/hooks/auth/use-login-form";
 import { Loader2 } from "lucide-react";
+import { useBreakpoint } from "@/hooks/use-mobile";
 
 interface LoginFormProps {
   onGoogleLogin?: () => void;
@@ -19,6 +21,9 @@ interface LoginFormProps {
 }
 
 export function LoginForm({ onGoogleLogin, onGithubLogin, onMagicLink }: LoginFormProps) {
+  const breakpoint = useBreakpoint();
+  const isSmallScreen = breakpoint === "xs" || breakpoint === "mobile";
+  
   const { 
     isLoading, 
     isBlocked, 
@@ -85,6 +90,7 @@ export function LoginForm({ onGoogleLogin, onGithubLogin, onMagicLink }: LoginFo
             className="w-full transition-all duration-300 relative"
             disabled={isLoading || isBlocked}
             aria-busy={isLoading}
+            size={isSmallScreen ? "sm" : "default"}
           >
             {isLoading && (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />
@@ -111,9 +117,4 @@ export function LoginForm({ onGoogleLogin, onGithubLogin, onMagicLink }: LoginFo
       <DemoUserCredentials />
     </div>
   );
-}
-
-// Helper function - keeping for backwards compatibility if needed
-function navigate(path: string): void {
-  window.location.href = path;
 }

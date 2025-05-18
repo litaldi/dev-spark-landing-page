@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/form";
 import { UseFormReturn } from "react-hook-form";
 import { LoginFormValues } from "@/hooks/auth/use-login-form";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface LoginFormInputsProps {
   form: UseFormReturn<LoginFormValues>;
@@ -20,6 +21,8 @@ interface LoginFormInputsProps {
 }
 
 export function LoginFormInputs({ form, focusField, setFocusField }: LoginFormInputsProps) {
+  const isMobile = useIsMobile();
+  
   return (
     <>
       <FormField
@@ -49,7 +52,7 @@ export function LoginFormInputs({ form, focusField, setFocusField }: LoginFormIn
         name="password"
         render={({ field }) => (
           <FormItem className="space-y-1.5">
-            <div className="flex items-center justify-between">
+            <div className={`flex items-center justify-between ${isMobile ? 'flex-col items-start gap-1' : ''}`}>
               <FormLabel className="text-sm font-medium text-foreground">Password</FormLabel>
               <Button
                 variant="link"

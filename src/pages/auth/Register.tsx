@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -9,6 +10,7 @@ import { SkipNavLink, SkipNavContent } from "@/components/a11y/skip-nav";
 import { ArrowLeft } from "lucide-react";
 import { LoginSuccess } from "@/components/auth/LoginSuccess";
 import { useAuth } from "@/hooks/auth";
+import { useBreakpoint } from "@/hooks/use-mobile";
 
 const RegisterPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -17,6 +19,9 @@ const RegisterPage: React.FC = () => {
     showSuccessScreen: true,
     redirectTo: "/auth/onboarding"
   });
+  
+  const breakpoint = useBreakpoint();
+  const isSmallScreen = breakpoint === "xs" || breakpoint === "mobile";
 
   const handleGoogleSignUp = () => {
     setIsLoading(true);
@@ -73,9 +78,9 @@ const RegisterPage: React.FC = () => {
           
           <Card className="w-full shadow-lg border-border overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-br from-brand-50/50 dark:from-brand-900/20 to-transparent opacity-50 pointer-events-none" />
-            <CardHeader className="space-y-1 relative">
+            <CardHeader className="space-y-1 relative p-4 sm:p-6">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-xl sm:text-2xl font-bold" id="register-page-title">Join DevSpark</CardTitle>
+                <CardTitle className={`${isSmallScreen ? 'text-xl' : 'text-2xl'} font-bold`} id="register-page-title">Join DevSpark</CardTitle>
                 <Button 
                   variant="ghost" 
                   size="sm" 
@@ -84,7 +89,7 @@ const RegisterPage: React.FC = () => {
                 >
                   <Link to="/" className="flex items-center gap-1">
                     <ArrowLeft className="h-3 w-3 sm:h-4 sm:w-4" />
-                    Home
+                    <span className="hidden xs:inline">Home</span>
                   </Link>
                 </Button>
               </div>
@@ -92,10 +97,10 @@ const RegisterPage: React.FC = () => {
                 Create your account to start your learning journey
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4 relative">
+            <CardContent className="space-y-4 relative p-4 sm:p-6">
               <RegisterForm onGoogleSignUp={handleGoogleSignUp} />
             </CardContent>
-            <CardFooter className="flex flex-col space-y-4 pt-0 relative">
+            <CardFooter className="flex flex-col space-y-4 pt-0 relative p-4 sm:p-6">
               <div className="text-center w-full">
                 <p className="text-xs sm:text-sm text-muted-foreground">
                   Already have an account?{" "}
