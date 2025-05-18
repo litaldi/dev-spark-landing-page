@@ -1,7 +1,7 @@
 
 import React from "react";
 import NavbarLogo from "./NavbarLogo";
-import NavLinks from "./NavLinks";
+import { NavLinks } from "./NavLinks";
 import { SkipNavLink } from "@/components/a11y/skip-nav";
 import MobileMenu from "./MobileMenu";
 import NavbarContent from "./NavbarContent";

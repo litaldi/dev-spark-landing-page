@@ -1,8 +1,9 @@
+
 import React from "react"
-import { usePathname } from "next/navigation"
+import { useLocation } from "react-router-dom"
 import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button"
-import Link from "next/link"
+import { Link } from "react-router-dom"
 
 interface NavLinkProps {
   to: string
@@ -10,12 +11,12 @@ interface NavLinkProps {
 }
 
 function NavLink({ to, label }: NavLinkProps) {
-  const pathname = usePathname()
-  const isActive = pathname === to
+  const location = useLocation()
+  const isActive = location.pathname === to
 
   return (
     <Link
-      href={to}
+      to={to}
       className={cn(
         buttonVariants({ variant: "ghost", size: "sm" }),
         "font-medium",
@@ -30,7 +31,7 @@ function NavLink({ to, label }: NavLinkProps) {
 }
 
 export function NavLinks() {
-  const pathname = usePathname()
+  const location = useLocation()
   const isLoggedIn = false // Replace with actual auth check
 
   return (
