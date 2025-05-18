@@ -44,15 +44,15 @@ const StickyCTABar: React.FC = () => {
   return (
     <>
       <div 
-        className="fixed bottom-0 left-0 right-0 bg-background border-t border-border shadow-lg p-3 md:hidden z-40 animate-fade-up"
+        className="fixed bottom-0 left-0 right-0 bg-background border-t border-border shadow-lg p-3 z-40 animate-fade-up"
         role="complementary"
         aria-label="Call to action"
       >
-        <div className="flex items-center justify-between">
-          <div className="flex-1">
+        <div className="container mx-auto flex items-center justify-between px-4">
+          <div className="hidden sm:block flex-1">
             <p className="font-medium text-brand-700 dark:text-brand-300">🚀 Ready to start?</p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 w-full sm:w-auto justify-between sm:justify-end">
             <Button 
               onClick={scrollToTop} 
               variant="outline"

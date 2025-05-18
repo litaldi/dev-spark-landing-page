@@ -33,59 +33,62 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
   
   return (
     <div 
-      className="md:hidden mt-2 py-4 border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 rounded-b-lg shadow-lg" 
+      className="md:hidden fixed inset-x-0 top-[61px] bottom-0 z-40 pb-20 overflow-y-auto mt-2 py-4 border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-lg" 
       id="mobile-menu" 
       role="navigation" 
       aria-label="Mobile navigation"
       tabIndex={0}
     >
-      {isLoggedIn && isDemoUser && (
-        <div className="px-4 mb-2">
-          <Badge variant="outline" className="bg-brand-50 dark:bg-brand-900/20 text-brand-700 dark:text-brand-300 border-brand-200 dark:border-brand-800">
-            Demo Mode
-          </Badge>
-        </div>
-      )}
-      <nav className="flex flex-col space-y-2 px-4">
-        <NavLinks isMobile={true} onMobileMenuClose={onMenuClose} />
+      <div className="px-4 pb-4">
+        {isLoggedIn && isDemoUser && (
+          <div className="mb-2">
+            <Badge variant="outline" className="bg-brand-50 dark:bg-brand-900/20 text-brand-700 dark:text-brand-300 border-brand-200 dark:border-brand-800">
+              Demo Mode
+            </Badge>
+          </div>
+        )}
         
-        <div className="flex items-center justify-start gap-3 py-2 border-t border-gray-100 dark:border-gray-800 mt-2">
-          <AccessibilityMenu />
-          <ThemeToggle />
-          <span className="text-sm text-muted-foreground ml-2">Theme & Accessibility</span>
-        </div>
-        
-        {/* New prominent CTA buttons */}
-        <div className="py-2 space-y-2 border-t border-gray-100 dark:border-gray-800">
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            className="text-muted-foreground hover:text-foreground w-full justify-start"
-            asChild
-            onClick={onMenuClose}
-          >
-            <Link to="/contact">
-              <Mail className="h-4 w-4 mr-2" />
-              Contact Sales
-            </Link>
-          </Button>
-        </div>
-        
-        <div className="py-2 space-y-2 border-t border-gray-100 dark:border-gray-800">
-          {!isLoggedIn && (
-            <GetStartedButton isMobile={true} onMenuClose={onMenuClose} />
-          )}
-          <AuthButtons 
-            isLoggedIn={isLoggedIn}
-            userName={userName}
-            isDemoUser={isDemoUser}
-            isMobile={true}
-            onMobileMenuClose={onMenuClose}
-            onLogout={onLogout}
-            toggleLoginState={toggleLoginState}
-          />
-        </div>
-      </nav>
+        <nav className="flex flex-col space-y-2">
+          <NavLinks isMobile={true} onMobileMenuClose={onMenuClose} />
+          
+          <div className="flex items-center justify-start gap-3 py-2 border-t border-gray-100 dark:border-gray-800 mt-2">
+            <AccessibilityMenu />
+            <ThemeToggle />
+            <span className="text-sm text-muted-foreground ml-2">Theme & Accessibility</span>
+          </div>
+          
+          {/* New prominent CTA buttons */}
+          <div className="py-2 space-y-2 border-t border-gray-100 dark:border-gray-800">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="text-muted-foreground hover:text-foreground w-full justify-start"
+              asChild
+              onClick={onMenuClose}
+            >
+              <Link to="/contact">
+                <Mail className="h-4 w-4 mr-2" />
+                Contact Sales
+              </Link>
+            </Button>
+          </div>
+          
+          <div className="py-2 space-y-2 border-t border-gray-100 dark:border-gray-800">
+            {!isLoggedIn && (
+              <GetStartedButton isMobile={true} onMenuClose={onMenuClose} />
+            )}
+            <AuthButtons 
+              isLoggedIn={isLoggedIn}
+              userName={userName}
+              isDemoUser={isDemoUser}
+              isMobile={true}
+              onMobileMenuClose={onMenuClose}
+              onLogout={onLogout}
+              toggleLoginState={toggleLoginState}
+            />
+          </div>
+        </nav>
+      </div>
     </div>
   );
 };

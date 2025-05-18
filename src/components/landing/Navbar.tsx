@@ -19,7 +19,7 @@ const Navbar: React.FC = () => {
       role="banner"
     >
       <SkipNavLink className="focus:absolute focus:z-50" />
-      <div className="container">
+      <div className="container mx-auto">
         <NavbarContent 
           mobileMenuOpen={mobileMenuOpen}
           toggleMobileMenu={toggleMobileMenu}

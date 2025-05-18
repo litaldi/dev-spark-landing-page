@@ -21,13 +21,13 @@ const NavbarContent: React.FC<NavbarContentProps> = ({
   navbarState
 }) => {
   return (
-    <div className="flex items-center justify-between">
+    <div className="flex items-center justify-between w-full px-4 sm:px-6 md:px-0">
       <div className="flex items-center gap-2">
         <NavbarLogo />
       </div>
       
       <nav 
-        className="hidden md:flex items-center space-x-8" 
+        className="hidden md:flex items-center space-x-4 lg:space-x-8" 
         aria-label="Main navigation"
       >
         <NavLinks />

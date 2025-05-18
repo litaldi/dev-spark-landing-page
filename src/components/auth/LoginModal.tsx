@@ -38,14 +38,14 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent 
-        className="sm:max-w-md" 
+        className="sm:max-w-md px-4 sm:px-6" 
         aria-labelledby="login-title" 
         aria-describedby="login-description"
         role="dialog"
         aria-modal="true"
       >
         <DialogHeader>
-          <DialogTitle id="login-title" className="text-2xl font-bold text-center">Log In or Sign Up</DialogTitle>
+          <DialogTitle id="login-title" className="text-xl sm:text-2xl font-bold text-center">Log In or Sign Up</DialogTitle>
           <DialogDescription id="login-description" className="text-center pt-2">
             Sign in to continue your learning journey
           </DialogDescription>
@@ -78,7 +78,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
           
           <div className="relative flex items-center justify-center mt-2 mb-2">
             <Separator className="w-full" />
-            <span className="relative bg-background px-2 text-sm text-muted-foreground">or</span>
+            <span className="relative bg-background px-2 text-xs sm:text-sm text-muted-foreground">or</span>
           </div>
           
           <Button 

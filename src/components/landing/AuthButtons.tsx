@@ -47,13 +47,13 @@ const AuthButtons: React.FC<AuthButtonsProps> = ({
         <div className="hidden md:flex items-center gap-2">
           <div className="flex items-center gap-2">
             <User className="h-4 w-4 text-brand-500" aria-hidden="true" />
-            <p className="text-brand-700 dark:text-brand-300 font-medium">
+            <p className="text-brand-700 dark:text-brand-300 font-medium truncate max-w-[120px] lg:max-w-none">
               {userName}
             </p>
             {isDemoUser && (
               <Badge 
                 variant="outline" 
-                className="bg-brand-50 dark:bg-brand-900/20 text-brand-700 dark:text-brand-300 border-brand-200 dark:border-brand-800"
+                className="bg-brand-50 dark:bg-brand-900/20 text-brand-700 dark:text-brand-300 border-brand-200 dark:border-brand-800 hidden lg:inline-flex"
               >
                 Demo
               </Badge>
@@ -72,7 +72,7 @@ const AuthButtons: React.FC<AuthButtonsProps> = ({
             aria-label="User menu"
           >
             <User className="h-4 w-4 mr-1" />
-            {userName}
+            <span className="truncate max-w-[80px] lg:max-w-none">{userName}</span>
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-48">
