@@ -70,11 +70,11 @@ describe('useLocalStorage hook', () => {
     const storedValue = { name: 'stored', count: 5 };
     mockGetItem.mockReturnValueOnce(JSON.stringify(storedValue));
     
-    const { result } = renderHook(() => useLocalStorage(testKey, initialValue));
+    const { result } = renderHook(() => useLocalStorage<{ name: string; count: number }>(testKey, initialValue));
     
     act(() => {
-      // Update using a function
-      result.current[1]((prev) => ({ ...prev, count: prev.count + 1 }));
+      // Update using a function with proper typing
+      result.current[1]((prev: { name: string; count: number }) => ({ ...prev, count: prev.count + 1 }));
     });
     
     // Should store the updated value
