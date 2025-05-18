@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -6,7 +5,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { LoginForm } from '@/components/auth/LoginForm';
 
 // Mock the useAuth hook
-jest.mock('@/hooks/use-auth', () => ({
+jest.mock('@/hooks/auth', () => ({
   useAuth: () => ({
     login: jest.fn().mockImplementation(async (email, password) => {
       // Simulate login validation
@@ -175,7 +174,7 @@ describe('LoginForm Validation Integration', () => {
     });
     
     // Override the mock to use our implementation
-    jest.mock('@/hooks/use-auth', () => ({
+    jest.mock('@/hooks/auth', () => ({
       useAuth: () => ({
         login: loginMock,
         isLoading: false,

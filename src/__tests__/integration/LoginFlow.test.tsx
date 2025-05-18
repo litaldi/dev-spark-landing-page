@@ -5,11 +5,11 @@ import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import LoginPage from '@/pages/auth/Login';
 import Dashboard from '@/pages/Dashboard';
-import * as authHook from '@/hooks/use-auth';
+import * as authHook from '@/hooks/auth';
 import { LoginSuccess } from '@/components/auth/LoginSuccess';
 
 // Mock the hooks and components used in the login flow
-jest.mock('@/hooks/use-auth', () => ({
+jest.mock('@/hooks/auth', () => ({
   useAuth: jest.fn(),
 }));
 

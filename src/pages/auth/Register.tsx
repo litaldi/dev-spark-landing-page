@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -9,7 +8,7 @@ import { RegisterForm } from "@/components/auth/RegisterForm";
 import { SkipNavLink, SkipNavContent } from "@/components/a11y/skip-nav";
 import { ArrowLeft } from "lucide-react";
 import { LoginSuccess } from "@/components/auth/LoginSuccess";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/hooks/auth";
 
 const RegisterPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);

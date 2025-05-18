@@ -13,7 +13,7 @@ import { Github } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/hooks/auth";
 import { Link } from "react-router-dom";
 
 interface GetStartedModalProps {
