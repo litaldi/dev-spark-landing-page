@@ -18,6 +18,7 @@ interface AuthButtonsProps {
   isMobile?: boolean;
   onMobileMenuClose?: () => void;
   onLogout: () => void;
+  toggleLoginState?: () => void;
 }
 
 const AuthButtons: React.FC<AuthButtonsProps> = ({

@@ -11,6 +11,7 @@ import { Link } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
 import GetStartedButton from "./GetStartedButton";
 import AuthButtons from "./AuthButtons";
+import MobileMenu from "./MobileMenu";
 
 const Navbar: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -55,6 +56,25 @@ const Navbar: React.FC = () => {
     setIsLoggedIn(false);
     setUserName(null);
     setIsDemoUser(false);
+  };
+
+  const toggleLoginState = () => {
+    const newState = !isLoggedIn;
+    setIsLoggedIn(newState);
+    localStorage.setItem("isLoggedIn", String(newState));
+    
+    if (newState) {
+      // Mock user data for demo purposes
+      setUserName("Demo User");
+      setIsDemoUser(true);
+      localStorage.setItem("userName", "Demo User");
+      localStorage.setItem("isDemoUser", "true");
+    } else {
+      setUserName(null);
+      setIsDemoUser(false);
+      localStorage.removeItem("userName");
+      localStorage.removeItem("isDemoUser");
+    }
   };
 
   return (
@@ -118,6 +138,7 @@ const Navbar: React.FC = () => {
           isDemoUser={isDemoUser}
           onMenuClose={() => setMobileMenuOpen(false)}
           onLogout={handleLogout}
+          toggleLoginState={toggleLoginState}
         />
       </div>
     </header>
@@ -125,84 +146,3 @@ const Navbar: React.FC = () => {
 };
 
 export default Navbar;
-
-interface MobileMenuProps {
-  isOpen: boolean;
-  isLoggedIn: boolean;
-  userName: string | null;
-  isDemoUser?: boolean;
-  onMenuClose: () => void;
-  onLogout: () => void;
-}
-
-const MobileMenu: React.FC<MobileMenuProps> = ({ 
-  isOpen, 
-  isLoggedIn, 
-  userName,
-  isDemoUser = false,
-  onMenuClose,
-  onLogout
-}) => {
-  if (!isOpen) return null;
-  
-  return (
-    <div 
-      className="md:hidden mt-2 py-4 border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 rounded-b-lg shadow-lg" 
-      id="mobile-menu" 
-      role="navigation" 
-      aria-label="Mobile navigation"
-      tabIndex={0}
-    >
-      {isLoggedIn && isDemoUser && (
-        <div className="px-4 mb-2">
-          <div className="bg-brand-50 dark:bg-brand-900/20 text-brand-700 dark:text-brand-300 border border-brand-200 dark:border-brand-800 rounded-md px-3 py-1.5 text-sm">
-            Demo Mode
-          </div>
-        </div>
-      )}
-      <nav className="flex flex-col space-y-2 px-4">
-        <NavLinks isMobile={true} onMobileMenuClose={onMenuClose} />
-        
-        <div className="flex items-center justify-start gap-3 py-2 border-t border-gray-100 dark:border-gray-800 mt-2">
-          <AccessibilityMenu />
-          <ThemeToggle />
-          <span className="text-sm text-muted-foreground ml-2">Theme & Accessibility</span>
-        </div>
-        
-        <div className="py-2 space-y-2 border-t border-gray-100 dark:border-gray-800">
-          {isLoggedIn ? (
-            <>
-              {isDemoUser && (
-                <div className="px-2 py-1">
-                  <p className="text-brand-700 dark:text-brand-300 font-medium flex items-center gap-2">
-                    <span className="ml-1 text-xs text-brand-500">(Demo User)</span>
-                    {userName}
-                  </p>
-                </div>
-              )}
-              <Button 
-                className="justify-start text-white bg-brand-500 hover:bg-brand-600 w-full"
-                asChild
-                onClick={onMenuClose}
-              >
-                <Link to="/dashboard">Go to Dashboard</Link>
-              </Button>
-              <Button 
-                variant="ghost" 
-                className="justify-start text-brand-600 dark:text-brand-300 hover:bg-brand-50 dark:hover:bg-brand-900/30 w-full"
-                onClick={() => {
-                  onLogout();
-                  onMenuClose();
-                }}
-              >
-                Log out
-              </Button>
-            </>
-          ) : (
-            <GetStartedButton isMobile onMenuClose={onMenuClose} />
-          )}
-        </div>
-      </nav>
-    </div>
-  );
-};
