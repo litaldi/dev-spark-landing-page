@@ -1,32 +1,16 @@
-
-import React, { useState, useEffect } from "react";
-import { z } from "zod";
+import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { Separator } from "@/components/ui/separator";
-import { useAuth } from "@/hooks/auth";
 import { AlertError } from "./AlertError";
 import { LoginFormInputs } from "./LoginFormInputs";
 import { LoginAlternatives } from "./LoginAlternatives";
-import { useRateLimit } from "@/hooks/use-rate-limit";
-import { sanitizeInput } from "@/lib/security";
-import { useToast } from "@/hooks/use-toast";
+import { RateLimitWarning } from "./RateLimitWarning";
+import { DemoUserCredentials } from "./DemoUserCredentials";
+import { useLoginForm, loginSchema, LoginFormValues } from "@/hooks/auth/use-login-form";
 import { Loader2 } from "lucide-react";
-
-// Form validation schema
-const loginSchema = z.object({
-  email: z.string()
-    .trim()
-    .email({ message: "Please enter a valid email address" })
-    .transform(sanitizeInput),
-  password: z.string()
-    .min(8, { message: "Password must be at least 8 characters" })
-    .transform(sanitizeInput),
-});
-
-export type LoginFormValues = z.infer<typeof loginSchema>;
 
 interface LoginFormProps {
   onGoogleLogin?: () => void;
@@ -35,23 +19,17 @@ interface LoginFormProps {
 }
 
 export function LoginForm({ onGoogleLogin, onGithubLogin, onMagicLink }: LoginFormProps) {
-  const { login, isLoading, errorMessage, clearError } = useAuth();
-  const { toast } = useToast();
-  
-  // For accessibility, track focus management during form interactions
-  const [focusField, setFocusField] = useState<string | null>(null);
-  
-  // Implement rate limiting for login attempts
-  const {
-    isBlocked,
-    timeRemaining,
-    registerAttempt,
-    resetLimit,
-  } = useRateLimit("login", {
-    maxAttempts: 5,           // Max 5 attempts
-    timeWindow: 60000 * 10,   // Within 10 minutes
-    blockDuration: 60000 * 15 // Block for 15 minutes after exceeding
-  });
+  const { 
+    isLoading, 
+    isBlocked, 
+    timeRemaining, 
+    errorMessage, 
+    clearError,
+    handleSubmit,
+    handleMagicLink: handleMagicLinkRequest,
+    focusField,
+    setFocusField
+  } = useLoginForm(onMagicLink);
   
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -61,50 +39,16 @@ export function LoginForm({ onGoogleLogin, onGithubLogin, onMagicLink }: LoginFo
     },
   });
 
-  // Clear form errors when component unmounts
-  useEffect(() => {
-    return () => {
-      clearError();
-    };
-  }, [clearError]);
-
-  // Submit handler with rate limiting
-  const onSubmit = async (data: LoginFormValues) => {
-    clearError();
-    
-    // Check rate limiting before proceeding
-    const { isAllowed, remainingAttempts } = registerAttempt();
-    if (!isAllowed) {
-      const minutesRemaining = Math.ceil(timeRemaining / 60000);
-      toast({
-        title: "Too many login attempts",
-        description: `For security reasons, please try again in ${minutesRemaining} minutes.`,
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    // If we're running low on attempts, warn the user
-    if (remainingAttempts <= 2) {
-      toast({
-        title: "Login Attempt Limit",
-        description: `You have ${remainingAttempts} login attempts remaining before a temporary block.`,
-        variant: "default", // Using 'default' variant as it's a supported type
-      });
-    }
-    
-    // Proceed with login attempt
-    const success = await login(data.email, data.password);
-    
-    // If login was successful, reset the rate limit
-    if (success) {
-      resetLimit();
-    }
+  // Form submission handler
+  const onSubmit = (data: LoginFormValues) => {
+    handleSubmit(data);
   };
-
-  const handleMagicLink = async () => {
+  
+  // Magic link handler
+  const handleMagicLink = () => {
     const email = form.getValues("email");
-    if (!z.string().email().safeParse(email).success) {
+    
+    if (!email) {
       form.setError("email", {
         type: "manual",
         message: "Please enter a valid email address",
@@ -112,36 +56,15 @@ export function LoginForm({ onGoogleLogin, onGithubLogin, onMagicLink }: LoginFo
       setFocusField("email");
       return;
     }
-
-    // Apply rate limiting to magic link requests as well
-    const { isAllowed } = registerAttempt();
-    if (!isAllowed) {
-      const minutesRemaining = Math.ceil(timeRemaining / 60000);
-      toast({
-        title: "Too many login attempts",
-        description: `For security reasons, please try again in ${minutesRemaining} minutes.`,
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (onMagicLink) {
-      onMagicLink(sanitizeInput(email));
-    }
+    
+    handleMagicLinkRequest(email);
   };
 
   return (
     <div className="animate-fade-in space-y-6">
       <AlertError message={errorMessage} />
       
-      {isBlocked && (
-        <div className="bg-destructive/10 border border-destructive text-destructive px-4 py-3 rounded-lg mb-4" role="alert" aria-live="assertive">
-          <p className="font-medium">Account protection activated</p>
-          <p className="text-sm">
-            Too many login attempts. Please try again in {Math.ceil(timeRemaining / 60000)} minutes.
-          </p>
-        </div>
-      )}
+      <RateLimitWarning isBlocked={isBlocked} timeRemaining={timeRemaining} />
       
       <Form {...form}>
         <form 
@@ -185,17 +108,12 @@ export function LoginForm({ onGoogleLogin, onGithubLogin, onMagicLink }: LoginFo
         isLoading={isLoading || isBlocked}
       />
       
-      <div className="mt-4 pt-2 border-t border-border">
-        <p className="text-xs text-muted-foreground/80 text-center">
-          <strong className="font-medium">Demo User:</strong><br />
-          Email: demo@example.com<br />
-          Password: demo1234
-        </p>
-      </div>
+      <DemoUserCredentials />
     </div>
   );
 }
 
+// Helper function - keeping for backwards compatibility if needed
 function navigate(path: string): void {
   window.location.href = path;
 }

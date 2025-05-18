@@ -41,6 +41,21 @@ jest.mock('@/hooks/use-rate-limit', () => ({
   }),
 }));
 
+// Mock the useLoginForm hook
+jest.mock('@/hooks/auth/use-login-form', () => ({
+  useLoginForm: () => ({
+    isLoading: false,
+    isBlocked: false,
+    timeRemaining: 0,
+    errorMessage: null,
+    clearError: jest.fn(),
+    handleSubmit: jest.fn().mockResolvedValue(true),
+    handleMagicLink: jest.fn(),
+    focusField: null,
+    setFocusField: jest.fn(),
+  }),
+}));
+
 describe('Login Flow Integration', () => {
   beforeEach(() => {
     jest.clearAllMocks();

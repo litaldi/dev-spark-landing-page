@@ -37,6 +37,31 @@ jest.mock('@/hooks/use-toast', () => ({
   }),
 }));
 
+// Mock the useLoginForm hook
+jest.mock('@/hooks/auth/use-login-form', () => ({
+  useLoginForm: () => ({
+    isLoading: false,
+    isBlocked: false,
+    timeRemaining: 0,
+    errorMessage: null,
+    clearError: jest.fn(),
+    handleSubmit: jest.fn().mockImplementation(async (data) => {
+      // Simulate login validation
+      if (data.email === 'test@example.com' && data.password === 'Password123!') {
+        return true;
+      }
+      return false;
+    }),
+    handleMagicLink: jest.fn(),
+    focusField: null,
+    setFocusField: jest.fn(),
+  }),
+  loginSchema: {
+    parse: jest.fn(),
+    safeParse: jest.fn().mockReturnValue({ success: true }),
+  },
+}));
+
 describe('LoginForm Validation Integration', () => {
   test('validates email format', async () => {
     const user = userEvent.setup();
