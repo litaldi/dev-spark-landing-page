@@ -1,35 +1,48 @@
 
-import React from "react";
-import { motion } from "framer-motion";
+import React, { useEffect } from "react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { X } from "lucide-react";
+import { XCircle } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface AlertErrorProps {
-  message: string | null;
+  message?: string | null;
+  className?: string;
+  onClose?: () => void;
+  autoClose?: boolean;
+  autoCloseDelay?: number;
 }
 
-export function AlertError({ message }: AlertErrorProps) {
+export function AlertError({ 
+  message, 
+  className,
+  onClose,
+  autoClose = false,
+  autoCloseDelay = 5000
+}: AlertErrorProps) {
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (message && autoClose) {
+      timer = setTimeout(() => {
+        if (onClose) onClose();
+      }, autoCloseDelay);
+    }
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
+  }, [message, onClose, autoClose, autoCloseDelay]);
+
   if (!message) return null;
-  
+
   return (
-    <motion.div
-      initial={{ opacity: 0, y: -10 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -10 }}
-      transition={{ duration: 0.3 }}
-      className="mb-5"
+    <Alert 
+      variant="destructive" 
+      className={cn(
+        "animate-fade-in transition-all duration-300", 
+        className
+      )}
     >
-      <Alert 
-        variant="destructive" 
-        className="border-destructive/30 bg-destructive/10 text-destructive flex items-start justify-between gap-2"
-        role="alert"
-        aria-live="assertive"
-      >
-        <AlertDescription className="font-medium text-destructive text-sm py-1">
-          {message}
-        </AlertDescription>
-        <X className="h-4 w-4 shrink-0 mt-0.5 opacity-70" aria-hidden="true" />
-      </Alert>
-    </motion.div>
+      <XCircle className="h-4 w-4" />
+      <AlertDescription>{message}</AlertDescription>
+    </Alert>
   );
 }

@@ -10,6 +10,8 @@ import { StackSelectionStep } from "@/components/onboarding/StackSelectionStep";
 import { WeeklyGoalsStep } from "@/components/onboarding/WeeklyGoalsStep";
 import { onboardingSchema, OnboardingFormValues } from "@/schemas/onboarding-schema";
 import { useFormState } from "@/hooks/use-form-state";
+import { SkipNavLink, SkipNavContent } from "@/components/a11y/skip-nav";
+import { Stepper } from "@/components/ui/stepper";
 
 const OnboardingPage = () => {
   const [activeStep, setActiveStep] = useState(0);
@@ -34,6 +36,11 @@ const OnboardingPage = () => {
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1500));
       
+      // Store in localStorage for demo purposes
+      localStorage.setItem("onboardingComplete", "true");
+      localStorage.setItem("userStack", JSON.stringify(data.stack));
+      localStorage.setItem("weeklyGoal", data.weeklyGoal.toString());
+      
       // Navigate to dashboard
       navigate("/dashboard");
       return true;
@@ -52,7 +59,7 @@ const OnboardingPage = () => {
       
     form.trigger(fieldsToValidate as any).then((isValid) => {
       if (isValid) {
-        setActiveStep((prev) => (prev < 2 ? prev + 1 : prev));
+        setActiveStep((prev) => (prev < 1 ? prev + 1 : prev));
       }
     });
   };
@@ -87,47 +94,66 @@ const OnboardingPage = () => {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-background p-4 md:p-6 lg:p-8">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-background p-4 md:p-6 lg:p-8 bg-gradient-to-b from-background to-background/80">
+      <SkipNavLink>Skip to content</SkipNavLink>
+      
       <div className="absolute top-4 right-4">
         <ThemeToggle />
       </div>
       
-      <div 
-        className="w-full max-w-md" 
-        role="main" 
-        aria-label="Onboarding process"
-      >
-        <Card className="w-full shadow-md border-opacity-40">
-          <CardHeader className="space-y-2">
-            <CardTitle 
-              className="text-2xl font-bold tracking-tight" 
-              ref={headingRef}
-              tabIndex={-1}
-            >
-              Complete your profile
-            </CardTitle>
-            <CardDescription className="text-base">
-              Let's personalize your learning experience
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-                <div 
-                  role="region" 
-                  aria-label={`Step ${activeStep + 1} of ${steps.length}`}
-                >
-                  {steps[activeStep].content}
-                </div>
-                
-                <div className="sr-only" aria-live="polite">
-                  {isSubmitting ? "Submitting your preferences. Please wait." : ""}
-                </div>
-              </form>
-            </Form>
-          </CardContent>
-        </Card>
-      </div>
+      <SkipNavContent>
+        <div 
+          className="w-full max-w-lg" 
+          role="main" 
+          aria-label="Onboarding process"
+        >
+          <div className="text-center mb-6">
+            <h1 className="text-3xl font-bold tracking-tight mb-2">Welcome to DevSpark</h1>
+            <p className="text-muted-foreground">Let's personalize your experience in just two steps</p>
+          </div>
+          
+          <Card className="w-full shadow-md border-opacity-40 overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-brand-50 to-transparent opacity-30 pointer-events-none" />
+            
+            <CardHeader className="space-y-2 relative pb-2">
+              <CardTitle 
+                className="text-2xl font-bold tracking-tight" 
+                ref={headingRef}
+                tabIndex={-1}
+              >
+                Complete your profile
+              </CardTitle>
+              <CardDescription className="text-base">
+                Personalize your learning experience
+              </CardDescription>
+            </CardHeader>
+            
+            <CardContent className="space-y-6 relative pt-4">
+              <Stepper steps={steps} activeStep={activeStep} className="mb-8" />
+              
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+                  <div 
+                    role="region" 
+                    aria-label={`Step ${activeStep + 1} of ${steps.length}`}
+                    className="min-h-[320px]"
+                  >
+                    {steps[activeStep].content}
+                  </div>
+                  
+                  <div className="sr-only" aria-live="polite">
+                    {isSubmitting ? "Submitting your preferences. Please wait." : ""}
+                  </div>
+                </form>
+              </Form>
+            </CardContent>
+          </Card>
+          
+          <div className="mt-6 text-center text-sm text-muted-foreground">
+            <p>You can always change these settings later in your profile</p>
+          </div>
+        </div>
+      </SkipNavContent>
     </div>
   );
 };

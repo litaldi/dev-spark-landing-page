@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -13,6 +13,7 @@ import { LoginAlternatives } from "./LoginAlternatives";
 import { useRateLimit } from "@/hooks/use-rate-limit";
 import { sanitizeInput } from "@/lib/security";
 import { useToast } from "@/hooks/use-toast";
+import { Loader2 } from "lucide-react";
 
 // Form validation schema
 const loginSchema = z.object({
@@ -44,6 +45,9 @@ export function LoginForm({ onGoogleLogin, onMagicLink }: LoginFormProps) {
   // For accessibility, track focus management during form interactions
   const [focusField, setFocusField] = useState<string | null>(null);
   
+  // Animation state for demo login
+  const [isDemoFilling, setIsDemoFilling] = useState<boolean>(false);
+  
   // Implement rate limiting for login attempts
   const {
     isBlocked,
@@ -63,6 +67,13 @@ export function LoginForm({ onGoogleLogin, onMagicLink }: LoginFormProps) {
       password: "",
     },
   });
+
+  // Clear form errors when component unmounts
+  useEffect(() => {
+    return () => {
+      clearError();
+    };
+  }, [clearError]);
 
   // Submit handler with rate limiting
   const onSubmit = async (data: LoginFormValues) => {
@@ -109,13 +120,20 @@ export function LoginForm({ onGoogleLogin, onMagicLink }: LoginFormProps) {
       return;
     }
     
+    // Show animation of form filling
+    setIsDemoFilling(true);
     form.setValue("email", DEMO_USER.email);
-    form.setValue("password", DEMO_USER.password);
     
-    // Short delay to show the form being filled
+    // Simulate typing
     setTimeout(() => {
-      form.handleSubmit(onSubmit)();
-    }, 500);
+      form.setValue("password", DEMO_USER.password);
+      
+      // Submit after a short delay
+      setTimeout(() => {
+        setIsDemoFilling(false);
+        form.handleSubmit(onSubmit)();
+      }, 300);
+    }, 300);
   };
 
   const handleMagicLink = async () => {
@@ -125,6 +143,7 @@ export function LoginForm({ onGoogleLogin, onMagicLink }: LoginFormProps) {
         type: "manual",
         message: "Please enter a valid email address",
       });
+      setFocusField("email");
       return;
     }
 
@@ -146,7 +165,7 @@ export function LoginForm({ onGoogleLogin, onMagicLink }: LoginFormProps) {
   };
 
   return (
-    <>
+    <div className="animate-fade-in space-y-6">
       <AlertError message={errorMessage} />
       
       {isBlocked && (
@@ -163,6 +182,7 @@ export function LoginForm({ onGoogleLogin, onMagicLink }: LoginFormProps) {
           onSubmit={form.handleSubmit(onSubmit)} 
           className="space-y-4"
           onChange={() => clearError()}
+          aria-label="Login form"
         >
           <LoginFormInputs 
             form={form} 
@@ -170,13 +190,29 @@ export function LoginForm({ onGoogleLogin, onMagicLink }: LoginFormProps) {
             setFocusField={setFocusField} 
           />
           
+          <div className="flex items-center justify-between">
+            <Button
+              type="button"
+              variant="link"
+              size="sm"
+              className="px-0 text-xs"
+              onClick={() => navigate("/auth/forgot-password")}
+              tabIndex={0}
+            >
+              Forgot password?
+            </Button>
+          </div>
+          
           <Button 
             type="submit" 
-            className="w-full" 
-            disabled={isLoading || isBlocked}
-            aria-busy={isLoading}
+            className="w-full transition-all duration-300 relative"
+            disabled={isLoading || isBlocked || isDemoFilling}
+            aria-busy={isLoading || isDemoFilling}
           >
-            {isLoading ? "Signing in..." : "Sign in"}
+            {(isLoading || isDemoFilling) && (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />
+            )}
+            {isLoading ? "Signing in..." : isDemoFilling ? "Filling demo data..." : "Sign in"}
           </Button>
         </form>
       </Form>
@@ -192,8 +228,12 @@ export function LoginForm({ onGoogleLogin, onMagicLink }: LoginFormProps) {
         onGoogleLogin={onGoogleLogin}
         onMagicLink={handleMagicLink}
         onDemoLogin={handleDemoLogin}
-        isLoading={isLoading || isBlocked}
+        isLoading={isLoading || isBlocked || isDemoFilling}
       />
-    </>
+    </div>
   );
+}
+
+function navigate(path: string): void {
+  window.location.href = path;
 }
