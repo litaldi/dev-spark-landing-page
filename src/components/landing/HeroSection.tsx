@@ -1,13 +1,17 @@
 
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { LogIn } from "lucide-react";
+import { ArrowRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import LoginModal from "@/components/auth/LoginModal";
 
 const HeroSection: React.FC = () => {
   const [loginModalOpen, setLoginModalOpen] = useState(false);
+  const navigate = useNavigate();
   // In a real app, this would come from your auth provider
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(
+    localStorage.getItem("isLoggedIn") === "true"
+  );
 
   const openLoginModal = () => {
     setLoginModalOpen(true);
@@ -20,6 +24,17 @@ const HeroSection: React.FC = () => {
   // For demo purposes only - toggle login state
   const toggleLoginState = () => {
     setIsLoggedIn(!isLoggedIn);
+  };
+
+  const handleGetStarted = () => {
+    navigate("/auth/register");
+  };
+
+  const handleTryDemo = () => {
+    const demoSection = document.getElementById('demo');
+    if (demoSection) {
+      demoSection.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
   return (
@@ -52,36 +67,32 @@ const HeroSection: React.FC = () => {
               <Button 
                 size="lg" 
                 className="rounded-full bg-brand-500 hover:bg-brand-600 text-white px-8 py-6 text-lg transform transition-all duration-300 hover:scale-105 shadow-md hover:shadow-lg"
-                onClick={toggleLoginState}
+                onClick={() => navigate("/dashboard")}
                 aria-label="Navigate to your dashboard"
               >
                 Go to Dashboard
+                <ArrowRight className="ml-1 h-5 w-5" />
               </Button>
             ) : (
               <>
                 <Button 
                   size="lg" 
                   className="rounded-full bg-brand-500 hover:bg-brand-600 text-white px-8 py-6 text-lg transform transition-all duration-300 hover:scale-105 shadow-md hover:shadow-lg"
-                  onClick={() => {
-                    const demoSection = document.getElementById('demo');
-                    if (demoSection) {
-                      demoSection.scrollIntoView({ behavior: 'smooth' });
-                    }
-                  }}
-                  aria-label="Try the demo"
+                  onClick={handleGetStarted}
+                  aria-label="Sign up for an account"
                 >
-                  Try Demo
+                  Get Started
+                  <ArrowRight className="ml-1 h-5 w-5" />
                 </Button>
                 
                 <Button 
                   variant="outline" 
                   size="lg" 
                   className="rounded-full border-brand-300 dark:border-brand-700 bg-white dark:bg-gray-900 bg-opacity-90 backdrop-blur-sm hover:bg-brand-50 dark:hover:bg-gray-800 px-8 py-6 text-brand-700 dark:text-brand-300"
-                  onClick={openLoginModal}
-                  aria-label="Get started with the platform"
+                  onClick={handleTryDemo}
+                  aria-label="Try the demo"
                 >
-                  <LogIn className="mr-2 h-5 w-5" aria-hidden="true" />
-                  Get Started
+                  Try Demo
                 </Button>
               </>
             )}

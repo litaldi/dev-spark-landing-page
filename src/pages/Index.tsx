@@ -16,7 +16,6 @@ import CommunityStats from "@/components/landing/CommunityStats";
 import MotivationQuote from "@/components/landing/MotivationQuote";
 import AppPreview from "@/components/landing/AppPreview";
 import NewsletterSignup from "@/components/landing/NewsletterSignup";
-import { SearchBar } from "@/components/search/SearchBar";
 import { SkipNavLink, SkipNavContent } from "@/components/a11y/skip-nav";
 
 const Index = () => {
@@ -29,12 +28,6 @@ const Index = () => {
       <SkipNavContent id="main-content">
         {/* Primary sections */}
         <HeroSection />
-        
-        {/* Search bar in hero section */}
-        <div className="container mx-auto -mt-8 mb-12 px-4 relative z-10">
-          <SearchBar variant="hero" />
-        </div>
-        
         <WhyItWorks />
         <HowItWorksSection />
         

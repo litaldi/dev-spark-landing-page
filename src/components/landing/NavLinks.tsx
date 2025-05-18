@@ -14,14 +14,13 @@ const NavLinks: React.FC<NavLinksProps> = ({
   const links = [
     { to: "/", text: "Home" },
     { to: "/dashboard", text: "Dashboard" },
-    { to: "/profile", text: "Profile" },
     { to: "/about", text: "About" },
     { to: "/contact", text: "Contact" },
   ];
 
   const linkClasses = isMobile 
     ? "text-gray-600 dark:text-gray-300 hover:text-brand-500 dark:hover:text-brand-400 transition-colors px-2 py-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-300 rounded-sm"
-    : "text-gray-600 dark:text-gray-300 hover:text-brand-500 dark:hover:text-brand-400 transition-colors relative group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-300 rounded-sm px-1";
+    : "text-gray-600 dark:text-gray-300 hover:text-brand-500 dark:hover:text-brand-400 transition-colors relative group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-300 rounded-sm px-2";
 
   return (
     <>

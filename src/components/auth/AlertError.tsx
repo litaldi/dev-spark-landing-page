@@ -22,6 +22,8 @@ export function AlertError({ message }: AlertErrorProps) {
       <Alert 
         variant="destructive" 
         className="border-destructive/30 bg-destructive/10 text-destructive flex items-start justify-between gap-2"
+        role="alert"
+        aria-live="assertive"
       >
         <AlertDescription className="font-medium text-destructive text-sm py-1">
           {message}

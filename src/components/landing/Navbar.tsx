@@ -1,7 +1,6 @@
 
 import React, { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react";
-import { SearchBar } from "@/components/search/SearchBar";
 import NavbarLogo from "./NavbarLogo";
 import NavLinks from "./NavLinks";
 import AuthButtons from "./AuthButtons";
@@ -84,14 +83,10 @@ const Navbar: React.FC = () => {
           </div>
           
           <nav 
-            className="hidden md:flex items-center space-x-8" 
+            className="hidden md:flex items-center space-x-10" 
             aria-label="Main navigation"
           >
             <NavLinks />
-            
-            <div className="hidden lg:flex">
-              <SearchBar />
-            </div>
           </nav>
           
           <div className="flex items-center gap-4">

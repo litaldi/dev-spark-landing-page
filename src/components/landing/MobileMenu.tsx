@@ -1,6 +1,5 @@
 
 import React from "react";
-import { SearchBar } from "@/components/search/SearchBar";
 import NavLinks from "./NavLinks";
 import AuthButtons from "./AuthButtons";
 import { Badge } from "@/components/ui/badge";
@@ -34,9 +33,6 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
       aria-label="Mobile navigation"
       tabIndex={0}
     >
-      <div className="mb-4 px-2">
-        <SearchBar />
-      </div>
       {isLoggedIn && isDemoUser && (
         <div className="px-2 mb-2">
           <Badge variant="outline" className="bg-brand-50 dark:bg-brand-900/20 text-brand-700 dark:text-brand-300 border-brand-200 dark:border-brand-800">
