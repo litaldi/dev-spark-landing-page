@@ -11,7 +11,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { UseFormReturn } from "react-hook-form";
-import { LoginFormValues } from "./LoginForm";
+import { LoginFormValues } from "@/hooks/auth/use-login-form";
 
 interface LoginFormInputsProps {
   form: UseFormReturn<LoginFormValues>;
