@@ -10,7 +10,6 @@ interface MobileMenuProps {
   isOpen: boolean;
   isLoggedIn: boolean;
   userName: string | null;
-  isDemoUser: boolean;
   onMenuClose: () => void;
   onLogout: () => void;
   toggleLoginState?: () => void;
@@ -20,7 +19,6 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
   isOpen,
   isLoggedIn,
   userName,
-  isDemoUser,
   onMenuClose,
   onLogout,
   toggleLoginState

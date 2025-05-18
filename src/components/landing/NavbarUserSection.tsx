@@ -9,7 +9,6 @@ import AuthButtons from "./AuthButtons";
 interface NavbarUserSectionProps {
   isLoggedIn: boolean;
   userName: string | null;
-  isDemoUser: boolean;
   mobileMenuOpen: boolean;
   onToggleMobileMenu: () => void;
   onLogout: () => void;
@@ -18,7 +17,6 @@ interface NavbarUserSectionProps {
 const NavbarUserSection: React.FC<NavbarUserSectionProps> = ({
   isLoggedIn,
   userName,
-  isDemoUser,
   mobileMenuOpen,
   onToggleMobileMenu,
   onLogout

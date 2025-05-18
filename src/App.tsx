@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
+import Home from "./pages/Home";
 import NotFound from "./pages/NotFound";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
@@ -23,6 +24,7 @@ import About from "./pages/About";
 import Contact from "./pages/Contact";
 import Newsletter from "./pages/Newsletter";
 import FAQ from "./pages/FAQ";
+import Help from "./pages/Help";
 import { useEffect } from "react";
 
 // Create a new query client with optimized settings
@@ -51,15 +53,12 @@ function App() {
             <Sonner />
             <Router>
               <Routes>
-                {/* Redirect from root to login or dashboard based on authentication state */}
-                <Route path="/" element={
-                  localStorage.getItem("isLoggedIn") === "true" 
-                    ? <Navigate to="/dashboard" replace /> 
-                    : <Navigate to="/auth/login" replace />
-                } />
+                {/* Home page route */}
+                <Route path="/" element={<Home />} />
                 
                 <Route path="/about" element={<About />} />
                 <Route path="/faq" element={<FAQ />} />
+                <Route path="/help" element={<Help />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/newsletter" element={<Newsletter />} />
                 <Route path="/terms" element={<Terms />} />

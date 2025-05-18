@@ -69,7 +69,6 @@ export function useNavbarState() {
     mobileMenuOpen,
     isLoggedIn,
     userName,
-    isDemoUser: false, // Always return false
     toggleMobileMenu,
     closeMobileMenu,
     handleLogout,
