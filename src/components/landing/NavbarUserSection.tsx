@@ -34,7 +34,6 @@ const NavbarUserSection: React.FC<NavbarUserSectionProps> = ({
         <AuthButtons 
           isLoggedIn={isLoggedIn} 
           userName={userName}
-          isDemoUser={isDemoUser}
           onLogout={onLogout}
         />
       )}

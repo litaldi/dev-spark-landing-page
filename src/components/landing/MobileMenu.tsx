@@ -85,7 +85,6 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
               <AuthButtons 
                 isLoggedIn={isLoggedIn}
                 userName={userName}
-                isDemoUser={isDemoUser}
                 isMobile={true}
                 onMobileMenuClose={onMenuClose}
                 onLogout={onLogout}

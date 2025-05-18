@@ -95,7 +95,7 @@ describe('Authentication Utilities', () => {
     });
     
     test('handles skipOnboarding flag', () => {
-      storeUserData('test@example.com', 'Test User', false, true);
+      storeUserData('test@example.com', 'Test User', true);
       
       expect(localStorage.getItem('onboardingComplete')).toBe('true');
     });
