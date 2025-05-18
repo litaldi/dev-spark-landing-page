@@ -25,12 +25,6 @@ const NavbarUserSection: React.FC<NavbarUserSectionProps> = ({
 }) => {
   return (
     <div className="flex items-center gap-3">
-      <div className="hidden md:flex items-center gap-4">
-        {!isLoggedIn && (
-          <GetStartedButton className="hidden lg:flex" />
-        )}
-      </div>
-      
       <div className="hidden md:flex items-center gap-2">
         <AccessibilityMenu />
         <ThemeToggle />

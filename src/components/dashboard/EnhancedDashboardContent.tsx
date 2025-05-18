@@ -150,7 +150,6 @@ export const EnhancedDashboardContent: React.FC<EnhancedDashboardContentProps> =
                   <CardTitle>Milestones & Learning Journey</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  {/* Future milestone timeline will go here */}
                   <div className="text-center py-8 text-gray-500">
                     More achievements and milestones coming soon!
                   </div>

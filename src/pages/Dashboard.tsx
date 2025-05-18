@@ -3,7 +3,6 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/landing/Navbar";
 import Footer from "@/components/landing/Footer";
-import DemoUserBanner from "@/components/demo/DemoUserBanner";
 import { SkipNavLink, SkipNavContent } from "@/components/a11y/skip-nav";
 import { useToast } from "@/hooks/use-toast";
 import { AlertError } from "@/components/auth/AlertError";
@@ -17,7 +16,7 @@ const Dashboard = () => {
   const [isFirstTimeUser, setIsFirstTimeUser] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
-
+  
   useEffect(() => {
     // Simulate loading
     const timer = setTimeout(() => {
@@ -39,7 +38,7 @@ const Dashboard = () => {
       setUserName(storedUserName);
     }
     
-    // Check if demo user
+    // Check if demo user (leaving this for compatibility with existing data)
     const demoStatus = localStorage.getItem("isDemoUser");
     setIsDemoUser(demoStatus === "true");
     
@@ -60,7 +59,6 @@ const Dashboard = () => {
       <Navbar />
       <main className="flex-1 container py-6 md:py-10 lg:py-12" id="main-content">
         <SkipNavContent>
-          {isDemoUser && <DemoUserBanner className="mb-6" />}
           <AlertError 
             message={error}
             onClose={() => setError(null)}
