@@ -5,6 +5,9 @@ import { ProgressSection } from "@/components/dashboard/ProgressSection";
 import { LearningPathSection } from "@/components/dashboard/LearningPathSection";
 import { RecentActivitySection } from "@/components/dashboard/RecentActivitySection";
 import { RecommendedContent } from "@/components/dashboard/RecommendedContent";
+import { AIRecommendations } from "@/components/dashboard/AIRecommendations";
+import { AIStudyCompanion } from "@/components/dashboard/AIStudyCompanion";
+import { MotivationalPrompts } from "@/components/dashboard/MotivationalPrompts";
 import { useDashboardActions } from "@/hooks/dashboard/use-dashboard-actions";
 import { Button } from "@/components/ui/button";
 import { HelpCircle } from "lucide-react";
@@ -29,6 +32,9 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
     handleAction
   } = useDashboardActions(onError);
 
+  // Get last activity timestamp from localStorage
+  const lastActivityDate = localStorage.getItem("lastSessionDate");
+
   return (
     <>
       <WelcomeSection
@@ -47,6 +53,11 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
             streakDays={5}
             lessonsCompleted={2}
             projectsStarted={1}
+            isLoading={isLoading}
+          />
+          
+          <AIRecommendations 
+            userName={userName}
             isLoading={isLoading}
           />
           
@@ -78,6 +89,12 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
           </div>
         </div>
       </div>
+
+      {/* AI Study Companion (floating chat widget) */}
+      <AIStudyCompanion userName={userName} />
+      
+      {/* Motivational Prompts (floating notifications) */}
+      <MotivationalPrompts userName={userName} lastActivity={lastActivityDate} />
     </>
   );
 };

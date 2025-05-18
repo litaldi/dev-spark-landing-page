@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { DashboardContent } from '@/components/dashboard/DashboardContent';
@@ -40,6 +39,24 @@ jest.mock('@/components/dashboard/RecentActivitySection', () => ({
   RecentActivitySection: () => <div data-testid="recent-activity-section">Recent Activity</div>,
 }));
 
+jest.mock('@/components/dashboard/AIRecommendations', () => ({
+  AIRecommendations: ({ userName }) => (
+    <div data-testid="ai-recommendations">AI Recommendations for {userName}</div>
+  ),
+}));
+
+jest.mock('@/components/dashboard/AIStudyCompanion', () => ({
+  AIStudyCompanion: ({ userName }) => (
+    <div data-testid="ai-study-companion">AI Study Companion for {userName}</div>
+  ),
+}));
+
+jest.mock('@/components/dashboard/MotivationalPrompts', () => ({
+  MotivationalPrompts: ({ userName }) => (
+    <div data-testid="motivational-prompts">Motivational Prompts for {userName}</div>
+  ),
+}));
+
 describe('DashboardContent Component', () => {
   // Setup mock for the useDashboardActions hook
   const mockStartFirstLesson = jest.fn();
@@ -57,6 +74,12 @@ describe('DashboardContent Component', () => {
       startSession: mockStartSession,
       startLesson: mockStartLesson,
     });
+
+    // Mock localStorage
+    Storage.prototype.getItem = jest.fn().mockImplementation((key) => {
+      if (key === 'lastSessionDate') return '2025-05-15T10:30:00.000Z';
+      return null;
+    });
   });
 
   test('renders all dashboard sections', () => {
@@ -73,6 +96,9 @@ describe('DashboardContent Component', () => {
     expect(screen.getByTestId('progress-section')).toBeInTheDocument();
     expect(screen.getByTestId('learning-path-section')).toBeInTheDocument();
     expect(screen.getByTestId('recent-activity-section')).toBeInTheDocument();
+    expect(screen.getByTestId('ai-recommendations')).toBeInTheDocument();
+    expect(screen.getByTestId('ai-study-companion')).toBeInTheDocument();
+    expect(screen.getByTestId('motivational-prompts')).toBeInTheDocument();
   });
 
   test('displays user name correctly', () => {
@@ -86,6 +112,9 @@ describe('DashboardContent Component', () => {
     );
     
     expect(screen.getByText('Welcome, Jane Doe')).toBeInTheDocument();
+    expect(screen.getByText('AI Recommendations for Jane Doe')).toBeInTheDocument();
+    expect(screen.getByText('AI Study Companion for Jane Doe')).toBeInTheDocument();
+    expect(screen.getByText('Motivational Prompts for Jane Doe')).toBeInTheDocument();
   });
 
   test('handles first time user state', () => {
