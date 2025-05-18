@@ -11,7 +11,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import {
   Accessibility,
-  TextSize,
+  Type,
   Keyboard,
   Contrast
 } from "lucide-react";
@@ -94,7 +94,7 @@ export function AccessibilityMenu() {
             <div className="flex flex-col gap-2">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
-                  <TextSize className="h-4 w-4" />
+                  <Type className="h-4 w-4" />
                   <Label htmlFor="text-size">Text Size: {settings.textSize}%</Label>
                 </div>
               </div>
