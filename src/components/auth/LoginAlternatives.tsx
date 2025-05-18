@@ -1,19 +1,18 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Github } from "lucide-react";
 
 interface LoginAlternativesProps {
   onGoogleLogin?: () => void;
   onMagicLink: () => void;
-  onDemoLogin: () => void;
+  onDemoLogin?: () => void;
   isLoading: boolean;
 }
 
 export function LoginAlternatives({ 
   onGoogleLogin, 
   onMagicLink, 
-  onDemoLogin, 
   isLoading 
 }: LoginAlternativesProps) {
   return (
@@ -36,23 +35,23 @@ export function LoginAlternatives({
       
       <Button 
         variant="outline" 
+        onClick={() => {}} 
+        disabled={isLoading}
+        className="w-full"
+        aria-label="Continue with GitHub"
+      >
+        <Github className="mr-2 h-4 w-4" aria-hidden="true" />
+        <span>Continue with GitHub</span>
+      </Button>
+      
+      <Button 
+        variant="outline" 
         onClick={onMagicLink} 
         disabled={isLoading}
         className="w-full"
         aria-label="Sign in with Magic Link"
       >
-        Magic Link Sign In
-      </Button>
-
-      <Button
-        variant="secondary"
-        onClick={onDemoLogin}
-        disabled={isLoading}
-        className="w-full bg-brand-100 hover:bg-brand-200 dark:bg-brand-900/30 dark:hover:bg-brand-900/50 border border-brand-200 dark:border-brand-800"
-        aria-label="Try with demo account"
-      >
-        <span>Try with Demo Account</span>
-        <Badge variant="outline" className="ml-2 bg-brand-50 dark:bg-brand-900/50 text-xs">Demo</Badge>
+        <span>Magic Link Sign In</span>
       </Button>
     </div>
   );

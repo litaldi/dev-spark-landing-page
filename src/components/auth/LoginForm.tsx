@@ -33,20 +33,12 @@ interface LoginFormProps {
   onMagicLink?: (email: string) => void;
 }
 
-const DEMO_USER = {
-  email: "demo@looplist.app",
-  password: "Demo123!",
-};
-
 export function LoginForm({ onGoogleLogin, onMagicLink }: LoginFormProps) {
   const { login, isLoading, errorMessage, clearError } = useAuth();
   const { toast } = useToast();
   
   // For accessibility, track focus management during form interactions
   const [focusField, setFocusField] = useState<string | null>(null);
-  
-  // Animation state for demo login
-  const [isDemoFilling, setIsDemoFilling] = useState<boolean>(false);
   
   // Implement rate limiting for login attempts
   const {
@@ -109,33 +101,6 @@ export function LoginForm({ onGoogleLogin, onMagicLink }: LoginFormProps) {
     }
   };
 
-  const handleDemoLogin = () => {
-    if (isBlocked) {
-      const minutesRemaining = Math.ceil(timeRemaining / 60000);
-      toast({
-        title: "Too many login attempts",
-        description: `For security reasons, please try again in ${minutesRemaining} minutes.`,
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    // Show animation of form filling
-    setIsDemoFilling(true);
-    form.setValue("email", DEMO_USER.email);
-    
-    // Simulate typing
-    setTimeout(() => {
-      form.setValue("password", DEMO_USER.password);
-      
-      // Submit after a short delay
-      setTimeout(() => {
-        setIsDemoFilling(false);
-        form.handleSubmit(onSubmit)();
-      }, 300);
-    }, 300);
-  };
-
   const handleMagicLink = async () => {
     const email = form.getValues("email");
     if (!z.string().email().safeParse(email).success) {
@@ -169,7 +134,7 @@ export function LoginForm({ onGoogleLogin, onMagicLink }: LoginFormProps) {
       <AlertError message={errorMessage} />
       
       {isBlocked && (
-        <div className="bg-destructive/10 border border-destructive text-destructive px-4 py-3 rounded-lg mb-4">
+        <div className="bg-destructive/10 border border-destructive text-destructive px-4 py-3 rounded-lg mb-4" role="alert" aria-live="assertive">
           <p className="font-medium">Account protection activated</p>
           <p className="text-sm">
             Too many login attempts. Please try again in {Math.ceil(timeRemaining / 60000)} minutes.
@@ -183,6 +148,7 @@ export function LoginForm({ onGoogleLogin, onMagicLink }: LoginFormProps) {
           className="space-y-4"
           onChange={() => clearError()}
           aria-label="Login form"
+          noValidate
         >
           <LoginFormInputs 
             form={form} 
@@ -190,29 +156,16 @@ export function LoginForm({ onGoogleLogin, onMagicLink }: LoginFormProps) {
             setFocusField={setFocusField} 
           />
           
-          <div className="flex items-center justify-between">
-            <Button
-              type="button"
-              variant="link"
-              size="sm"
-              className="px-0 text-xs"
-              onClick={() => navigate("/auth/forgot-password")}
-              tabIndex={0}
-            >
-              Forgot password?
-            </Button>
-          </div>
-          
           <Button 
             type="submit" 
             className="w-full transition-all duration-300 relative"
-            disabled={isLoading || isBlocked || isDemoFilling}
-            aria-busy={isLoading || isDemoFilling}
+            disabled={isLoading || isBlocked}
+            aria-busy={isLoading}
           >
-            {(isLoading || isDemoFilling) && (
+            {isLoading && (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />
             )}
-            {isLoading ? "Signing in..." : isDemoFilling ? "Filling demo data..." : "Sign in"}
+            {isLoading ? "Signing in..." : "Sign in"}
           </Button>
         </form>
       </Form>
@@ -227,9 +180,16 @@ export function LoginForm({ onGoogleLogin, onMagicLink }: LoginFormProps) {
       <LoginAlternatives
         onGoogleLogin={onGoogleLogin}
         onMagicLink={handleMagicLink}
-        onDemoLogin={handleDemoLogin}
-        isLoading={isLoading || isBlocked || isDemoFilling}
+        isLoading={isLoading || isBlocked}
       />
+      
+      <div className="mt-4 pt-2 border-t border-border">
+        <p className="text-xs text-muted-foreground/80 text-center">
+          <strong className="font-medium">Demo User:</strong><br />
+          Email: demo@example.com<br />
+          Password: demo1234
+        </p>
+      </div>
     </div>
   );
 }

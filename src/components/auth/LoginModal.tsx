@@ -10,11 +10,10 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Github, Mail, Apple } from "lucide-react";
+import { Github } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "react-router-dom";
 import { Separator } from "@/components/ui/separator";
-import { Badge } from "@/components/ui/badge";
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -39,7 +38,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
   const handleDemoLogin = () => {
     toast({
       title: "Demo Login",
-      description: "Redirecting to the demo login...",
+      description: "Using demo credentials...",
       duration: 2000,
     });
     
@@ -55,7 +54,13 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md" aria-labelledby="login-title" aria-describedby="login-description">
+      <DialogContent 
+        className="sm:max-w-md" 
+        aria-labelledby="login-title" 
+        aria-describedby="login-description"
+        role="dialog"
+        aria-modal="true"
+      >
         <DialogHeader>
           <DialogTitle id="login-title" className="text-2xl font-bold text-center">Log In or Sign Up</DialogTitle>
           <DialogDescription id="login-description" className="text-center pt-2">
@@ -88,16 +93,6 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
             <span>Continue with GitHub</span>
           </Button>
           
-          <Button 
-            variant="outline" 
-            className="flex items-center justify-center gap-2 w-full transition-all hover:border-gray-400 dark:hover:border-gray-600"
-            onClick={() => handleLogin("Apple")}
-            aria-label="Continue with Apple"
-          >
-            <Apple className="w-5 h-5" aria-hidden="true" />
-            <span>Continue with Apple</span>
-          </Button>
-          
           <div className="relative flex items-center justify-center mt-2 mb-2">
             <Separator className="w-full" />
             <span className="relative bg-background px-2 text-sm text-muted-foreground">or</span>
@@ -109,18 +104,11 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
             onClick={() => handleLogin("Email")}
             aria-label="Sign in with email"
           >
-            <Mail className="w-5 h-5" aria-hidden="true" />
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="w-5 h-5">
+              <rect width="20" height="16" x="2" y="4" rx="2" />
+              <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+            </svg>
             <span>Sign in with Email</span>
-          </Button>
-
-          <Button 
-            variant="secondary"
-            className="flex items-center justify-center gap-2 w-full bg-brand-100 hover:bg-brand-200 dark:bg-brand-900/30 dark:hover:bg-brand-900/50 border border-brand-200 dark:border-brand-800 transition-all"
-            onClick={handleDemoLogin}
-            aria-label="Try demo account"
-          >
-            <span>Try Demo Account</span>
-            <Badge variant="outline" className="bg-brand-50 dark:bg-brand-900/50 text-xs">Demo</Badge>
           </Button>
 
           <p className="text-xs text-center text-muted-foreground">
@@ -148,6 +136,14 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
               <Link to="/auth/register">Sign up for free</Link>
             </Button>
           </p>
+          
+          <div className="mt-4 pt-2 border-t border-border">
+            <p className="text-xs text-muted-foreground/80 text-center">
+              <strong className="font-medium">Demo User:</strong><br />
+              Email: demo@example.com<br />
+              Password: demo1234
+            </p>
+          </div>
         </DialogFooter>
       </DialogContent>
     </Dialog>

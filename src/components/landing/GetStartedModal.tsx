@@ -9,8 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Github, Apple } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { Github } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
@@ -37,16 +36,6 @@ const GetStartedModal: React.FC<GetStartedModalProps> = ({ isOpen, onClose }) =>
       description: `Redirecting to ${provider} authentication...`,
       duration: 2000,
     });
-    
-    if (provider === "Demo") {
-      // Simulate demo login
-      localStorage.setItem("isDemoUser", "true");
-      localStorage.setItem("userName", "Demo User");
-      localStorage.setItem("userEmail", "demo@example.com");
-      localStorage.setItem("isLoggedIn", "true");
-      navigate("/dashboard");
-      onClose();
-    }
   };
 
   const handleLoginWithEmail = async (e: React.FormEvent) => {
@@ -87,7 +76,12 @@ const GetStartedModal: React.FC<GetStartedModalProps> = ({ isOpen, onClose }) =>
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md" aria-labelledby="login-signup-title">
+      <DialogContent 
+        className="sm:max-w-md" 
+        aria-labelledby="login-signup-title"
+        role="dialog"
+        aria-modal="true"
+      >
         <DialogHeader>
           <DialogTitle id="login-signup-title" className="text-2xl font-bold text-center">
             Log In or Sign Up
@@ -120,26 +114,6 @@ const GetStartedModal: React.FC<GetStartedModalProps> = ({ isOpen, onClose }) =>
             <span>Log in with GitHub</span>
           </Button>
           
-          <Button 
-            variant="outline" 
-            className="flex items-center justify-center gap-2 w-full"
-            onClick={() => handleThirdPartyLogin("Apple")}
-            aria-label="Continue with Apple"
-          >
-            <Apple className="w-5 h-5" aria-hidden="true" />
-            <span>Log in with Apple</span>
-          </Button>
-
-          <Button 
-            variant="secondary"
-            className="flex items-center justify-center gap-2 w-full bg-brand-100 hover:bg-brand-200 dark:bg-brand-900/30 dark:hover:bg-brand-900/50 border border-brand-200 dark:border-brand-800"
-            onClick={() => handleThirdPartyLogin("Demo")}
-            aria-label="Try demo account"
-          >
-            <span>Log in as Demo User</span>
-            <Badge variant="outline" className="bg-brand-50 dark:bg-brand-900/50 text-xs">Demo</Badge>
-          </Button>
-          
           <div className="relative flex items-center justify-center mt-2">
             <Separator className="w-full" />
             <span className="relative bg-background px-2 text-sm text-muted-foreground">OR</span>
@@ -157,6 +131,7 @@ const GetStartedModal: React.FC<GetStartedModalProps> = ({ isOpen, onClose }) =>
                 autoComplete="email"
                 aria-label="Email address"
                 className="w-full"
+                aria-required="true"
               />
               
               <div className="relative">
@@ -169,6 +144,7 @@ const GetStartedModal: React.FC<GetStartedModalProps> = ({ isOpen, onClose }) =>
                   autoComplete="current-password"
                   aria-label="Password"
                   className="w-full"
+                  aria-required="true"
                 />
                 <Button
                   type="button"
@@ -176,6 +152,7 @@ const GetStartedModal: React.FC<GetStartedModalProps> = ({ isOpen, onClose }) =>
                   size="sm"
                   className="absolute right-1 top-1/2 -translate-y-1/2 h-7 px-2 text-muted-foreground"
                   onClick={() => setShowPassword(!showPassword)}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
                 >
                   {showPassword ? "Hide" : "Show"}
                 </Button>
@@ -186,6 +163,7 @@ const GetStartedModal: React.FC<GetStartedModalProps> = ({ isOpen, onClose }) =>
               type="submit" 
               className="w-full" 
               disabled={isProcessing}
+              aria-busy={isProcessing}
             >
               {isProcessing ? "Logging in..." : "Log In"}
             </Button>
@@ -196,10 +174,6 @@ const GetStartedModal: React.FC<GetStartedModalProps> = ({ isOpen, onClose }) =>
           </form>
           
           <div className="flex flex-col space-y-2 text-center text-sm">
-            <Button variant="link" className="px-0" asChild>
-              <Link to="/auth/login">Log in with your organization</Link>
-            </Button>
-            
             <Button 
               variant="link" 
               className="px-0" 
@@ -212,6 +186,14 @@ const GetStartedModal: React.FC<GetStartedModalProps> = ({ isOpen, onClose }) =>
             <Button variant="link" className="px-0" asChild>
               <Link to="/auth/forgot-password">Forgot your password?</Link>
             </Button>
+
+            <div className="mt-4 pt-2 border-t border-border">
+              <p className="text-xs text-muted-foreground/80">
+                <strong className="font-medium">Demo User:</strong><br />
+                Email: demo@example.com<br />
+                Password: demo1234
+              </p>
+            </div>
           </div>
         </div>
       </DialogContent>

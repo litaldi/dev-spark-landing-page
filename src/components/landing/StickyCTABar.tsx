@@ -57,7 +57,7 @@ const StickyCTABar: React.FC = () => {
               onClick={scrollToTop} 
               variant="outline"
               size="sm"
-              className="h-10 w-10 rounded-full p-0"
+              className="h-10 w-10 rounded-full p-0 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
               aria-label="Back to top"
             >
               <ArrowUp className="h-5 w-5" />
@@ -65,15 +65,17 @@ const StickyCTABar: React.FC = () => {
             
             {isLoggedIn ? (
               <Button 
-                className="rounded-full bg-brand-500 hover:bg-brand-600 text-white"
+                className="rounded-full bg-brand-500 hover:bg-brand-600 text-white focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
                 onClick={() => window.location.href = "/dashboard"}
+                aria-label="Go to dashboard"
               >
                 Dashboard
               </Button>
             ) : (
               <Button 
-                className="rounded-full bg-brand-500 hover:bg-brand-600 text-white"
+                className="rounded-full bg-brand-500 hover:bg-brand-600 text-white focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
                 onClick={() => setModalOpen(true)}
+                aria-label="Get started with our app"
               >
                 Get Started
               </Button>
