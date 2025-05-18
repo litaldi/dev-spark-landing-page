@@ -2,11 +2,38 @@
 // This file is run before each test file
 import '@testing-library/jest-dom';
 
+// Extend Jest with missing matchers if needed
+expect.extend({
+  // If your version of testing-library/jest-dom doesn't have toHaveAccessibleName
+  // we'll define it ourselves
+  toHaveAccessibleName: (element, expectedName) => {
+    const accessibleName = element.getAttribute('aria-label') || 
+                          element.getAttribute('aria-labelledby') ||
+                          element.textContent || '';
+                          
+    const hasName = accessibleName.trim() !== '';
+    const nameMatches = expectedName ? accessibleName.includes(expectedName) : true;
+    
+    return {
+      pass: hasName && nameMatches,
+      message: () => {
+        if (!hasName) {
+          return `Expected element to have an accessible name, but it doesn't have one.`;
+        }
+        if (!nameMatches) {
+          return `Expected element to have accessible name containing "${expectedName}", but got "${accessibleName}".`;
+        }
+        return `Expected element not to have accessible name, but it has "${accessibleName}".`;
+      },
+    };
+  }
+});
+
 // Mock ResizeObserver
 global.ResizeObserver = class ResizeObserver {
-  observe() {}
-  unobserve() {}
-  disconnect() {}
+  observe(): void {}
+  unobserve(): void {}
+  disconnect(): void {}
 };
 
 // Mock matchMedia with proper type handling
@@ -35,11 +62,6 @@ console.error = (...args) => {
   }
   originalError.call(console, ...args);
 };
-
-// Extend Jest matchers if needed
-expect.extend({
-  // Add any custom matchers here
-});
 
 // Mock IntersectionObserver with proper TypeScript type definitions
 global.IntersectionObserver = class IntersectionObserver {

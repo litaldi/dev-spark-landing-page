@@ -6,7 +6,7 @@ declare global {
     interface Matchers<R> {
       toBeInTheDocument(): R;
       toHaveTextContent(text: string | RegExp): R;
-      // Add other matchers as needed
+      toHaveAccessibleName(name?: string): R;
       toBeVisible(): R;
       toBeChecked(): R;
       toBeDisabled(): R;
@@ -24,11 +24,11 @@ declare global {
       toHaveFormValues(expectedValues: Record<string, any>): R;
       toHaveStyle(css: string | Record<string, any>): R;
       toHaveValue(value?: string | string[] | number): R;
+      toHaveAccessibleDescription(description?: string | RegExp): R;
       toBeInTheDOM(): R;
       toHaveDescription(text?: string | RegExp): R;
     }
   }
 }
 
-// This exports an empty object to make the file a module
 export {};
