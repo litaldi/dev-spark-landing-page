@@ -6,12 +6,8 @@ import Footer from "@/components/landing/Footer";
 import DemoUserBanner from "@/components/demo/DemoUserBanner";
 import { SkipNavLink, SkipNavContent } from "@/components/a11y/skip-nav";
 import { useToast } from "@/hooks/use-toast";
-import { useIsMobile, useIsTablet } from "@/hooks/use-mobile";
 import { AlertError } from "@/components/auth/AlertError";
-import { WelcomeSection } from "@/components/dashboard/WelcomeSection";
-import { ProgressSection } from "@/components/dashboard/ProgressSection";
-import { LearningPathSection } from "@/components/dashboard/LearningPathSection";
-import { RecentActivitySection } from "@/components/dashboard/RecentActivitySection";
+import { DashboardContent } from "@/components/dashboard/DashboardContent";
 
 const Dashboard = () => {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
@@ -20,10 +16,7 @@ const Dashboard = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isFirstTimeUser, setIsFirstTimeUser] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const { toast } = useToast();
   const navigate = useNavigate();
-  const isMobile = useIsMobile();
-  const isTablet = useIsTablet();
 
   useEffect(() => {
     // Simulate loading
@@ -61,33 +54,6 @@ const Dashboard = () => {
     return null; // Will redirect in useEffect
   }
 
-  const handleAction = (action: string) => {
-    toast({
-      title: "Action Triggered",
-      description: `You clicked on ${action}. This feature is coming soon!`,
-    });
-  };
-
-  const startFirstLesson = () => {
-    localStorage.setItem("onboardingComplete", "true");
-    setIsFirstTimeUser(false);
-    toast({
-      title: "First Lesson Started",
-      description: "Welcome to your learning journey!",
-    });
-  };
-
-  const startSession = () => {
-    handleAction("Start Today's Session");
-  };
-
-  const startLesson = (lessonId: string) => {
-    toast({
-      title: "Lesson Started",
-      description: `You've started the lesson: ${lessonId}`,
-    });
-  };
-
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <SkipNavLink>Skip to content</SkipNavLink>
@@ -101,35 +67,12 @@ const Dashboard = () => {
             className="mb-6"
           />
           
-          <WelcomeSection
+          <DashboardContent
             userName={userName}
             isFirstTimeUser={isFirstTimeUser}
             isLoading={isLoading}
-            onStartFirstLesson={startFirstLesson}
-            onStartTodaysSession={startSession}
+            onError={setError}
           />
-
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2 space-y-6">
-              <ProgressSection 
-                weeklyGoalHours={10}
-                currentHours={2}
-                streakDays={5}
-                lessonsCompleted={2}
-                projectsStarted={1}
-                isLoading={isLoading}
-              />
-              
-              <LearningPathSection 
-                isLoading={isLoading}
-                onStartLesson={startLesson}
-              />
-            </div>
-            
-            <div className="lg:col-span-1">
-              <RecentActivitySection isLoading={isLoading} />
-            </div>
-          </div>
         </SkipNavContent>
       </main>
       <Footer />
