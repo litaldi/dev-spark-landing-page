@@ -6,7 +6,7 @@ import { Github, Linkedin, Twitter, Info, Mail, MailPlus } from "lucide-react";
 const Footer: React.FC = () => {
   return (
     <footer 
-      className="py-12 border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900" 
+      className="py-12 border-t border-border bg-background" 
       role="contentinfo"
       aria-labelledby="footer-heading"
     >
@@ -21,13 +21,13 @@ const Footer: React.FC = () => {
               >
                 D
               </div>
-              <span className="font-bold text-lg text-brand-800 dark:text-white">DevAI</span>
+              <span className="font-bold text-lg text-foreground">DevAI</span>
             </Link>
-            <p className="text-gray-600 dark:text-gray-400 max-w-xs">Secure & privacy-focused platform.</p>
+            <p className="text-muted-foreground max-w-xs">Secure & privacy-focused platform.</p>
             <div className="flex items-center gap-4 mt-3">
               <a 
                 href="https://github.com" 
-                className="text-gray-400 dark:text-gray-500 hover:text-brand-500 dark:hover:text-brand-400 transition-colors p-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-300 rounded-full"
+                className="text-muted-foreground hover:text-brand-500 dark:hover:text-brand-400 transition-colors p-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-300 rounded-full"
                 aria-label="GitHub"
                 rel="noopener noreferrer"
                 target="_blank"
@@ -36,7 +36,7 @@ const Footer: React.FC = () => {
               </a>
               <a 
                 href="https://linkedin.com" 
-                className="text-gray-400 dark:text-gray-500 hover:text-brand-500 dark:hover:text-brand-400 transition-colors p-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-300 rounded-full"
+                className="text-muted-foreground hover:text-brand-500 dark:hover:text-brand-400 transition-colors p-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-300 rounded-full"
                 aria-label="LinkedIn"
                 rel="noopener noreferrer"
                 target="_blank"
@@ -45,7 +45,7 @@ const Footer: React.FC = () => {
               </a>
               <a 
                 href="https://twitter.com" 
-                className="text-gray-400 dark:text-gray-500 hover:text-brand-500 dark:hover:text-brand-400 transition-colors p-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-300 rounded-full"
+                className="text-muted-foreground hover:text-brand-500 dark:hover:text-brand-400 transition-colors p-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-300 rounded-full"
                 aria-label="Twitter"
                 rel="noopener noreferrer"
                 target="_blank"
@@ -57,12 +57,12 @@ const Footer: React.FC = () => {
           
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-8 md:gap-12 lg:gap-16">
             <div>
-              <h3 className="font-medium text-gray-800 dark:text-gray-200 mb-3">Company</h3>
+              <h3 className="font-medium text-foreground mb-3">Company</h3>
               <ul className="space-y-2">
                 <li>
                   <Link 
                     to="/about" 
-                    className="text-gray-500 dark:text-gray-400 hover:text-brand-500 dark:hover:text-brand-400 text-sm transition-colors flex items-center gap-1.5"
+                    className="text-muted-foreground hover:text-brand-500 dark:hover:text-brand-400 text-sm transition-colors flex items-center gap-1.5"
                   >
                     <Info className="h-3.5 w-3.5" aria-hidden="true" />
                     About
@@ -71,7 +71,7 @@ const Footer: React.FC = () => {
                 <li>
                   <Link 
                     to="/contact" 
-                    className="text-gray-500 dark:text-gray-400 hover:text-brand-500 dark:hover:text-brand-400 text-sm transition-colors flex items-center gap-1.5"
+                    className="text-muted-foreground hover:text-brand-500 dark:hover:text-brand-400 text-sm transition-colors flex items-center gap-1.5"
                   >
                     <Mail className="h-3.5 w-3.5" aria-hidden="true" />
                     Contact
@@ -80,7 +80,7 @@ const Footer: React.FC = () => {
                 <li>
                   <Link 
                     to="/newsletter" 
-                    className="text-gray-500 dark:text-gray-400 hover:text-brand-500 dark:hover:text-brand-400 text-sm transition-colors flex items-center gap-1.5"
+                    className="text-muted-foreground hover:text-brand-500 dark:hover:text-brand-400 text-sm transition-colors flex items-center gap-1.5"
                   >
                     <MailPlus className="h-3.5 w-3.5" aria-hidden="true" />
                     Newsletter
@@ -90,12 +90,12 @@ const Footer: React.FC = () => {
             </div>
             
             <div>
-              <h3 className="font-medium text-gray-800 dark:text-gray-200 mb-3">Resources</h3>
+              <h3 className="font-medium text-foreground mb-3">Resources</h3>
               <ul className="space-y-2">
                 <li>
                   <Link 
                     to="/faq" 
-                    className="text-gray-500 dark:text-gray-400 hover:text-brand-500 dark:hover:text-brand-400 text-sm transition-colors"
+                    className="text-muted-foreground hover:text-brand-500 dark:hover:text-brand-400 text-sm transition-colors"
                   >
                     FAQ / Help
                   </Link>
@@ -103,7 +103,7 @@ const Footer: React.FC = () => {
                 <li>
                   <Link 
                     to="/terms" 
-                    className="text-gray-500 dark:text-gray-400 hover:text-brand-500 dark:hover:text-brand-400 text-sm transition-colors"
+                    className="text-muted-foreground hover:text-brand-500 dark:hover:text-brand-400 text-sm transition-colors"
                   >
                     Terms of Use
                   </Link>
@@ -111,7 +111,7 @@ const Footer: React.FC = () => {
                 <li>
                   <Link 
                     to="/privacy" 
-                    className="text-gray-500 dark:text-gray-400 hover:text-brand-500 dark:hover:text-brand-400 text-sm transition-colors"
+                    className="text-muted-foreground hover:text-brand-500 dark:hover:text-brand-400 text-sm transition-colors"
                   >
                     Privacy Policy
                   </Link>
@@ -120,12 +120,12 @@ const Footer: React.FC = () => {
             </div>
             
             <div className="col-span-2 sm:col-span-1">
-              <h3 className="font-medium text-gray-800 dark:text-gray-200 mb-3">Links</h3>
+              <h3 className="font-medium text-foreground mb-3">Links</h3>
               <ul className="space-y-2">
                 <li>
                   <Link 
                     to="/faq" 
-                    className="text-gray-500 dark:text-gray-400 hover:text-brand-500 dark:hover:text-brand-400 text-sm transition-colors"
+                    className="text-muted-foreground hover:text-brand-500 dark:hover:text-brand-400 text-sm transition-colors"
                   >
                     Help Center
                   </Link>
@@ -133,7 +133,7 @@ const Footer: React.FC = () => {
                 <li>
                   <Link 
                     to="/accessibility" 
-                    className="text-gray-500 dark:text-gray-400 hover:text-brand-500 dark:hover:text-brand-400 text-sm transition-colors"
+                    className="text-muted-foreground hover:text-brand-500 dark:hover:text-brand-400 text-sm transition-colors"
                   >
                     Accessibility
                   </Link>
@@ -143,7 +143,7 @@ const Footer: React.FC = () => {
           </div>
         </div>
         
-        <div className="mt-8 pt-8 border-t border-gray-100 dark:border-gray-800 text-center text-xs text-gray-400 dark:text-gray-500">
+        <div className="mt-8 pt-8 border-t border-border text-center text-xs text-muted-foreground">
           <p>© {new Date().getFullYear()} DevAI Companion. All rights reserved.</p>
         </div>
       </div>

@@ -55,8 +55,8 @@ const RegisterPage: React.FC = () => {
             </Link>
           </div>
           
-          <Card className="w-full shadow-lg border-opacity-50 overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-brand-50 to-transparent opacity-50 pointer-events-none" />
+          <Card className="w-full shadow-lg border-border overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-brand-50/50 dark:from-brand-900/20 to-transparent opacity-50 pointer-events-none" />
             <CardHeader className="space-y-1 relative">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-2xl font-bold" id="register-page-title">Join DevSpark</CardTitle>

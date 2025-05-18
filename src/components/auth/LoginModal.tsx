@@ -10,7 +10,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Github, Mail } from "lucide-react";
+import { Github, Mail, Apple } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "react-router-dom";
 import { Separator } from "@/components/ui/separator";
@@ -43,7 +43,13 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
       duration: 2000,
     });
     
-    navigate("/auth/login?demo=true");
+    // Set demo user login state
+    localStorage.setItem("isDemoUser", "true");
+    localStorage.setItem("userName", "Demo User");
+    localStorage.setItem("userEmail", "demo@example.com");
+    localStorage.setItem("isLoggedIn", "true");
+    
+    navigate("/dashboard");
     onClose();
   };
 
@@ -51,7 +57,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md" aria-labelledby="login-title" aria-describedby="login-description">
         <DialogHeader>
-          <DialogTitle id="login-title" className="text-2xl font-bold text-center">Welcome back</DialogTitle>
+          <DialogTitle id="login-title" className="text-2xl font-bold text-center">Log In or Sign Up</DialogTitle>
           <DialogDescription id="login-description" className="text-center pt-2">
             Sign in to continue your learning journey
           </DialogDescription>
@@ -82,9 +88,19 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
             <span>Continue with GitHub</span>
           </Button>
           
+          <Button 
+            variant="outline" 
+            className="flex items-center justify-center gap-2 w-full transition-all hover:border-gray-400 dark:hover:border-gray-600"
+            onClick={() => handleLogin("Apple")}
+            aria-label="Continue with Apple"
+          >
+            <Apple className="w-5 h-5" aria-hidden="true" />
+            <span>Continue with Apple</span>
+          </Button>
+          
           <div className="relative flex items-center justify-center mt-2 mb-2">
             <Separator className="w-full" />
-            <span className="relative bg-white dark:bg-gray-800 px-2 text-sm text-gray-500">or</span>
+            <span className="relative bg-background px-2 text-sm text-muted-foreground">or</span>
           </div>
           
           <Button 
@@ -107,6 +123,12 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
             <Badge variant="outline" className="bg-brand-50 dark:bg-brand-900/50 text-xs">Demo</Badge>
           </Button>
 
+          <p className="text-xs text-center text-muted-foreground">
+            By logging in, you agree to our <Link to="/privacy" className="underline hover:text-foreground">Privacy Policy</Link> and <Link to="/terms" className="underline hover:text-foreground">Terms of Service</Link>
+          </p>
+        </div>
+        
+        <DialogFooter className="justify-center flex-col space-y-2">
           <Button 
             variant="link" 
             className="text-sm text-brand-500 hover:text-brand-600 dark:text-brand-400 dark:hover:text-brand-300"
@@ -114,10 +136,8 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
           >
             <Link to="/auth/magic-link" onClick={onClose}>Sign in with Magic Link</Link>
           </Button>
-        </div>
-        
-        <DialogFooter className="justify-center">
-          <p className="text-sm text-gray-500 dark:text-gray-400">
+          
+          <p className="text-sm text-muted-foreground">
             Don't have an account?{" "}
             <Button 
               variant="link" 

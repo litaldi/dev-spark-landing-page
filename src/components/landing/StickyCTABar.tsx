@@ -44,7 +44,7 @@ const StickyCTABar: React.FC = () => {
   return (
     <>
       <div 
-        className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t border-brand-100 dark:border-gray-800 shadow-lg p-3 md:hidden z-40 animate-fade-up"
+        className="fixed bottom-0 left-0 right-0 bg-background border-t border-border shadow-lg p-3 md:hidden z-40 animate-fade-up"
         role="complementary"
         aria-label="Call to action"
       >
