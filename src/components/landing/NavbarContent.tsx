@@ -11,7 +11,6 @@ interface NavbarContentProps {
   navbarState: {
     isLoggedIn: boolean;
     userName: string | null;
-    isDemoUser: boolean;
     handleLogout: () => void;
   };
 }
@@ -40,7 +39,6 @@ const NavbarContent: React.FC<NavbarContentProps> = ({
       <NavbarUserSection
         isLoggedIn={navbarState.isLoggedIn}
         userName={navbarState.userName}
-        isDemoUser={navbarState.isDemoUser}
         mobileMenuOpen={mobileMenuOpen}
         onToggleMobileMenu={toggleMobileMenu}
         onLogout={navbarState.handleLogout}

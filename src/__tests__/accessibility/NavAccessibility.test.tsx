@@ -15,7 +15,6 @@ jest.mock('@/hooks/use-navbar-state', () => ({
     closeMobileMenu: jest.fn(),
     isLoggedIn: false,
     userName: null,
-    isDemoUser: false,
     handleLogout: jest.fn(),
   }),
 }));
@@ -49,7 +48,6 @@ describe('Navigation Accessibility', () => {
           navbarState={{
             isLoggedIn: false,
             userName: null,
-            isDemoUser: false,
             handleLogout: jest.fn(),
           }}
         />
@@ -71,7 +69,6 @@ describe('Navigation Accessibility', () => {
           navbarState={{
             isLoggedIn: false,
             userName: null,
-            isDemoUser: false,
             handleLogout: jest.fn(),
           }}
         />
@@ -90,7 +87,6 @@ describe('Navigation Accessibility', () => {
           isOpen={false}
           isLoggedIn={false}
           userName={null}
-          isDemoUser={false}
           onMenuClose={jest.fn()}
           onLogout={jest.fn()}
           toggleLoginState={jest.fn()}
@@ -110,7 +106,6 @@ describe('Navigation Accessibility', () => {
           isOpen={true}
           isLoggedIn={false}
           userName={null}
-          isDemoUser={false}
           onMenuClose={jest.fn()}
           onLogout={jest.fn()}
           toggleLoginState={jest.fn()}

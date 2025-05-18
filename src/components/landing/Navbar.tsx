@@ -30,7 +30,6 @@ const Navbar: React.FC = () => {
           isOpen={mobileMenuOpen}
           isLoggedIn={navbarState.isLoggedIn}
           userName={navbarState.userName}
-          isDemoUser={navbarState.isDemoUser}
           onMenuClose={closeMobileMenu}
           onLogout={navbarState.handleLogout}
           toggleLoginState={navbarState.toggleLoginState}
