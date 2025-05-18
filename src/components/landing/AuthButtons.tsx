@@ -18,7 +18,6 @@ interface AuthButtonsProps {
   isMobile?: boolean;
   onMobileMenuClose?: () => void;
   onLogout: () => void;
-  toggleLoginState: () => void;
 }
 
 const AuthButtons: React.FC<AuthButtonsProps> = ({
@@ -27,8 +26,7 @@ const AuthButtons: React.FC<AuthButtonsProps> = ({
   isDemoUser = false,
   isMobile = false,
   onMobileMenuClose = () => {},
-  onLogout,
-  toggleLoginState
+  onLogout
 }) => {
   const navigate = useNavigate();
 

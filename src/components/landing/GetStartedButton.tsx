@@ -24,26 +24,15 @@ const GetStartedButton: React.FC<GetStartedButtonProps> = ({
   const [loginModalOpen, setLoginModalOpen] = useState(false);
   const navigate = useNavigate();
 
-  const openLoginModal = () => {
-    setLoginModalOpen(true);
-    if (isMobile && onMenuClose) {
-      onMenuClose();
+  const handleAction = (action: 'login' | 'signup' | 'demo') => {
+    if (action === 'login') {
+      setLoginModalOpen(true);
+    } else if (action === 'signup') {
+      navigate("/auth/register");
+    } else if (action === 'demo') {
+      navigate("/auth/login?demo=true");
     }
-  };
-
-  const closeLoginModal = () => {
-    setLoginModalOpen(false);
-  };
-
-  const handleSignUp = () => {
-    navigate("/auth/register");
-    if (isMobile && onMenuClose) {
-      onMenuClose();
-    }
-  };
-
-  const handleTryDemo = () => {
-    navigate("/auth/login?demo=true");
+    
     if (isMobile && onMenuClose) {
       onMenuClose();
     }
@@ -54,25 +43,25 @@ const GetStartedButton: React.FC<GetStartedButtonProps> = ({
       <>
         <Button 
           className="justify-start w-full bg-brand-500 hover:bg-brand-600"
-          onClick={handleSignUp}
+          onClick={() => handleAction('signup')}
         >
           Get Started for Free
         </Button>
         <Button 
           variant="outline" 
           className="justify-start w-full"
-          onClick={openLoginModal}
+          onClick={() => handleAction('login')}
         >
           Log in
         </Button>
         <Button
           variant="secondary"
           className="justify-start w-full bg-brand-100 hover:bg-brand-200 dark:bg-brand-900/30 dark:hover:bg-brand-900/50"
-          onClick={handleTryDemo}
+          onClick={() => handleAction('demo')}
         >
           <span>Try Demo</span>
         </Button>
-        <LoginModal isOpen={loginModalOpen} onClose={closeLoginModal} />
+        <LoginModal isOpen={loginModalOpen} onClose={() => setLoginModalOpen(false)} />
       </>
     );
   }
@@ -94,27 +83,27 @@ const GetStartedButton: React.FC<GetStartedButtonProps> = ({
             <Button 
               variant="ghost" 
               className="justify-start"
-              onClick={openLoginModal}
+              onClick={() => handleAction('login')}
             >
               Log in
             </Button>
             <Button 
               className="justify-start"
-              onClick={handleSignUp}
+              onClick={() => handleAction('signup')}
             >
               Sign up
             </Button>
             <Button
               variant="secondary"
               className="justify-start bg-brand-100 hover:bg-brand-200 dark:bg-brand-900/30 dark:hover:bg-brand-900/50"
-              onClick={handleTryDemo}
+              onClick={() => handleAction('demo')}
             >
               <span>Try Demo</span>
             </Button>
           </div>
         </PopoverContent>
       </Popover>
-      <LoginModal isOpen={loginModalOpen} onClose={closeLoginModal} />
+      <LoginModal isOpen={loginModalOpen} onClose={() => setLoginModalOpen(false)} />
     </>
   );
 };

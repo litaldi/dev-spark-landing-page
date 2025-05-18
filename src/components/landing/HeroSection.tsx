@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
-import GetStartedButton from "./GetStartedButton";
 
 const HeroSection: React.FC = () => {
   const navigate = useNavigate();
@@ -13,11 +12,19 @@ const HeroSection: React.FC = () => {
   // In a real app, this would come from your auth provider
   const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
 
+  const handleGetStarted = () => {
+    navigate("/auth/register");
+  };
+
   const handleTryDemo = () => {
     const demoSection = document.getElementById('demo');
     if (demoSection) {
       demoSection.scrollIntoView({ behavior: 'smooth' });
     }
+  };
+
+  const handleDashboard = () => {
+    navigate("/dashboard");
   };
 
   return (
@@ -50,7 +57,7 @@ const HeroSection: React.FC = () => {
               <Button 
                 size="lg" 
                 className="rounded-full bg-brand-500 hover:bg-brand-600 text-white px-6 sm:px-8 py-5 sm:py-6 text-base sm:text-lg transform transition-all duration-300 hover:scale-105 shadow-md hover:shadow-lg"
-                onClick={() => navigate("/dashboard")}
+                onClick={handleDashboard}
                 aria-label="Navigate to your dashboard"
               >
                 Go to Dashboard
@@ -61,7 +68,7 @@ const HeroSection: React.FC = () => {
                 <Button 
                   size="lg" 
                   className={`rounded-full bg-brand-500 hover:bg-brand-600 text-white px-6 sm:px-8 py-5 sm:py-6 text-base sm:text-lg transform transition-all duration-300 hover:scale-105 shadow-md hover:shadow-lg ${isMobile ? 'w-full' : ''}`}
-                  onClick={() => navigate("/auth/register")}
+                  onClick={handleGetStarted}
                   aria-label="Sign up for an account"
                 >
                   Get Started for Free

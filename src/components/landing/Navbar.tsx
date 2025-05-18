@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react";
 import NavbarLogo from "./NavbarLogo";
@@ -21,11 +22,7 @@ const Navbar: React.FC = () => {
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 10) {
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
-      }
+      setIsScrolled(window.scrollY > 10);
     };
 
     window.addEventListener("scroll", handleScroll);
@@ -60,21 +57,6 @@ const Navbar: React.FC = () => {
     setIsDemoUser(false);
   };
 
-  // For demo purposes only - toggle login state
-  const toggleLoginState = () => {
-    setIsLoggedIn(!isLoggedIn);
-    if (!isLoggedIn) {
-      setUserName("User");
-      localStorage.setItem("isLoggedIn", "true");
-      localStorage.setItem("userName", "User");
-    } else {
-      setUserName(null);
-      localStorage.removeItem("isLoggedIn");
-      localStorage.removeItem("userName");
-      localStorage.removeItem("isDemoUser");
-    }
-  };
-
   return (
     <header 
       className={`py-3 md:py-4 border-b border-gray-100 dark:border-gray-800 sticky top-0 z-50 transition-all duration-300 ${
@@ -97,27 +79,23 @@ const Navbar: React.FC = () => {
           </nav>
           
           <div className="flex items-center gap-3">
-            {/* Update: Removed "Contact Sales" button and replaced login/signup buttons with GetStarted */}
             <div className="hidden md:flex items-center gap-4">
               {!isLoggedIn && (
                 <GetStartedButton className="hidden lg:flex" />
               )}
             </div>
             
-            {/* Add accessibility menu and theme toggle to the right side */}
             <div className="hidden md:flex items-center gap-2">
               <AccessibilityMenu />
               <ThemeToggle />
             </div>
             
-            {/* Keep AuthButtons for logged-in users */}
             {isLoggedIn && (
               <AuthButtons 
                 isLoggedIn={isLoggedIn} 
                 userName={userName}
                 isDemoUser={isDemoUser}
                 onLogout={handleLogout}
-                toggleLoginState={toggleLoginState}
               />
             )}
             
@@ -133,7 +111,6 @@ const Navbar: React.FC = () => {
           </div>
         </div>
         
-        {/* Mobile menu */}
         <MobileMenu 
           isOpen={mobileMenuOpen}
           isLoggedIn={isLoggedIn}
@@ -141,7 +118,6 @@ const Navbar: React.FC = () => {
           isDemoUser={isDemoUser}
           onMenuClose={() => setMobileMenuOpen(false)}
           onLogout={handleLogout}
-          toggleLoginState={toggleLoginState}
         />
       </div>
     </header>
@@ -157,7 +133,6 @@ interface MobileMenuProps {
   isDemoUser?: boolean;
   onMenuClose: () => void;
   onLogout: () => void;
-  toggleLoginState: () => void;
 }
 
 const MobileMenu: React.FC<MobileMenuProps> = ({ 
@@ -166,8 +141,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
   userName,
   isDemoUser = false,
   onMenuClose,
-  onLogout,
-  toggleLoginState
+  onLogout
 }) => {
   if (!isOpen) return null;
   
