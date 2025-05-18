@@ -1,21 +1,9 @@
 
-import React, { useState } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 import { Github, Linkedin, Twitter, Info, Mail, MailPlus } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import LoginModal from "@/components/auth/LoginModal";
 
 const Footer: React.FC = () => {
-  const [loginModalOpen, setLoginModalOpen] = useState(false);
-
-  const openLoginModal = () => {
-    setLoginModalOpen(true);
-  };
-
-  const closeLoginModal = () => {
-    setLoginModalOpen(false);
-  };
-
   return (
     <footer 
       className="py-12 border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900" 
@@ -132,22 +120,25 @@ const Footer: React.FC = () => {
             </div>
             
             <div className="col-span-2 sm:col-span-1">
-              <h3 className="font-medium text-gray-800 dark:text-gray-200 mb-3">Get Started</h3>
-              <div className="flex flex-col space-y-2">
-                <Button 
-                  className="bg-brand-500 hover:bg-brand-600 text-white"
-                  size="sm"
-                  asChild
-                >
-                  <Link to="/auth/register">Create account</Link>
-                </Button>
-                <Link 
-                  to="/dashboard"
-                  className="text-gray-500 dark:text-gray-400 hover:text-brand-500 dark:hover:text-brand-400 text-sm transition-colors"
-                >
-                  Visit Dashboard
-                </Link>
-              </div>
+              <h3 className="font-medium text-gray-800 dark:text-gray-200 mb-3">Links</h3>
+              <ul className="space-y-2">
+                <li>
+                  <Link 
+                    to="/faq" 
+                    className="text-gray-500 dark:text-gray-400 hover:text-brand-500 dark:hover:text-brand-400 text-sm transition-colors"
+                  >
+                    Help Center
+                  </Link>
+                </li>
+                <li>
+                  <Link 
+                    to="/accessibility" 
+                    className="text-gray-500 dark:text-gray-400 hover:text-brand-500 dark:hover:text-brand-400 text-sm transition-colors"
+                  >
+                    Accessibility
+                  </Link>
+                </li>
+              </ul>
             </div>
           </div>
         </div>
@@ -156,9 +147,6 @@ const Footer: React.FC = () => {
           <p>© {new Date().getFullYear()} DevAI Companion. All rights reserved.</p>
         </div>
       </div>
-      
-      {/* Login Modal (kept for compatibility with other components) */}
-      <LoginModal isOpen={loginModalOpen} onClose={closeLoginModal} />
     </footer>
   );
 };

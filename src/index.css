@@ -55,33 +55,33 @@
     --popover: 240 10% 3.9%;
     --popover-foreground: 0 0% 98%;
 
-    --primary: 282 53% 48%; /* #6C3483 for dark mode */
+    --primary: 282 53% 62%; /* Brighter purple for dark mode to improve contrast */
     --primary-foreground: 0 0% 98%;
 
     --secondary: 240 3.7% 15.9%;
     --secondary-foreground: 0 0% 98%;
 
     --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
+    --muted-foreground: 240 5% 74.9%; /* Increased brightness for better visibility */
 
-    --accent: 282 25% 20%;
+    --accent: 282 25% 25%; /* Adjusted for better contrast in dark mode */
     --accent-foreground: 0 0% 98%;
 
-    --destructive: 0 62.8% 30.6%;
+    --destructive: 0 62.8% 50.6%; /* Brighter for dark mode */
     --destructive-foreground: 0 0% 98%;
 
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 282 53% 48%;
+    --border: 240 3.7% 25.9%; /* Brighter border for better visibility */
+    --input: 240 3.7% 25.9%;
+    --ring: 282 53% 62%; /* Match primary for consistency */
 
     --sidebar-background: 240 10% 3.9%;
     --sidebar-foreground: 0 0% 98%;
-    --sidebar-primary: 282 53% 48%;
+    --sidebar-primary: 282 53% 62%;
     --sidebar-primary-foreground: 0 0% 98%;
     --sidebar-accent: 240 3.7% 15.9%;
     --sidebar-accent-foreground: 0 0% 98%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 282 53% 48%;
+    --sidebar-border: 240 3.7% 25.9%;
+    --sidebar-ring: 282 53% 62%;
   }
 
   /* High contrast mode styles */
@@ -210,23 +210,23 @@
   }
   
   .mui-shadow-1 {
-    @apply shadow-mui-1;
+    @apply shadow-mui-1 dark:shadow-mui-dark-1;
   }
   
   .mui-shadow-2 {
-    @apply shadow-mui-2;
+    @apply shadow-mui-2 dark:shadow-mui-dark-2;
   }
   
   .mui-shadow-3 {
-    @apply shadow-mui-3;
+    @apply shadow-mui-3 dark:shadow-mui-dark-3;
   }
   
   .mui-paper {
-    @apply bg-background rounded-md shadow-mui-1 p-4;
+    @apply bg-background rounded-md shadow-mui-1 dark:shadow-mui-dark-1 p-4;
   }
   
   .mui-card {
-    @apply bg-card rounded-md shadow-mui-1 overflow-hidden;
+    @apply bg-card rounded-md shadow-mui-1 dark:shadow-mui-dark-1 overflow-hidden;
   }
   
   .mui-input-label {
@@ -235,5 +235,15 @@
   
   .mui-field {
     @apply mb-4;
+  }
+
+  /* Enhanced dark mode dialog/modal styles */
+  .dark [role="dialog"] {
+    @apply bg-card border-border;
+  }
+
+  /* Enhanced dark mode dropdown styles */
+  .dark [role="menu"] {
+    @apply bg-card border-border text-foreground;
   }
 }

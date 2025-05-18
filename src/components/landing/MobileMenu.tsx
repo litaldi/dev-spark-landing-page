@@ -8,6 +8,7 @@ import { AccessibilityMenu } from "@/components/a11y/AccessibilityMenu";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { Mail } from "lucide-react";
+import GetStartedButton from "./GetStartedButton";
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -71,6 +72,9 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
         </div>
         
         <div className="py-2 space-y-2 border-t border-gray-100 dark:border-gray-800">
+          {!isLoggedIn && (
+            <GetStartedButton isMobile={true} onMenuClose={onMenuClose} />
+          )}
           <AuthButtons 
             isLoggedIn={isLoggedIn}
             userName={userName}
