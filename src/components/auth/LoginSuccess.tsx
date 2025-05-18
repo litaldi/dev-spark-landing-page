@@ -30,27 +30,27 @@ export const LoginSuccess = ({ userName, redirectTo, isFirstTimeUser }: LoginSuc
 
   return (
     <div 
-      className="fixed inset-0 flex flex-col items-center justify-center bg-background z-50 animate-fade-in"
+      className="fixed inset-0 flex flex-col items-center justify-center bg-background z-50 animate-fade-in px-4"
       role="alert"
       aria-live="assertive"
     >
-      <div className="flex flex-col items-center text-center max-w-md px-4">
-        <div className="rounded-full bg-green-100 dark:bg-green-900/20 p-6 mb-6">
-          <CheckCircle className="h-12 w-12 text-green-600 dark:text-green-400" aria-hidden="true" />
+      <div className="flex flex-col items-center text-center max-w-sm sm:max-w-md">
+        <div className="rounded-full bg-green-100 dark:bg-green-900/20 p-4 sm:p-6 mb-4 sm:mb-6">
+          <CheckCircle className="h-8 w-8 sm:h-12 sm:w-12 text-green-600 dark:text-green-400" aria-hidden="true" />
         </div>
         
-        <h1 className="text-2xl md:text-3xl font-bold mb-2">
+        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-2">
           {isFirstTimeUser ? "Welcome to DevSpark!" : "Welcome back!"}
         </h1>
         
-        <p className="text-muted-foreground mb-8">
+        <p className="text-sm sm:text-base text-muted-foreground mb-6 sm:mb-8">
           {isFirstTimeUser 
             ? `Great to have you here, ${userName}. Setting up your dashboard...`
             : `Good to see you again, ${userName}. Loading your dashboard...`
           }
         </p>
         
-        <div className="relative w-64 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+        <div className="relative w-full max-w-[220px] sm:w-64 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
           <div 
             className="absolute top-0 left-0 h-full bg-brand-500 dark:bg-brand-400 rounded-full transition-all duration-300"
             style={{ width: `${((2 - countdown) / 2) * 100}%` }}

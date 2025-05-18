@@ -11,6 +11,7 @@ import { MotivationalPrompts } from "@/components/dashboard/MotivationalPrompts"
 import { useDashboardActions } from "@/hooks/dashboard/use-dashboard-actions";
 import { Button } from "@/components/ui/button";
 import { HelpCircle } from "lucide-react";
+import { useViewportSize } from "@/hooks/use-mobile";
 
 interface DashboardContentProps {
   userName: string;
@@ -31,6 +32,9 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
     startLesson,
     handleAction
   } = useDashboardActions(onError);
+  
+  const { width } = useViewportSize();
+  const isSmallScreen = width < 640;
 
   // Get last activity timestamp from localStorage
   const lastActivityDate = localStorage.getItem("lastSessionDate");
@@ -46,8 +50,8 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
         onStartTodaysSession={startSession}
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 space-y-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+        <div className="lg:col-span-2 space-y-4 sm:space-y-6">
           <ProgressSection 
             weeklyGoalHours={10}
             currentHours={2}
@@ -74,13 +78,13 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
           />
         </div>
         
-        <div className="lg:col-span-1 space-y-6">
+        <div className="lg:col-span-1 space-y-4 sm:space-y-6">
           <RecentActivitySection isLoading={isLoading} />
           
-          <div className="fixed bottom-6 right-6 md:static md:mt-4 md:flex md:justify-end">
+          <div className="fixed bottom-6 right-6 md:static md:mt-4 md:flex md:justify-end z-10">
             <Button 
               variant="outline"
-              size="sm"
+              size={isSmallScreen ? "icon" : "sm"}
               className="rounded-full h-12 w-12 md:h-auto md:w-auto md:rounded-md md:px-4 shadow-lg md:shadow-none bg-white dark:bg-gray-800"
               aria-label="Get help with dashboard features"
               onClick={() => handleAction('help')}

@@ -1,4 +1,5 @@
 
+/* Base styling */
 #root {
   margin: 0 auto;
   text-align: center;
@@ -21,12 +22,8 @@
 
 /* Animation */
 @keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -54,24 +51,11 @@
 }
 
 /* Section spacing */
-.section {
-  padding: 3rem 0;
-}
-
-.section-lg {
-  padding: 5rem 0;
-}
-
-/* Custom focus styles */
-.custom-focus:focus {
-  outline: 2px solid var(--ring);
-  outline-offset: 2px;
-}
+.section { padding: 3rem 0; }
+.section-lg { padding: 5rem 0; }
 
 /* Form element styling */
-input, 
-select, 
-textarea {
+input, select, textarea {
   font-size: 1rem;
   line-height: 1.5;
   width: 100%;
@@ -91,36 +75,13 @@ textarea {
 }
 
 /* Custom shadows */
-.shadow-soft {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-}
-
-.shadow-medium {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-}
-
-/* Focus states for interactive elements */
-a:focus-visible,
-button:focus-visible,
-input:focus-visible,
-select:focus-visible,
-textarea:focus-visible {
-  outline: 2px solid var(--ring);
-  outline-offset: 2px;
-}
+.shadow-soft { box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); }
+.shadow-medium { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); }
 
 /* Global animations */
-.animate-fade-in {
-  animation: fadeIn 0.3s ease-in-out;
-}
-
-.animate-fade-up {
-  animation: fadeUp 0.4s ease-in-out;
-}
-
-.animate-scale-in {
-  animation: scaleIn 0.3s ease-in-out;
-}
+.animate-fade-in { animation: fadeIn 0.3s ease-in-out; }
+.animate-fade-up { animation: fadeUp 0.4s ease-in-out; }
+.animate-scale-in { animation: scaleIn 0.3s ease-in-out; }
 
 @keyframes fadeIn {
   from { opacity: 0; }
@@ -128,25 +89,13 @@ textarea:focus-visible {
 }
 
 @keyframes fadeUp {
-  from { 
-    opacity: 0; 
-    transform: translateY(10px); 
-  }
-  to { 
-    opacity: 1; 
-    transform: translateY(0); 
-  }
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes scaleIn {
-  from { 
-    opacity: 0; 
-    transform: scale(0.95); 
-  }
-  to { 
-    opacity: 1; 
-    transform: scale(1); 
-  }
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
 }
 
 /* Enhanced hover effects */
@@ -159,20 +108,6 @@ textarea:focus-visible {
   box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
 }
 
-/* High contrast mode */
-.high-contrast {
-  --foreground: #ffffff;
-  --background: #121212;
-  --primary: #4d7cfe;
-  --border: #555555;
-}
-
-/* Enhanced keyboard navigation */
-.keyboard-navigation :focus {
-  outline: 3px solid var(--ring) !important;
-  outline-offset: 3px !important;
-}
-
 /* Mobile-specific utilities */
 @media (max-width: 480px) {
   .mobile-full-width {
@@ -181,51 +116,29 @@ textarea:focus-visible {
     margin-right: 0 !important;
   }
   
-  .mobile-stack {
-    flex-direction: column !important;
-  }
-  
-  .mobile-text-center {
-    text-align: center !important;
-  }
-  
-  .mobile-pt-6 {
-    padding-top: 1.5rem !important;
-  }
-  
-  .mobile-pb-6 {
-    padding-bottom: 1.5rem !important;
-  }
+  .mobile-stack { flex-direction: column !important; }
+  .mobile-text-center { text-align: center !important; }
+  .mobile-pt-6 { padding-top: 1.5rem !important; }
+  .mobile-pb-6 { padding-bottom: 1.5rem !important; }
 }
 
 /* Tablet-specific utilities */
 @media (min-width: 481px) and (max-width: 1024px) {
-  .tablet-py-8 {
-    padding-top: 2rem !important;
-    padding-bottom: 2rem !important;
-  }
-  
-  .tablet-px-6 {
-    padding-left: 1.5rem !important;
-    padding-right: 1.5rem !important;
-  }
+  .tablet-py-8 { padding-top: 2rem !important; padding-bottom: 2rem !important; }
+  .tablet-px-6 { padding-left: 1.5rem !important; padding-right: 1.5rem !important; }
 }
 
-/* Responsive spacing utilities */
+/* Responsive spacing utility */
 .space-y-responsive {
   --space: 1rem;
 }
 
 @media (min-width: 640px) {
-  .space-y-responsive {
-    --space: 1.5rem;
-  }
+  .space-y-responsive { --space: 1.5rem; }
 }
 
 @media (min-width: 768px) {
-  .space-y-responsive {
-    --space: 2rem;
-  }
+  .space-y-responsive { --space: 2rem; }
 }
 
 .space-y-responsive > * + * {
