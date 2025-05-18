@@ -81,7 +81,7 @@ describe('RegisterForm Component', () => {
   test('renders registration form correctly', () => {
     render(
       <BrowserRouter>
-        <RegisterForm onSubmitSuccess={mockSubmit} />
+        <RegisterForm onGoogleSignUp={mockSubmit} />
       </BrowserRouter>
     );
     
@@ -99,7 +99,7 @@ describe('RegisterForm Component', () => {
     
     render(
       <BrowserRouter>
-        <RegisterForm onSubmitSuccess={mockSubmit} />
+        <RegisterForm onGoogleSignUp={mockSubmit} />
       </BrowserRouter>
     );
     
@@ -121,7 +121,7 @@ describe('RegisterForm Component', () => {
   test('displays password strength indicator', () => {
     render(
       <BrowserRouter>
-        <RegisterForm onSubmitSuccess={mockSubmit} />
+        <RegisterForm onGoogleSignUp={mockSubmit} />
       </BrowserRouter>
     );
     

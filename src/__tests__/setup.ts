@@ -2,24 +2,27 @@
 // This file is run before each test file
 import '@testing-library/jest-dom';
 
-// Mock APIs that aren't available in Jest DOM environment
+// Mock ResizeObserver
 global.ResizeObserver = class ResizeObserver {
   observe() {}
   unobserve() {}
   disconnect() {}
 };
 
-// Mock matchMedia
-window.matchMedia = window.matchMedia || function() {
-  return {
+// Mock matchMedia with proper type handling
+Object.defineProperty(window, 'matchMedia', {
+  writable: true,
+  value: jest.fn().mockImplementation(query => ({
     matches: false,
-    addListener: function() {},
-    removeListener: function() {},
-    addEventListener: function() {},
-    removeEventListener: function() {},
-    dispatchEvent: function() { return true; },
-  };
-};
+    media: query,
+    onchange: null,
+    addListener: jest.fn(), // deprecated
+    removeListener: jest.fn(), // deprecated
+    addEventListener: jest.fn(),
+    removeEventListener: jest.fn(),
+    dispatchEvent: jest.fn(),
+  })),
+});
 
 // Suppress React 18 console errors about act()
 const originalError = console.error;
@@ -38,12 +41,16 @@ expect.extend({
   // Add any custom matchers here
 });
 
-// Mock IntersectionObserver
+// Mock IntersectionObserver with proper TypeScript type definitions
 global.IntersectionObserver = class IntersectionObserver {
-  constructor(callback) {
-    this.callback = callback;
-  }
+  root: Element | null = null;
+  rootMargin: string = '';
+  thresholds: ReadonlyArray<number> = [];
+  
+  constructor(private readonly cb: IntersectionObserverCallback) {}
+  
   observe() {}
   unobserve() {}
   disconnect() {}
+  takeRecords(): IntersectionObserverEntry[] { return []; }
 };
