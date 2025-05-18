@@ -5,6 +5,9 @@ import NavbarLogo from "./NavbarLogo";
 import NavLinks from "./NavLinks";
 import AuthButtons from "./AuthButtons";
 import MobileMenu from "./MobileMenu";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
+import { AccessibilityMenu } from "@/components/a11y/AccessibilityMenu";
+import { SkipNavLink } from "@/components/a11y/skip-nav";
 
 const Navbar: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -76,6 +79,7 @@ const Navbar: React.FC = () => {
       }`}
       role="banner"
     >
+      <SkipNavLink className="focus:absolute focus:z-50" />
       <div className="container">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -89,7 +93,13 @@ const Navbar: React.FC = () => {
             <NavLinks />
           </nav>
           
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
+            {/* Add accessibility menu and theme toggle to the right side */}
+            <div className="hidden md:flex items-center gap-2">
+              <AccessibilityMenu />
+              <ThemeToggle />
+            </div>
+            
             <AuthButtons 
               isLoggedIn={isLoggedIn} 
               userName={userName}

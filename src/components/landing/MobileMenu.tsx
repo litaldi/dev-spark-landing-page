@@ -3,6 +3,8 @@ import React from "react";
 import NavLinks from "./NavLinks";
 import AuthButtons from "./AuthButtons";
 import { Badge } from "@/components/ui/badge";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
+import { AccessibilityMenu } from "@/components/a11y/AccessibilityMenu";
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -42,6 +44,12 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
       )}
       <nav className="flex flex-col space-y-4">
         <NavLinks isMobile={true} onMobileMenuClose={onMenuClose} />
+        
+        <div className="flex items-center justify-start gap-3 px-2 py-2">
+          <AccessibilityMenu />
+          <ThemeToggle />
+          <span className="text-sm text-muted-foreground ml-2">Theme & Accessibility</span>
+        </div>
         
         <AuthButtons 
           isLoggedIn={isLoggedIn}
