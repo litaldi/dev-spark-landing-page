@@ -8,9 +8,10 @@ import { Link } from "react-router-dom"
 interface NavLinkProps {
   to: string
   label: string
+  onClick?: () => void;
 }
 
-function NavLink({ to, label }: NavLinkProps) {
+function NavLink({ to, label, onClick }: NavLinkProps) {
   const location = useLocation()
   const isActive = location.pathname === to
 
@@ -24,31 +25,43 @@ function NavLink({ to, label }: NavLinkProps) {
           ? "bg-secondary text-secondary-foreground hover:bg-secondary/80"
           : "hover:bg-accent hover:text-accent-foreground"
       )}
+      onClick={onClick}
     >
       {label}
     </Link>
   )
 }
 
-export function NavLinks() {
+interface NavLinksProps {
+  isMobile?: boolean;
+  onLinkClick?: () => void;
+}
+
+export function NavLinks({ isMobile = false, onLinkClick }: NavLinksProps) {
   const location = useLocation()
   const isLoggedIn = false // Replace with actual auth check
 
+  const handleClick = () => {
+    if (onLinkClick) {
+      onLinkClick();
+    }
+  };
+
   return (
-    <nav className="hidden md:flex items-center gap-1">
-      <NavLink to="/" label="Home" />
-      <NavLink to="/about" label="About" />
-      <NavLink to="/dashboard" label="Dashboard" />
-      <NavLink to="/code-review" label="Code Review" />
+    <nav className={`${isMobile ? "" : "hidden md:flex"} items-center ${isMobile ? "flex-col" : "flex"} gap-1`}>
+      <NavLink to="/" label="Home" onClick={handleClick} />
+      <NavLink to="/about" label="About" onClick={handleClick} />
+      <NavLink to="/dashboard" label="Dashboard" onClick={handleClick} />
+      <NavLink to="/code-review" label="Code Review" onClick={handleClick} />
       {isLoggedIn ? (
         <>
-          <NavLink to="/profile" label="Profile" />
-          <NavLink to="/settings" label="Settings" />
+          <NavLink to="/profile" label="Profile" onClick={handleClick} />
+          <NavLink to="/settings" label="Settings" onClick={handleClick} />
         </>
       ) : (
         <>
-          <NavLink to="/auth/login" label="Login" />
-          <NavLink to="/auth/register" label="Register" />
+          <NavLink to="/auth/login" label="Login" onClick={handleClick} />
+          <NavLink to="/auth/register" label="Register" onClick={handleClick} />
         </>
       )}
     </nav>
