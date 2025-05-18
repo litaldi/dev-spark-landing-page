@@ -73,8 +73,8 @@ describe('useLocalStorage hook', () => {
     const { result } = renderHook(() => useLocalStorage<{ name: string; count: number }>(testKey, initialValue));
     
     act(() => {
-      // Update using a function with proper typing
-      result.current[1]((prev: { name: string; count: number }) => ({ ...prev, count: prev.count + 1 }));
+      // Use the updater function pattern
+      result.current[1]((prev) => ({ ...prev, count: prev.count + 1 }));
     });
     
     // Should store the updated value
