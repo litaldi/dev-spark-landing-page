@@ -35,23 +35,6 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
     onClose();
   };
 
-  const handleDemoLogin = () => {
-    toast({
-      title: "Demo Login",
-      description: "Using demo credentials...",
-      duration: 2000,
-    });
-    
-    // Set demo user login state
-    localStorage.setItem("isDemoUser", "true");
-    localStorage.setItem("userName", "Demo User");
-    localStorage.setItem("userEmail", "demo@example.com");
-    localStorage.setItem("isLoggedIn", "true");
-    
-    navigate("/dashboard");
-    onClose();
-  };
-
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent 

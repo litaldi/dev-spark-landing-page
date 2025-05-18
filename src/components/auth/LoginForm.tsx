@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
@@ -30,10 +29,11 @@ export type LoginFormValues = z.infer<typeof loginSchema>;
 
 interface LoginFormProps {
   onGoogleLogin?: () => void;
+  onGithubLogin?: () => void;
   onMagicLink?: (email: string) => void;
 }
 
-export function LoginForm({ onGoogleLogin, onMagicLink }: LoginFormProps) {
+export function LoginForm({ onGoogleLogin, onGithubLogin, onMagicLink }: LoginFormProps) {
   const { login, isLoading, errorMessage, clearError } = useAuth();
   const { toast } = useToast();
   
@@ -179,6 +179,7 @@ export function LoginForm({ onGoogleLogin, onMagicLink }: LoginFormProps) {
       
       <LoginAlternatives
         onGoogleLogin={onGoogleLogin}
+        onGithubLogin={onGithubLogin}
         onMagicLink={handleMagicLink}
         isLoading={isLoading || isBlocked}
       />

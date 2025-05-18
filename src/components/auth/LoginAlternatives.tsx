@@ -5,13 +5,14 @@ import { Github } from "lucide-react";
 
 interface LoginAlternativesProps {
   onGoogleLogin?: () => void;
+  onGithubLogin?: () => void;
   onMagicLink: () => void;
-  onDemoLogin?: () => void;
   isLoading: boolean;
 }
 
 export function LoginAlternatives({ 
   onGoogleLogin, 
+  onGithubLogin,
   onMagicLink, 
   isLoading 
 }: LoginAlternativesProps) {
@@ -35,7 +36,7 @@ export function LoginAlternatives({
       
       <Button 
         variant="outline" 
-        onClick={() => {}} 
+        onClick={onGithubLogin}
         disabled={isLoading}
         className="w-full"
         aria-label="Continue with GitHub"
