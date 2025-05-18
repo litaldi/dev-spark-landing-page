@@ -14,7 +14,11 @@ const Footer: React.FC = () => {
       <div className="container">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
           <div className="mb-6 md:mb-0">
-            <Link to="/" className="flex items-center gap-2 mb-3 hover:opacity-80 transition-opacity">
+            <Link 
+              to="/" 
+              className="flex items-center gap-2 mb-3 hover:opacity-80 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-md"
+              aria-label="Go to homepage"
+            >
               <div 
                 className="w-8 h-8 rounded-md bg-gradient-to-br from-brand-400 to-brand-600 flex items-center justify-center text-white font-bold text-base" 
                 aria-hidden="true"
@@ -28,7 +32,7 @@ const Footer: React.FC = () => {
               <a 
                 href="https://github.com" 
                 className="text-muted-foreground hover:text-brand-500 dark:hover:text-brand-400 transition-colors p-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-300 rounded-full"
-                aria-label="GitHub"
+                aria-label="Visit our GitHub"
                 rel="noopener noreferrer"
                 target="_blank"
               >
@@ -37,7 +41,7 @@ const Footer: React.FC = () => {
               <a 
                 href="https://linkedin.com" 
                 className="text-muted-foreground hover:text-brand-500 dark:hover:text-brand-400 transition-colors p-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-300 rounded-full"
-                aria-label="LinkedIn"
+                aria-label="Visit our LinkedIn"
                 rel="noopener noreferrer"
                 target="_blank"
               >
@@ -46,7 +50,7 @@ const Footer: React.FC = () => {
               <a 
                 href="https://twitter.com" 
                 className="text-muted-foreground hover:text-brand-500 dark:hover:text-brand-400 transition-colors p-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-300 rounded-full"
-                aria-label="Twitter"
+                aria-label="Visit our Twitter"
                 rel="noopener noreferrer"
                 target="_blank"
               >
@@ -62,7 +66,7 @@ const Footer: React.FC = () => {
                 <li>
                   <Link 
                     to="/about" 
-                    className="text-muted-foreground hover:text-brand-500 dark:hover:text-brand-400 text-sm transition-colors flex items-center gap-1.5"
+                    className="text-muted-foreground hover:text-brand-500 dark:hover:text-brand-400 text-sm transition-colors flex items-center gap-1.5 focus:outline-none focus-visible:text-brand-500 focus-visible:underline"
                   >
                     <Info className="h-3.5 w-3.5" aria-hidden="true" />
                     About
@@ -71,7 +75,7 @@ const Footer: React.FC = () => {
                 <li>
                   <Link 
                     to="/contact" 
-                    className="text-muted-foreground hover:text-brand-500 dark:hover:text-brand-400 text-sm transition-colors flex items-center gap-1.5"
+                    className="text-muted-foreground hover:text-brand-500 dark:hover:text-brand-400 text-sm transition-colors flex items-center gap-1.5 focus:outline-none focus-visible:text-brand-500 focus-visible:underline"
                   >
                     <Mail className="h-3.5 w-3.5" aria-hidden="true" />
                     Contact
@@ -80,7 +84,7 @@ const Footer: React.FC = () => {
                 <li>
                   <Link 
                     to="/newsletter" 
-                    className="text-muted-foreground hover:text-brand-500 dark:hover:text-brand-400 text-sm transition-colors flex items-center gap-1.5"
+                    className="text-muted-foreground hover:text-brand-500 dark:hover:text-brand-400 text-sm transition-colors flex items-center gap-1.5 focus:outline-none focus-visible:text-brand-500 focus-visible:underline"
                   >
                     <MailPlus className="h-3.5 w-3.5" aria-hidden="true" />
                     Newsletter
@@ -95,7 +99,7 @@ const Footer: React.FC = () => {
                 <li>
                   <Link 
                     to="/faq" 
-                    className="text-muted-foreground hover:text-brand-500 dark:hover:text-brand-400 text-sm transition-colors"
+                    className="text-muted-foreground hover:text-brand-500 dark:hover:text-brand-400 text-sm transition-colors focus:outline-none focus-visible:text-brand-500 focus-visible:underline"
                   >
                     FAQ / Help
                   </Link>
@@ -103,7 +107,7 @@ const Footer: React.FC = () => {
                 <li>
                   <Link 
                     to="/terms" 
-                    className="text-muted-foreground hover:text-brand-500 dark:hover:text-brand-400 text-sm transition-colors"
+                    className="text-muted-foreground hover:text-brand-500 dark:hover:text-brand-400 text-sm transition-colors focus:outline-none focus-visible:text-brand-500 focus-visible:underline"
                   >
                     Terms of Use
                   </Link>
@@ -111,7 +115,7 @@ const Footer: React.FC = () => {
                 <li>
                   <Link 
                     to="/privacy" 
-                    className="text-muted-foreground hover:text-brand-500 dark:hover:text-brand-400 text-sm transition-colors"
+                    className="text-muted-foreground hover:text-brand-500 dark:hover:text-brand-400 text-sm transition-colors focus:outline-none focus-visible:text-brand-500 focus-visible:underline"
                   >
                     Privacy Policy
                   </Link>
@@ -125,7 +129,7 @@ const Footer: React.FC = () => {
                 <li>
                   <Link 
                     to="/faq" 
-                    className="text-muted-foreground hover:text-brand-500 dark:hover:text-brand-400 text-sm transition-colors"
+                    className="text-muted-foreground hover:text-brand-500 dark:hover:text-brand-400 text-sm transition-colors focus:outline-none focus-visible:text-brand-500 focus-visible:underline"
                   >
                     Help Center
                   </Link>
@@ -133,7 +137,7 @@ const Footer: React.FC = () => {
                 <li>
                   <Link 
                     to="/accessibility" 
-                    className="text-muted-foreground hover:text-brand-500 dark:hover:text-brand-400 text-sm transition-colors"
+                    className="text-muted-foreground hover:text-brand-500 dark:hover:text-brand-400 text-sm transition-colors focus:outline-none focus-visible:text-brand-500 focus-visible:underline"
                   >
                     Accessibility
                   </Link>

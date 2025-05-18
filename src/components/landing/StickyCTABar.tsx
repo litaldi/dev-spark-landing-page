@@ -60,7 +60,8 @@ const StickyCTABar: React.FC = () => {
               className="h-10 w-10 rounded-full p-0 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
               aria-label="Back to top"
             >
-              <ArrowUp className="h-5 w-5" />
+              <ArrowUp className="h-5 w-5" aria-hidden="true" />
+              <span className="sr-only">Scroll to top</span>
             </Button>
             
             {isLoggedIn ? (

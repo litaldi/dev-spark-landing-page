@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Dialog,
@@ -15,6 +15,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
 import { useAuth } from "@/hooks/auth";
 import { Link } from "react-router-dom";
+import { useKeyboardNavigation } from "@/hooks/use-keyboard-navigation";
 
 interface GetStartedModalProps {
   isOpen: boolean;
@@ -29,6 +30,14 @@ const GetStartedModal: React.FC<GetStartedModalProps> = ({ isOpen, onClose }) =>
   const { login } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const modalRef = useRef<HTMLDivElement>(null);
+
+  // Use keyboard navigation hook
+  useKeyboardNavigation(modalRef, {
+    trapFocus: true,
+    escapeHandler: onClose,
+    enabled: isOpen
+  });
 
   const handleThirdPartyLogin = (provider: string) => {
     toast({
@@ -81,6 +90,7 @@ const GetStartedModal: React.FC<GetStartedModalProps> = ({ isOpen, onClose }) =>
         aria-labelledby="login-signup-title"
         role="dialog"
         aria-modal="true"
+        ref={modalRef}
       >
         <DialogHeader>
           <DialogTitle id="login-signup-title" className="text-2xl font-bold text-center">
