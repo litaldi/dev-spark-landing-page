@@ -2,7 +2,6 @@
 import React from "react";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { AccessibilityMenu } from "@/components/a11y/AccessibilityMenu";
-import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
 import GetStartedButton from "./GetStartedButton";
 import AuthButtons from "./AuthButtons";
