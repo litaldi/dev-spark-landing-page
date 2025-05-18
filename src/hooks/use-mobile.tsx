@@ -3,6 +3,7 @@ import * as React from "react"
 
 const MOBILE_BREAKPOINT = 768
 const TABLET_BREAKPOINT = 1024
+const DESKTOP_BREAKPOINT = 1280
 
 export function useIsMobile() {
   const [isMobile, setIsMobile] = React.useState<boolean | undefined>(undefined)
@@ -42,6 +43,24 @@ export function useIsTablet() {
   return !!isTablet
 }
 
+export function useIsDesktop() {
+  const [isDesktop, setIsDesktop] = React.useState<boolean | undefined>(undefined)
+
+  React.useEffect(() => {
+    const checkDesktop = () => {
+      setIsDesktop(window.innerWidth >= DESKTOP_BREAKPOINT)
+    }
+    
+    const mql = window.matchMedia(`(min-width: ${DESKTOP_BREAKPOINT}px)`)
+    mql.addEventListener("change", checkDesktop)
+    checkDesktop()
+    
+    return () => mql.removeEventListener("change", checkDesktop)
+  }, [])
+
+  return !!isDesktop
+}
+
 export function useViewportSize() {
   const [size, setSize] = React.useState({ width: 0, height: 0 })
   
@@ -60,6 +79,22 @@ export function useViewportSize() {
   }, [])
   
   return size
+}
+
+export function useBreakpoint() {
+  const { width } = useViewportSize();
+  
+  if (width === 0) {
+    return null; // Not yet determined (SSR or initial load)
+  }
+  
+  if (width < MOBILE_BREAKPOINT) {
+    return "mobile";
+  } else if (width < TABLET_BREAKPOINT) {
+    return "tablet";
+  } else {
+    return "desktop";
+  }
 }
 
 export function useResponsiveValue<T>(
