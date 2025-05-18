@@ -166,3 +166,4 @@ We aim for at least 70% test coverage for all code. You can check coverage repor
 5. Don't test third-party libraries, only your code
 6. Use proper semantic queries (getByRole instead of getByTestId when possible)
 7. Test edge cases and error states
+
