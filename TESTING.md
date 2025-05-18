@@ -24,7 +24,12 @@ npm test -- src/__tests__/components/ui/Input.test.tsx
 Our tests are organized into the following categories in the `src/__tests__` directory:
 
 - **components/**: Unit tests for individual UI components
+  - **ui/**: Tests for UI components
+  - **auth/**: Tests for authentication components
+  - **dashboard/**: Tests for dashboard components
+  - **gamification/**: Tests for gamification components
 - **hooks/**: Tests for custom React hooks
+  - **auth/**: Tests for authentication hooks
 - **integration/**: Tests for component interactions
 - **pages/**: Tests for page components
 - **accessibility/**: Tests for accessibility features
@@ -106,9 +111,19 @@ For accessibility testing:
 ```jsx
 import React from 'react';
 import { render, screen } from '@testing-library/react';
+import { axe, toHaveNoViolations } from 'jest-axe';
 import { AccessibleComponent } from '@/components/path/to/component';
 
+// Add jest-axe custom matcher
+expect.extend(toHaveNoViolations);
+
 describe('Accessibility Tests for AccessibleComponent', () => {
+  test('has no accessibility violations', async () => {
+    const { container } = render(<AccessibleComponent />);
+    const results = await axe(container);
+    expect(results).toHaveNoViolations();
+  });
+  
   test('has proper ARIA attributes', () => {
     render(<AccessibleComponent />);
     const element = screen.getByRole('button');
@@ -151,13 +166,28 @@ jest.mock('@/hooks/use-auth', () => ({
 jest.mock('@/api/userApi', () => ({
   fetchUser: jest.fn().mockResolvedValue({ id: 1, name: 'Test User' }),
 }));
+
+// Mock localStorage
+const mockLocalStorage = (() => {
+  let store = {};
+  return {
+    getItem: (key) => store[key] || null,
+    setItem: (key, value) => { store[key] = value.toString(); },
+    clear: () => { store = {}; },
+  };
+})();
+
+Object.defineProperty(window, 'localStorage', {
+  value: mockLocalStorage,
+  writable: true,
+});
 ```
 
 ## Coverage Requirements
 
 We aim for at least 70% test coverage for all code. You can check coverage reports in the `coverage` directory after running `npm test -- --coverage`.
 
-## Best Practices
+## Testing Best Practices
 
 1. Test behavior, not implementation details
 2. Use descriptive test names
@@ -166,4 +196,6 @@ We aim for at least 70% test coverage for all code. You can check coverage repor
 5. Don't test third-party libraries, only your code
 6. Use proper semantic queries (getByRole instead of getByTestId when possible)
 7. Test edge cases and error states
-
+8. Ensure your tests are maintainable
+9. Keep tests isolated and independent from each other
+10. Write tests that are resilient to changes in implementation details

@@ -35,15 +35,15 @@ export function AchievementBadge({
   const getIconComponent = () => {
     switch (achievement.icon) {
       case "star":
-        return <Star />;
+        return <Star data-testid="star-icon" />;
       case "trophy":
-        return <Trophy />;
+        return <Trophy data-testid="trophy-icon" />;
       case "check":
-        return <CheckCheck />;
+        return <CheckCheck data-testid="check-icon" />;
       case "custom":
         return achievement.customIcon;
       default:
-        return <Star />;
+        return <Star data-testid="default-icon" />;
     }
   };
 
@@ -67,6 +67,7 @@ export function AchievementBadge({
         onClick ? "cursor-pointer" : ""
       )}
       onClick={onClick}
+      data-testid={`achievement-${achievement.id}`}
     >
       <div 
         className={cn(
@@ -87,12 +88,12 @@ export function AchievementBadge({
         
         {!achievement.isUnlocked && (
           <div className="absolute inset-0 flex items-center justify-center bg-gray-200/60 dark:bg-gray-700/60 rounded-full">
-            <Lock className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+            <Lock className="h-4 w-4 text-gray-500 dark:text-gray-400" data-testid="lock-icon" />
           </div>
         )}
         
         {achievement.isUnlocked && achievement.dateAchieved && (
-          <div className="absolute -bottom-1 -right-1 bg-brand-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+          <div className="absolute -bottom-1 -right-1 bg-brand-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center" data-testid="achievement-completed-indicator">
             ✓
           </div>
         )}
@@ -108,14 +109,15 @@ export function AchievementBadge({
         </p>
         
         {showProgress && achievement.progress !== undefined && achievement.maxProgress && (
-          <div className="w-full mt-1">
+          <div className="w-full mt-1" data-testid="achievement-progress">
             <div className="h-1 w-full bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
               <div 
                 className="h-full bg-brand-500 rounded-full" 
                 style={{ width: `${(achievement.progress / achievement.maxProgress) * 100}%` }}
+                data-testid="achievement-progress-bar"
               />
             </div>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1" data-testid="achievement-progress-text">
               {achievement.progress}/{achievement.maxProgress}
             </p>
           </div>
