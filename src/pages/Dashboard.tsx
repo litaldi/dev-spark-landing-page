@@ -7,7 +7,7 @@ import DemoUserBanner from "@/components/demo/DemoUserBanner";
 import { SkipNavLink, SkipNavContent } from "@/components/a11y/skip-nav";
 import { useToast } from "@/hooks/use-toast";
 import { AlertError } from "@/components/auth/AlertError";
-import { DashboardContent } from "@/components/dashboard/DashboardContent";
+import { EnhancedDashboardContent } from "@/components/dashboard/EnhancedDashboardContent";
 
 const Dashboard = () => {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
@@ -67,7 +67,7 @@ const Dashboard = () => {
             className="mb-6"
           />
           
-          <DashboardContent
+          <EnhancedDashboardContent
             userName={userName}
             isFirstTimeUser={isFirstTimeUser}
             isLoading={isLoading}
