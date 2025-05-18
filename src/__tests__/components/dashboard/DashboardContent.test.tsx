@@ -45,12 +45,14 @@ describe('DashboardContent Component', () => {
   const mockStartFirstLesson = jest.fn();
   const mockStartSession = jest.fn();
   const mockStartLesson = jest.fn();
+  const mockHandleAction = jest.fn();
   
   beforeEach(() => {
     jest.clearAllMocks();
     
     // Mock the hook implementation
     jest.spyOn(dashboardActionsHook, 'useDashboardActions').mockReturnValue({
+      handleAction: mockHandleAction,
       startFirstLesson: mockStartFirstLesson,
       startSession: mockStartSession,
       startLesson: mockStartLesson,
