@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
@@ -85,7 +84,7 @@ export function LoginForm({ onGoogleLogin, onMagicLink }: LoginFormProps) {
       toast({
         title: "Login Attempt Limit",
         description: `You have ${remainingAttempts} login attempts remaining before a temporary block.`,
-        variant: "warning",
+        variant: "default",
       });
     }
     
