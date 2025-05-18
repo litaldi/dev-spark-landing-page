@@ -26,7 +26,7 @@ export const securityHeaders = {
     "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:;",
   'X-XSS-Protection': '1; mode=block',
   'X-Frame-Options': 'DENY',
-  'X-Content-Type-Options': 'nosnify',
+  'X-Content-Type-Options': 'nosniff', // Fixed typo: was 'nosnify'
   'Referrer-Policy': 'strict-origin-when-cross-origin',
   'Strict-Transport-Security': 'max-age=31536000; includeSubDomains'
 };
