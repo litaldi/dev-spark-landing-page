@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -114,11 +113,6 @@ const LoginPage = () => {
               <LoginForm 
                 onGoogleLogin={handleGoogleLogin} 
                 onMagicLink={handleMagicLink} 
-              />
-              
-              <DemoUserCredentials 
-                email="demo@looplist.app"
-                password="Demo123!"
               />
             </CardContent>
             <CardFooter className="flex flex-col space-y-4 pt-0 relative p-4 sm:p-6">

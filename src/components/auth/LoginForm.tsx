@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -64,7 +63,7 @@ export function LoginForm({ onGoogleLogin, onGithubLogin, onMagicLink }: LoginFo
     
     handleMagicLinkRequest(email);
   };
-
+  
   return (
     <div className="animate-fade-in space-y-6">
       <AlertError message={errorMessage} />

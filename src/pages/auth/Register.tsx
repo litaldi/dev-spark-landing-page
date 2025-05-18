@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -100,11 +99,6 @@ const RegisterPage: React.FC = () => {
             </CardHeader>
             <CardContent className="space-y-4 relative p-4 sm:p-6">
               <RegisterForm onGoogleSignUp={handleGoogleSignUp} />
-              
-              <DemoUserCredentials 
-                email="demo@looplist.app"
-                password="Demo123!"
-              />
             </CardContent>
             <CardFooter className="flex flex-col space-y-4 pt-0 relative p-4 sm:p-6">
               <div className="text-center w-full">
