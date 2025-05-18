@@ -5,14 +5,16 @@ import { Key } from "lucide-react";
 interface DemoUserCredentialsProps {
   email?: string;
   password?: string;
+  className?: string;
 }
 
 export function DemoUserCredentials({
-  email = "demo@example.com",
-  password = "demo1234"
+  email = "demo@looplist.app",
+  password = "Demo123!",
+  className = ""
 }: DemoUserCredentialsProps) {
   return (
-    <div className="mt-4 pt-2 border-t border-border">
+    <div className={`mt-4 pt-2 border-t border-border ${className}`}>
       <div className="flex items-center justify-center gap-2 mb-1">
         <Key className="h-3.5 w-3.5 text-muted-foreground/70" />
         <p className="text-xs font-medium text-muted-foreground/80">Demo Credentials</p>

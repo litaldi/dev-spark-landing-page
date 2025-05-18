@@ -83,7 +83,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
         <div className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700 space-y-4">
           {!isLoggedIn && (
             <div className="space-y-2 px-2">
-              <DemoUserButton />
+              <DemoUserButton variant="default" showText={true} onSuccess={onMenuClose} className="w-full justify-center"/>
               <div className="flex space-x-2 mt-4">
                 <Button asChild className="flex-1" onClick={onMenuClose}>
                   <Link to="/auth/login">Log In</Link>

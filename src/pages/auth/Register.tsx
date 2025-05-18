@@ -11,6 +11,7 @@ import { ArrowLeft } from "lucide-react";
 import { LoginSuccess } from "@/components/auth/LoginSuccess";
 import { useAuth } from "@/hooks/auth";
 import { useBreakpoint } from "@/hooks/use-mobile";
+import { DemoUserCredentials } from "@/components/auth/DemoUserCredentials";
 
 const RegisterPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -99,6 +100,11 @@ const RegisterPage: React.FC = () => {
             </CardHeader>
             <CardContent className="space-y-4 relative p-4 sm:p-6">
               <RegisterForm onGoogleSignUp={handleGoogleSignUp} />
+              
+              <DemoUserCredentials 
+                email="demo@looplist.app"
+                password="Demo123!"
+              />
             </CardContent>
             <CardFooter className="flex flex-col space-y-4 pt-0 relative p-4 sm:p-6">
               <div className="text-center w-full">

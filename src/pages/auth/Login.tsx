@@ -11,6 +11,7 @@ import { LoginSuccess } from "@/components/auth/LoginSuccess";
 import { useAuth } from "@/hooks/auth";
 import { ArrowLeft } from "lucide-react";
 import { useBreakpoint } from "@/hooks/use-mobile";
+import { DemoUserCredentials } from "@/components/auth/DemoUserCredentials";
 
 const LoginPage = () => {
   const { toast } = useToast();
@@ -113,6 +114,11 @@ const LoginPage = () => {
               <LoginForm 
                 onGoogleLogin={handleGoogleLogin} 
                 onMagicLink={handleMagicLink} 
+              />
+              
+              <DemoUserCredentials 
+                email="demo@looplist.app"
+                password="Demo123!"
               />
             </CardContent>
             <CardFooter className="flex flex-col space-y-4 pt-0 relative p-4 sm:p-6">
