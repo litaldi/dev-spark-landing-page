@@ -1,9 +1,8 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
@@ -24,6 +23,7 @@ import About from "./pages/About";
 import Contact from "./pages/Contact";
 import Newsletter from "./pages/Newsletter";
 import FAQ from "./pages/FAQ";
+import CodeReview from "./pages/CodeReview";
 import { DemoModeBanner } from "./components/auth/DemoModeBanner";
 import { useEffect } from "react";
 
@@ -38,7 +38,7 @@ const queryClient = new QueryClient({
   }
 });
 
-const App = () => {
+function App() {
   // Set html lang attribute
   useEffect(() => {
     document.documentElement.lang = "en";
@@ -54,37 +54,32 @@ const App = () => {
             </div>
             <Toaster />
             <Sonner />
-            <BrowserRouter>
+            <Router>
               <Routes>
                 <Route path="/" element={<Index />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/faq" element={<FAQ />} />
+                <Route path="/contact" element={<Contact />} />
+                <Route path="/newsletter" element={<Newsletter />} />
                 <Route path="/terms" element={<Terms />} />
                 <Route path="/privacy" element={<Privacy />} />
                 <Route path="/accessibility" element={<Accessibility />} />
-                
-                {/* Authentication Routes */}
-                <Route path="/auth/login" element={<LoginPage />} />
-                <Route path="/auth/register" element={<RegisterPage />} />
-                <Route path="/auth/onboarding" element={<OnboardingPage />} />
-                <Route path="/auth/forgot-password" element={<ForgotPasswordPage />} />
-                <Route path="/auth/magic-link" element={<MagicLinkPage />} />
-                <Route path="/auth/logout" element={<LogoutPage />} />
-                <Route path="/auth/error" element={<AuthErrorPage />} />
-                
-                {/* User Routes */}
-                <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/settings" element={<Settings />} />
-                
-                {/* Site Pages */}
-                <Route path="/about" element={<About />} />
-                <Route path="/contact" element={<Contact />} />
-                <Route path="/newsletter" element={<Newsletter />} />
-                <Route path="/faq" element={<FAQ />} />
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/code-review" element={<CodeReview />} />
+                <Route path="/auth/login" element={<LoginPage />} />
+                <Route path="/auth/register" element={<RegisterPage />} />
+                <Route path="/auth/forgot-password" element={<ForgotPasswordPage />} />
+                <Route path="/auth/magic-link" element={<MagicLinkPage />} />
+                <Route path="/auth/onboarding" element={<OnboardingPage />} />
+                <Route path="/auth/logout" element={<LogoutPage />} />
+                <Route path="/auth/error" element={<AuthErrorPage />} />
                 
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
-            </BrowserRouter>
+            </Router>
           </div>
         </TooltipProvider>
       </ThemeProvider>
