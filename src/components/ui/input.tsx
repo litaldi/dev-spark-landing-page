@@ -18,6 +18,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         aria-invalid={props["aria-invalid"]}
         aria-describedby={props["aria-describedby"]}
         aria-required={props["aria-required"] || props.required}
+        data-state={props.disabled ? "disabled" : undefined}
         {...props}
       />
     )

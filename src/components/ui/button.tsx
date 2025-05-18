@@ -50,6 +50,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         aria-disabled={props.disabled}
         aria-busy={props["aria-busy"]}
         aria-pressed={props.type === "button" ? props["aria-pressed"] : undefined}
+        data-state={props.disabled ? "disabled" : undefined}
         {...props}
       />
     )

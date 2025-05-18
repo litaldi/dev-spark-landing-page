@@ -17,8 +17,8 @@ const Navbar: React.FC = () => {
         isScrolled ? "bg-white/95 dark:bg-gray-900/95 backdrop-blur-md shadow-sm" : "bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm"
       }`}
       role="banner"
+      aria-label="Site header"
     >
-      <SkipNavLink className="focus:absolute focus:z-50" />
       <div className="container mx-auto">
         <NavbarContent 
           mobileMenuOpen={mobileMenuOpen}
