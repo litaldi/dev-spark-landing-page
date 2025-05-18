@@ -107,4 +107,25 @@ describe('LoginSuccess Component', () => {
     const alertElement = screen.getByRole('alert');
     expect(alertElement).toHaveAttribute('aria-live', 'assertive');
   });
+  
+  test('sanitizes userName to prevent XSS', () => {
+    const maliciousInput = '<script>alert("XSS")</script>John';
+    
+    render(
+      <MemoryRouter>
+        <LoginSuccess 
+          userName={maliciousInput} 
+          redirectTo="/dashboard" 
+          isFirstTimeUser={false} 
+        />
+      </MemoryRouter>
+    );
+    
+    // The script tag should be sanitized
+    const textElement = screen.getByRole('alert');
+    expect(textElement.innerHTML).not.toContain('<script>');
+    
+    // But should still contain the legitimate part of the name
+    expect(textElement.innerHTML).toContain('John');
+  });
 });

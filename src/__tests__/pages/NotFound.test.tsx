@@ -75,4 +75,23 @@ describe('NotFound Page', () => {
     
     consoleErrorSpy.mockRestore();
   });
+  
+  test('sanitizes URL parameters for security', () => {
+    // Mock a potentially malicious URL
+    const maliciousPath = '/"><script>alert("XSS")</script>';
+    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
+    
+    render(
+      <MemoryRouter initialEntries={[maliciousPath]}>
+        <NotFound />
+      </MemoryRouter>
+    );
+    
+    // Check that the console log doesn't contain unescaped script tags
+    expect(consoleErrorSpy).toHaveBeenCalled();
+    const errorCall = consoleErrorSpy.mock.calls[0];
+    expect(errorCall[1]).not.toContain('<script>');
+    
+    consoleErrorSpy.mockRestore();
+  });
 });

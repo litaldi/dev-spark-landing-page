@@ -8,6 +8,8 @@
  * with appropriate backend endpoints.
  */
 
+import { getCsrfToken } from './security';
+
 /**
  * Options for token operations
  */
@@ -48,6 +50,7 @@ export async function setSecureCookie(
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'X-CSRF-Token': getCsrfToken(), // Add CSRF protection
       },
       body: JSON.stringify({
         token,
@@ -72,6 +75,9 @@ export async function clearSecureCookie(endpoint: string): Promise<boolean> {
   try {
     const response = await fetch(endpoint, {
       method: 'POST',
+      headers: {
+        'X-CSRF-Token': getCsrfToken(), // Add CSRF protection
+      },
       credentials: 'include', // Important for cookies
     });
     
@@ -115,7 +121,7 @@ export function createSecureFetchOptions(options: RequestInit = {}): RequestInit
     credentials: 'include',
     headers: {
       ...options.headers,
-      'X-CSRF-Token': getCsrfTokenFromMeta(), // Add CSRF token if available
+      'X-CSRF-Token': getCsrfToken(), // Add CSRF token if available
     },
   };
 }
@@ -141,4 +147,40 @@ export function addCsrfTokenMeta(token: string): void {
   }
   
   metaTag.setAttribute('content', token);
+}
+
+/**
+ * Security: Detect local storage tampering attempts
+ * This helps protect against some client-side attacks
+ */
+export function detectStorageTampering(key: string, expectedType: 'string' | 'boolean' | 'number' | 'object'): boolean {
+  try {
+    const value = localStorage.getItem(key);
+    
+    // Check if the item exists
+    if (!value) return false;
+    
+    // Type checking based on expected type
+    switch (expectedType) {
+      case 'string':
+        return typeof value === 'string';
+      case 'boolean':
+        const boolValue = JSON.parse(value);
+        return typeof boolValue === 'boolean';
+      case 'number':
+        const numValue = JSON.parse(value);
+        return typeof numValue === 'number' && !isNaN(numValue);
+      case 'object':
+        try {
+          const objValue = JSON.parse(value);
+          return typeof objValue === 'object' && objValue !== null;
+        } catch {
+          return false;
+        }
+      default:
+        return false;
+    }
+  } catch {
+    return false; // Any parsing error indicates tampering
+  }
 }

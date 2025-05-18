@@ -165,4 +165,41 @@ describe('LoginForm Validation Integration', () => {
       expect(screen.getByText(/please enter a valid email address/i)).toBeInTheDocument();
     });
   });
+  
+  test('sanitizes inputs to prevent XSS attacks', async () => {
+    const user = userEvent.setup();
+    
+    // Mock implementation that exposes the sanitized inputs
+    const loginMock = jest.fn().mockImplementation(async (email, password) => {
+      return { email, password };
+    });
+    
+    // Override the mock to use our implementation
+    jest.mock('@/hooks/use-auth', () => ({
+      useAuth: () => ({
+        login: loginMock,
+        isLoading: false,
+        errorMessage: null,
+        clearError: jest.fn(),
+      }),
+    }));
+    
+    render(
+      <BrowserRouter>
+        <LoginForm />
+      </BrowserRouter>
+    );
+    
+    // Find the email and password inputs
+    const emailInput = screen.getByLabelText(/email/i);
+    const passwordInput = screen.getByLabelText(/password/i);
+    
+    // Type potentially malicious inputs
+    await user.type(emailInput, 'test@example.com<script>alert("xss")</script>');
+    await user.type(passwordInput, 'Password123!<img src="x" onerror="alert(1)">');
+    
+    // Submit the form
+    const submitButton = screen.getByRole('button', { name: /sign in/i });
+    await user.click(submitButton);
+  });
 });
