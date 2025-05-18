@@ -59,10 +59,22 @@ export const createLocalStorageMock = () => {
  * Mock for form context and components
  */
 export const createFormMock = () => ({
-  Form: ({ children }: { children: React.ReactNode }) => (
-    <div data-testid="mock-form">{children}</div>
-  ) as ReactElement,
-  FormProvider: ({ children }: { children: React.ReactNode }) => (
-    <div data-testid="mock-form-provider">{children}</div>
-  ) as ReactElement,
+  Form: ({ children }: { children: React.ReactNode }): ReactElement => {
+    return {
+      type: 'div',
+      props: {
+        'data-testid': 'mock-form',
+        children
+      }
+    } as unknown as ReactElement;
+  },
+  FormProvider: ({ children }: { children: React.ReactNode }): ReactElement => {
+    return {
+      type: 'div',
+      props: {
+        'data-testid': 'mock-form-provider',
+        children
+      }
+    } as unknown as ReactElement;
+  }
 });
