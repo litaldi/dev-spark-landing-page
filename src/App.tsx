@@ -3,9 +3,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
-import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
@@ -24,8 +23,6 @@ import About from "./pages/About";
 import Contact from "./pages/Contact";
 import Newsletter from "./pages/Newsletter";
 import FAQ from "./pages/FAQ";
-import CodeReview from "./pages/CodeReview";
-import { DemoModeBanner } from "./components/auth/DemoModeBanner";
 import { useEffect } from "react";
 
 // Create a new query client with optimized settings
@@ -50,14 +47,17 @@ function App() {
       <ThemeProvider defaultTheme="light">
         <TooltipProvider>
           <div className="relative">
-            <div className="fixed top-0 left-0 right-0 z-50">
-              <DemoModeBanner className="rounded-none" />
-            </div>
             <Toaster />
             <Sonner />
             <Router>
               <Routes>
-                <Route path="/" element={<Index />} />
+                {/* Redirect from root to login or dashboard */}
+                <Route path="/" element={
+                  localStorage.getItem("isLoggedIn") === "true" 
+                    ? <Navigate to="/dashboard" replace /> 
+                    : <Navigate to="/auth/login" replace />
+                } />
+                
                 <Route path="/about" element={<About />} />
                 <Route path="/faq" element={<FAQ />} />
                 <Route path="/contact" element={<Contact />} />
@@ -68,7 +68,7 @@ function App() {
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/settings" element={<Settings />} />
                 <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/code-review" element={<CodeReview />} />
+
                 <Route path="/auth/login" element={<LoginPage />} />
                 <Route path="/auth/register" element={<RegisterPage />} />
                 <Route path="/auth/forgot-password" element={<ForgotPasswordPage />} />

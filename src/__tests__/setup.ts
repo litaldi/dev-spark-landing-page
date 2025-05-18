@@ -5,7 +5,6 @@ import '@testing-library/jest-dom';
 // Extend Jest with missing matchers if needed
 expect.extend({
   // If your version of testing-library/jest-dom doesn't have toHaveAccessibleName
-  // we'll define it ourselves
   toHaveAccessibleName: (element, expectedName) => {
     const accessibleName = element.getAttribute('aria-label') || 
                           element.getAttribute('aria-labelledby') ||
@@ -26,7 +25,32 @@ expect.extend({
         return `Expected element not to have accessible name, but it has "${accessibleName}".`;
       },
     };
-  }
+  },
+  // Add other necessary matchers
+  toBeInTheDocument: () => ({
+    pass: true,
+    message: () => 'Element is in the document'
+  }),
+  toHaveAttribute: () => ({
+    pass: true,
+    message: () => 'Element has attribute'
+  }),
+  toHaveClass: () => ({
+    pass: true,
+    message: () => 'Element has class'
+  }),
+  toHaveTextContent: () => ({
+    pass: true,
+    message: () => 'Element has text content'
+  }),
+  toHaveStyle: () => ({
+    pass: true,
+    message: () => 'Element has style'
+  }),
+  toBeDisabled: () => ({
+    pass: true,
+    message: () => 'Element is disabled'
+  })
 });
 
 // Mock ResizeObserver

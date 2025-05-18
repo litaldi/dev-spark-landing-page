@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { WelcomeSection } from "@/components/dashboard/WelcomeSection";
 import { ProgressSection } from "@/components/dashboard/ProgressSection";
 import { LearningPathSection } from "@/components/dashboard/LearningPathSection";
@@ -16,6 +16,13 @@ import { AchievementsSection } from "@/components/gamification/AchievementsSecti
 import { StreakCalendar } from "@/components/gamification/StreakCalendar";
 import { CollaborativeSection } from "@/components/collaboration/CollaborativeSection";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { CodeReviewPanel } from "@/components/code-review/CodeReviewPanel";
+import { ProgressTracker } from "@/components/dashboard/ProgressTracker";
+import { SmartRecommendations } from "@/components/dashboard/SmartRecommendations";
+import { QuickAccessShortcuts } from "@/components/dashboard/QuickAccessShortcuts";
+import { StudyTimeSummary } from "@/components/dashboard/StudyTimeSummary";
+import { DailyGoals } from "@/components/dashboard/DailyGoals";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface EnhancedDashboardContentProps {
   userName: string;
@@ -56,8 +63,9 @@ export const EnhancedDashboardContent: React.FC<EnhancedDashboardContentProps> =
       />
 
       <Tabs defaultValue="learning" className="mb-6">
-        <TabsList className="grid w-full grid-cols-3 mb-4">
+        <TabsList className="grid w-full grid-cols-4 mb-4">
           <TabsTrigger value="learning">Learning</TabsTrigger>
+          <TabsTrigger value="codeReview">Code Review</TabsTrigger>
           <TabsTrigger value="achievements">Achievements</TabsTrigger>
           <TabsTrigger value="collaboration">Collaboration</TabsTrigger>
         </TabsList>
@@ -65,12 +73,24 @@ export const EnhancedDashboardContent: React.FC<EnhancedDashboardContentProps> =
         <TabsContent value="learning" className="mt-0">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 xs:gap-4 sm:gap-6">
             <div className="lg:col-span-2 space-y-3 xs:space-y-4 sm:space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 xs:gap-4">
+                <QuickAccessShortcuts />
+                <DailyGoals />
+              </div>
+              
+              <ProgressTracker 
+                weeklyGoalHours={10}
+                currentHours={4.5}
+                lessonsCompleted={8}
+                projectsStarted={3}
+              />
+              
               <ProgressSection 
                 weeklyGoalHours={10}
-                currentHours={2}
+                currentHours={4.5}
                 streakDays={5}
-                lessonsCompleted={2}
-                projectsStarted={1}
+                lessonsCompleted={8}
+                projectsStarted={3}
                 isLoading={isLoading}
               />
               
@@ -85,6 +105,12 @@ export const EnhancedDashboardContent: React.FC<EnhancedDashboardContentProps> =
                 onStartLesson={startLesson}
               />
               
+              <SmartRecommendations 
+                userName={userName}
+                isLoading={isLoading}
+                userTopics={userTopics.split(", ")}
+              />
+              
               <RecommendedContent 
                 isLoading={isLoading} 
                 onStartLesson={startLesson}
@@ -92,8 +118,24 @@ export const EnhancedDashboardContent: React.FC<EnhancedDashboardContentProps> =
             </div>
             
             <div className="lg:col-span-1 space-y-3 xs:space-y-4 sm:space-y-6">
+              <StudyTimeSummary />
               <StreakCalendar />
               <RecentActivitySection isLoading={isLoading} />
+            </div>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="codeReview" className="mt-0">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 xs:gap-4 sm:gap-6">
+            <div className="lg:col-span-3">
+              <Card className="border border-gray-200 dark:border-gray-700">
+                <CardHeader>
+                  <CardTitle>AI-Assisted Code Review</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <CodeReviewPanel />
+                </CardContent>
+              </Card>
             </div>
           </div>
         </TabsContent>
@@ -157,5 +199,3 @@ export const EnhancedDashboardContent: React.FC<EnhancedDashboardContentProps> =
     </>
   );
 };
-
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";

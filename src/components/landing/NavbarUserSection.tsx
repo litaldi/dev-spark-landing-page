@@ -5,7 +5,6 @@ import { AccessibilityMenu } from "@/components/a11y/AccessibilityMenu";
 import { Menu, X } from "lucide-react";
 import GetStartedButton from "./GetStartedButton";
 import AuthButtons from "./AuthButtons";
-// DemoUserButton import is kept but not rendered in the UI
 
 interface NavbarUserSectionProps {
   isLoggedIn: boolean;
@@ -28,10 +27,7 @@ const NavbarUserSection: React.FC<NavbarUserSectionProps> = ({
     <div className="flex items-center gap-3">
       <div className="hidden md:flex items-center gap-4">
         {!isLoggedIn && (
-          <>
-            {/* DemoUserButton removed from here but functionality kept in codebase */}
-            <GetStartedButton className="hidden lg:flex" />
-          </>
+          <GetStartedButton className="hidden lg:flex" />
         )}
       </div>
       

@@ -50,10 +50,8 @@ export function NavLinks({ isMobile = false, onLinkClick }: NavLinksProps) {
       className={`${isMobile ? "" : "hidden md:flex"} items-center ${isMobile ? "flex-col" : "flex"} gap-1`}
       aria-label={isMobile ? "Mobile navigation" : "Main navigation"}
     >
-      <NavLink to="/" label="Home" onClick={handleClick} />
-      <NavLink to="/about" label="About" onClick={handleClick} />
       <NavLink to="/dashboard" label="Dashboard" onClick={handleClick} />
-      <NavLink to="/code-review" label="Code Review" onClick={handleClick} />
+      <NavLink to="/about" label="About" onClick={handleClick} />
       <NavLink to="/contact" label="Contact" onClick={handleClick} />
       <NavLink to="/faq" label="FAQ" onClick={handleClick} />
     </nav>
