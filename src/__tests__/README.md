@@ -8,6 +8,7 @@ This project uses a comprehensive testing strategy with multiple layers of tests
 - **Unit Tests**: Testing individual components, hooks, and utilities in isolation
 - **Integration Tests**: Testing interactions between components and services
 - **Accessibility Tests**: Ensuring our application is accessible to all users
+- **Security Tests**: Validating security measures and protections
 
 ## Testing Stack
 
@@ -23,11 +24,16 @@ Tests are organized in a structure that mirrors the source code:
 src/
 ├── __tests__/
 │   ├── components/         # Tests for individual components
+│   │   ├── ui/            # Tests for UI components
+│   │   ├── auth/          # Tests for authentication components
+│   │   └── dashboard/     # Tests for dashboard components
 │   ├── hooks/             # Tests for React hooks
 │   ├── integration/       # Tests for component interactions
-│   ├── pages/            # Tests for page components
-│   ├── accessibility/    # Tests for accessibility features
-│   └── utils/            # Tests for utility functions
+│   ├── pages/             # Tests for page components
+│   ├── accessibility/     # Tests for accessibility features
+│   ├── security/          # Tests for security features
+│   ├── utils/             # Tests for utility functions and test helpers
+│   └── test-utils.tsx     # Common test utilities
 ```
 
 ## Running Tests
@@ -124,6 +130,15 @@ We prioritize accessibility testing to ensure our application is usable by every
 3. Test focus management
 4. Test color contrast and text sizing
 
+### Security Testing
+
+We validate security measures throughout the application:
+
+1. Test input sanitization and validation
+2. Test CSRF protection
+3. Test rate limiting and protection against brute force attacks
+4. Test secure cookie handling
+
 ### Mocking
 
 We use Jest's mocking capabilities for:
@@ -159,4 +174,3 @@ jest.mock('@/hooks/use-auth', () => ({
 - End-to-End Tests: Implement Cypress or Playwright tests for critical user flows
 - Visual Regression Testing: Add visual comparison tests for UI components
 - Performance Testing: Monitor and test application performance
-
