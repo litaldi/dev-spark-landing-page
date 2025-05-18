@@ -26,6 +26,7 @@ src/
 │   ├── hooks/             # Tests for React hooks
 │   ├── integration/       # Tests for component interactions
 │   ├── pages/            # Tests for page components
+│   ├── accessibility/    # Tests for accessibility features
 │   └── utils/            # Tests for utility functions
 ```
 
@@ -114,6 +115,15 @@ test('form submission updates user profile', async () => {
 });
 ```
 
+### Accessibility Testing
+
+We prioritize accessibility testing to ensure our application is usable by everyone:
+
+1. Test keyboard navigation
+2. Test screen reader announcements
+3. Test focus management
+4. Test color contrast and text sizing
+
 ### Mocking
 
 We use Jest's mocking capabilities for:
@@ -135,15 +145,6 @@ jest.mock('@/hooks/use-auth', () => ({
   }),
 }));
 ```
-
-## Accessibility Testing
-
-We prioritize accessibility testing to ensure our application is usable by everyone:
-
-1. Test keyboard navigation
-2. Test screen reader announcements
-3. Test focus management
-4. Test color contrast and text sizing
 
 ## Best Practices
 
