@@ -38,7 +38,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
       <div className="fixed inset-0 overflow-y-auto pb-20">
         <div className="pt-20 p-4 flex flex-col gap-6 min-h-[60vh]">
           <nav className="flex flex-col gap-6">
-            <NavLinks isMobile onLinkClick={onMenuClose} />
+            <NavLinks isMobile={true} onLinkClick={onMenuClose} />
           </nav>
           
           <div className="flex gap-4 mt-auto">

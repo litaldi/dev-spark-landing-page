@@ -3,145 +3,134 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { RegisterForm } from '@/components/auth/RegisterForm';
+import * as useAuthHook from '@/hooks/auth';
 
-// Mock the dependencies
+// Mock the useAuth hook
 jest.mock('@/hooks/auth', () => ({
-  useAuth: () => ({
-    register: jest.fn().mockResolvedValue(true),
-    isLoading: false,
-    errorMessage: null,
-    clearError: jest.fn()
-  })
-}));
-
-jest.mock('react-hook-form', () => ({
-  ...jest.requireActual('react-hook-form'),
-  useForm: () => ({
-    register: jest.fn(),
-    handleSubmit: (callback) => (data) => callback(data),
-    formState: {
-      errors: {},
-      isSubmitting: false,
-      isValid: true,
-    },
-    watch: jest.fn(),
-    setValue: jest.fn(),
-    control: {},
-    reset: jest.fn(),
-    getValues: jest.fn().mockReturnValue({
-      email: 'test@example.com',
-      name: 'Test User',
-      password: 'Password123!'
-    })
-  })
-}));
-
-// Mock components
-jest.mock('@/components/ui/form', () => ({
-  Form: ({ children }) => <form data-testid="register-form">{children}</form>,
-  FormField: ({ render }) => render({
-    field: { value: '', onChange: jest.fn(), name: '', ref: jest.fn() }
-  }),
-  FormItem: ({ children }) => <div data-testid="form-item">{children}</div>,
-  FormLabel: ({ children }) => <label data-testid="form-label">{children}</label>,
-  FormControl: ({ children }) => <div data-testid="form-control">{children}</div>,
-  FormDescription: ({ children }) => <div data-testid="form-description">{children}</div>,
-  FormMessage: ({ children }) => children ? <div data-testid="form-message">{children}</div> : null,
-}));
-
-jest.mock('@/components/ui/input', () => ({
-  Input: (props) => <input data-testid={`input-${props.name || 'unnamed'}`} {...props} />
-}));
-
-jest.mock('@/components/ui/button', () => ({
-  Button: ({ children, ...props }) => 
-    <button data-testid="submit-button" {...props}>{children}</button>
-}));
-
-jest.mock('@/components/auth/AlertError', () => ({
-  AlertError: ({ message }) => 
-    message ? <div data-testid="alert-error">{message}</div> : null
-}));
-
-jest.mock('@/components/auth/PasswordStrengthIndicator', () => ({
-  PasswordStrengthIndicator: ({ password }) => 
-    <div data-testid="password-strength">
-      Strength: {password ? (password.length > 8 ? 'Strong' : 'Weak') : 'None'}
-    </div>
+  useAuth: jest.fn(),
 }));
 
 describe('RegisterForm Component', () => {
-  const mockSubmit = jest.fn();
-  const mockNavigate = jest.fn();
-  
   beforeEach(() => {
+    // Default mock implementation for useAuth
+    (useAuthHook.useAuth as jest.Mock).mockReturnValue({
+      register: jest.fn().mockResolvedValue(true),
+      isLoading: false,
+      errorMessage: null,
+      clearError: jest.fn(),
+    });
+  });
+
+  afterEach(() => {
     jest.clearAllMocks();
   });
-  
-  test('renders registration form correctly', () => {
+
+  test('renders the form elements correctly', () => {
     render(
       <BrowserRouter>
-        <RegisterForm onGoogleSignUp={mockSubmit} />
+        <RegisterForm onGoogleSignUp={jest.fn()} />
       </BrowserRouter>
     );
+
+    // Check for form fields
+    expect(screen.getByLabelText(/name/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/confirm password/i)).toBeInTheDocument();
     
-    // Check for main form elements
-    expect(screen.getByTestId('register-form')).toBeInTheDocument();
-    expect(screen.getByTestId('submit-button')).toBeInTheDocument();
-    
-    // Test for the buttons and links
-    const submitButton = screen.getByTestId('submit-button');
-    expect(submitButton).toHaveTextContent(/create account/i);
+    // Check for buttons
+    expect(screen.getByRole('button', { name: /create account/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /sign up with google/i })).toBeInTheDocument();
   });
-  
-  test('submits form with user data', async () => {
-    const { register } = require('@/hooks/auth').useAuth();
-    
+
+  test('validates form fields correctly', async () => {
     render(
       <BrowserRouter>
-        <RegisterForm onGoogleSignUp={mockSubmit} />
+        <RegisterForm onGoogleSignUp={jest.fn()} />
       </BrowserRouter>
     );
     
-    // Submit the form
-    const submitButton = screen.getByTestId('submit-button');
+    // Submit without filling in required fields
+    const submitButton = screen.getByRole('button', { name: /create account/i });
     fireEvent.click(submitButton);
     
-    // Check if registration function was called
+    // Check for validation error messages
     await waitFor(() => {
-      expect(register).toHaveBeenCalled();
+      expect(screen.getByText(/name is required/i)).toBeInTheDocument();
+      expect(screen.getByText(/email is required/i)).toBeInTheDocument();
+      expect(screen.getByText(/password is required/i)).toBeInTheDocument();
     });
     
-    // Check if success callback was called
+    // Fill in invalid data
+    fireEvent.input(screen.getByLabelText(/email/i), { target: { value: 'invalid-email' } });
+    fireEvent.input(screen.getByLabelText(/password/i), { target: { value: 'weak' } });
+    fireEvent.input(screen.getByLabelText(/confirm password/i), { target: { value: 'different' } });
+    
+    fireEvent.click(submitButton);
+    
+    // Check for validation error messages
     await waitFor(() => {
-      expect(mockSubmit).toHaveBeenCalled();
+      expect(screen.getByText(/valid email address/i)).toBeInTheDocument();
+      expect(screen.getByText(/Password must be at least 8 characters/i)).toBeInTheDocument();
+      expect(screen.getByText(/Passwords do not match/i)).toBeInTheDocument();
     });
   });
-  
-  test('displays password strength indicator', () => {
+
+  test('submits form with valid data', async () => {
+    const mockRegister = jest.fn().mockResolvedValue(true);
+    (useAuthHook.useAuth as jest.Mock).mockReturnValue({
+      register: mockRegister,
+      isLoading: false,
+      errorMessage: null,
+      clearError: jest.fn(),
+    });
+    
     render(
       <BrowserRouter>
-        <RegisterForm onGoogleSignUp={mockSubmit} />
+        <RegisterForm onGoogleSignUp={jest.fn()} />
       </BrowserRouter>
     );
     
-    // Password strength indicator should be visible
-    const strengthIndicator = screen.getByTestId('password-strength');
-    expect(strengthIndicator).toBeInTheDocument();
-  });
-  
-  test('shows loading state during submission', () => {
-    // Override mock to set isLoading to true
-    jest.mock('@/hooks/auth', () => ({
-      useAuth: () => ({
-        register: jest.fn().mockResolvedValue(true),
-        isLoading: true,
-        errorMessage: null,
-        clearError: jest.fn()
-      })
-    }));
+    // Fill in valid data
+    fireEvent.input(screen.getByLabelText(/name/i), { target: { value: 'Test User' } });
+    fireEvent.input(screen.getByLabelText(/email/i), { target: { value: 'test@example.com' } });
+    fireEvent.input(screen.getByLabelText(/password/i), { target: { value: 'StrongPassword123!' } });
+    fireEvent.input(screen.getByLabelText(/confirm password/i), { target: { value: 'StrongPassword123!' } });
     
-    // The test would check for loading state indicators, but our
-    // current mocking approach doesn't allow this to be easily tested
+    // Accept terms
+    const termsCheckbox = screen.getByLabelText(/i agree to the terms/i);
+    fireEvent.click(termsCheckbox);
+    
+    // Submit form
+    const submitButton = screen.getByRole('button', { name: /create account/i });
+    fireEvent.click(submitButton);
+    
+    // Check if register function was called with correct data
+    await waitFor(() => {
+      expect(mockRegister).toHaveBeenCalledWith({
+        name: 'Test User',
+        email: 'test@example.com',
+        password: 'StrongPassword123!',
+      });
+    });
+  });
+
+  test('shows loading state when submitting', async () => {
+    (useAuthHook.useAuth as jest.Mock).mockReturnValue({
+      register: jest.fn().mockImplementation(() => new Promise(resolve => setTimeout(() => resolve(true), 100))),
+      isLoading: true,
+      errorMessage: null,
+      clearError: jest.fn(),
+    });
+    
+    render(
+      <BrowserRouter>
+        <RegisterForm onGoogleSignUp={jest.fn()} />
+      </BrowserRouter>
+    );
+    
+    // Check for loading state
+    expect(screen.getByRole('button', { name: /creating account/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /creating account/i })).toBeDisabled();
   });
 });
