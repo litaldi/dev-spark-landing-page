@@ -96,8 +96,8 @@ export const requestOptimizedAnimationFrame = (callback: FrameRequestCallback): 
     return window.requestAnimationFrame(callback);
   }
   
-  // Fallback to setTimeout
-  return window.setTimeout(callback, 16);
+  // Fallback to setTimeout with proper typing
+  return window.setTimeout(callback, 16) as unknown as number;
 };
 
 /**
@@ -112,6 +112,6 @@ export const cancelOptimizedAnimationFrame = (requestId: number): void => {
     return;
   }
   
-  // Fallback to clearTimeout
-  window.clearTimeout(requestId);
+  // Fallback to clearTimeout with proper typing
+  window.clearTimeout(requestId as unknown as number);
 };
