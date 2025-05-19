@@ -37,10 +37,12 @@ describe('Basic Components Accessibility', () => {
       
       return (
         <Form>
-          {/* Explicitly type the form parameter and cast the function as any to resolve the type error */}
-          {(form: typeof mockForm) => (
+          {/* Explicitly cast to React.ReactNode to fix the type error */}
+          {React.createElement(
+            'div',
+            {},
             <FormField
-              control={form.control}
+              control={mockForm.control as any}
               name="email"
               render={({ field }) => (
                 <FormItem>
@@ -51,7 +53,7 @@ describe('Basic Components Accessibility', () => {
                 </FormItem>
               )}
             />
-          ) as any}
+          )}
         </Form>
       );
     };
