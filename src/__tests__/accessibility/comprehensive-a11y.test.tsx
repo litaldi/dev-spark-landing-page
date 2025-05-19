@@ -8,48 +8,81 @@ import { AccessibilityMenu } from '@/components/a11y/AccessibilityMenu';
 import { SkipNavLink, SkipNavContent } from '@/components/a11y/skip-nav';
 import { PageLayout } from '@/components/layout/PageLayout';
 
-import {
-  Button,
-  Card,
+// Import UI components individually since there's no barrel export for all components
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { 
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
-  DropdownMenuItem,
+  DropdownMenuItem
+} from '@/components/ui/dropdown-menu';
+import { 
   Form,
   FormField,
   FormItem,
   FormLabel,
-  FormControl,
-  Input,
-  Label,
+  FormControl
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { 
   Popover,
   PopoverTrigger,
-  PopoverContent,
-  Drawer,
-  DrawerTrigger,
-  DrawerContent,
-} from '@/components/ui';
+  PopoverContent
+} from '@/components/ui/popover';
+import { Drawer } from '@/components/ui/drawer';
 
-import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogAction, AlertDialogCancel } from '@/components/ui/alert-dialog';
+import { 
+  AlertDialog, 
+  AlertDialogTrigger, 
+  AlertDialogContent, 
+  AlertDialogTitle, 
+  AlertDialogDescription, 
+  AlertDialogFooter, 
+  AlertDialogAction, 
+  AlertDialogCancel 
+} from '@/components/ui/alert-dialog';
 
 // Mock components that are unavailable in the test environment
-jest.mock('@/components/ui', () => ({
+jest.mock('@/components/ui/button', () => ({
   Button: ({ children, ...props }) => <button {...props}>{children}</button>,
+}));
+
+jest.mock('@/components/ui/card', () => ({
   Card: ({ children, ...props }) => <div {...props}>{children}</div>,
+}));
+
+jest.mock('@/components/ui/form', () => ({
   Form: ({ children, ...props }) => <form {...props}>{children}</form>,
   FormField: ({ children, ...props }) => <div {...props}>{children}</div>,
   FormItem: ({ children, ...props }) => <div {...props}>{children}</div>,
   FormLabel: ({ children, ...props }) => <label {...props}>{children}</label>,
   FormControl: ({ children, ...props }) => <div {...props}>{children}</div>,
+}));
+
+jest.mock('@/components/ui/input', () => ({
   Input: (props) => <input {...props} />,
+}));
+
+jest.mock('@/components/ui/label', () => ({
   Label: ({ children, ...props }) => <label {...props}>{children}</label>,
+}));
+
+jest.mock('@/components/ui/dropdown-menu', () => ({
   DropdownMenu: ({ children, ...props }) => <div {...props}>{children}</div>,
   DropdownMenuTrigger: ({ children, ...props }) => <button {...props}>{children}</button>,
   DropdownMenuContent: ({ children, ...props }) => <div role="menu" {...props}>{children}</div>,
   DropdownMenuItem: ({ children, ...props }) => <div role="menuitem" tabIndex={0} {...props}>{children}</div>,
+}));
+
+jest.mock('@/components/ui/popover', () => ({
   Popover: ({ children, ...props }) => <div {...props}>{children}</div>,
   PopoverTrigger: ({ children, ...props }) => <button {...props}>{children}</button>,
   PopoverContent: ({ children, ...props }) => <div role="dialog" {...props}>{children}</div>,
+}));
+
+jest.mock('@/components/ui/drawer', () => ({
   Drawer: ({ children, ...props }) => <div {...props}>{children}</div>,
   DrawerTrigger: ({ children, ...props }) => <button {...props}>{children}</button>,
   DrawerContent: ({ children, ...props }) => <div role="dialog" {...props}>{children}</div>,
