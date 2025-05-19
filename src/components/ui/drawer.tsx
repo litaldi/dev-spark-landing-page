@@ -64,6 +64,38 @@ const DrawerContent = React.forwardRef<
     enabled: isOpen
   })
 
+  // Extract any onOpenChange prop separately since it's not supported
+  // by DrawerPrimitive.Content
+  const { onOpenChange, ...contentProps } = props as any
+  
+  // Handle state changes and trigger the parent handler if provided
+  const handleStateChange = (open: boolean) => {
+    setIsOpen(open)
+    if (onOpenChange && typeof onOpenChange === 'function') {
+      onOpenChange(open)
+    }
+  }
+
+  // Monitor the open state using an effect and React's forwardRef pattern
+  React.useEffect(() => {
+    const drawerContent = contentRef.current
+    if (!drawerContent) return
+
+    // Create a mutation observer to detect when the drawer opens/closes
+    // by looking at data-state attribute changes
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.attributeName === 'data-state') {
+          const isNowOpen = drawerContent.getAttribute('data-state') === 'open'
+          handleStateChange(isNowOpen)
+        }
+      })
+    })
+
+    observer.observe(drawerContent, { attributes: true })
+    return () => observer.disconnect()
+  }, [])
+
   return (
     <DrawerPortal>
       <DrawerOverlay />
@@ -74,18 +106,11 @@ const DrawerContent = React.forwardRef<
           else if (ref) ref.current = node
           contentRef.current = node
         }}
-        onOpenChange={open => {
-          setIsOpen(open)
-          // If the parent provided an onOpenChange, call it too
-          if (props.onOpenChange) {
-            props.onOpenChange(open)
-          }
-        }}
         className={cn(
           "fixed inset-x-0 bottom-0 z-50 mt-24 flex h-auto flex-col rounded-t-[10px] border bg-background focus:outline-none",
           className
         )}
-        {...props}
+        {...contentProps}
       >
         <div className="mx-auto mt-4 h-2 w-[100px] rounded-full bg-muted" />
         {children}
