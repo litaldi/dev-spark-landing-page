@@ -31,7 +31,11 @@ import {
   PopoverTrigger,
   PopoverContent
 } from '@/components/ui/popover';
-import { Drawer } from '@/components/ui/drawer';
+import { 
+  Drawer, 
+  DrawerTrigger, 
+  DrawerContent 
+} from '@/components/ui/drawer';
 
 import { 
   AlertDialog, 
@@ -44,6 +48,26 @@ import {
   AlertDialogCancel 
 } from '@/components/ui/alert-dialog';
 
+// Create a mock for the useForm hook result
+const mockFormReturn = {
+  register: jest.fn(),
+  handleSubmit: jest.fn(),
+  control: { 
+    _formState: {} 
+  },
+  formState: { errors: {} },
+  watch: jest.fn(),
+  setValue: jest.fn(),
+  getValues: jest.fn(),
+  getFieldState: jest.fn(),
+  reset: jest.fn(),
+  resetField: jest.fn(),
+  setError: jest.fn(),
+  clearErrors: jest.fn(),
+  unregister: jest.fn(),
+  trigger: jest.fn(),
+};
+
 // Mock components that are unavailable in the test environment
 jest.mock('@/components/ui/button', () => ({
   Button: ({ children, ...props }) => <button {...props}>{children}</button>,
@@ -54,8 +78,12 @@ jest.mock('@/components/ui/card', () => ({
 }));
 
 jest.mock('@/components/ui/form', () => ({
-  Form: ({ children, ...props }) => <form {...props}>{children}</form>,
-  FormField: ({ children, ...props }) => <div {...props}>{children}</div>,
+  Form: ({ children, ...props }) => <form {...props}>{children(mockFormReturn)}</form>,
+  FormField: ({ name, render }) => render({
+    field: { name, value: '', onChange: jest.fn() },
+    fieldState: { error: null },
+    formState: { errors: {} }
+  }),
   FormItem: ({ children, ...props }) => <div {...props}>{children}</div>,
   FormLabel: ({ children, ...props }) => <label {...props}>{children}</label>,
   FormControl: ({ children, ...props }) => <div {...props}>{children}</div>,
@@ -114,14 +142,20 @@ describe('Comprehensive Accessibility Tests', () => {
     test('Form inputs have proper labels', async () => {
       const { container } = render(
         <Form>
-          <FormField name="email">
-            <FormItem>
-              <FormLabel>Email Address</FormLabel>
-              <FormControl>
-                <Input id="email" type="email" placeholder="your@email.com" />
-              </FormControl>
-            </FormItem>
-          </FormField>
+          {(form) => (
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email Address</FormLabel>
+                  <FormControl>
+                    <Input id="email" type="email" placeholder="your@email.com" {...field} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+          )}
         </Form>
       );
       
