@@ -3,7 +3,7 @@ import React, { createContext, useContext, useEffect } from 'react';
 import { useLocalStorage } from '@/hooks/use-local-storage';
 import { AccessibilitySettings } from '@/components/a11y/AccessibilityMenu';
 import { prefersReducedMotion } from '@/lib/keyboard-utils';
-import { createSkipLink } from '@/lib/keyboard-utils';
+import { createSkipLink } from '@/lib/keyboard-utils/a11y-helpers';
 import { applyReducedMotionStyles } from '@/lib/motion-utils';
 
 // Default settings if none are found in local storage

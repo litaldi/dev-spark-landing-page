@@ -3,8 +3,8 @@ import * as React from "react"
 import * as PopoverPrimitive from "@radix-ui/react-popover"
 
 import { cn } from "@/lib/utils"
-import { announceToScreenReader } from "@/lib/keyboard-utils"
-import { getFocusableElements } from "@/lib/keyboard-utils"
+import { announceToScreenReader } from "@/lib/keyboard-utils/a11y-helpers"
+import { getFocusableElements } from "@/lib/keyboard-utils/a11y-helpers"
 
 const Popover = PopoverPrimitive.Root;
 Popover.displayName = "Popover"

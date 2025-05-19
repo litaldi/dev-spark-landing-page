@@ -1,94 +1,106 @@
 
+import React from 'react';
+
 /**
- * Announces a message to screen readers.
- * 
- * @param message - The message to announce
- * @param politeness - The politeness level (assertive or polite)
+ * Returns all focusable elements within a container
  */
-export const announceToScreenReader = (message: string, politeness: 'assertive' | 'polite' = 'polite') => {
-  // Create a visually hidden element for announcements
-  const announcement = document.createElement('div');
-  announcement.setAttribute('aria-live', politeness);
-  announcement.setAttribute('role', politeness === 'assertive' ? 'alert' : 'status');
-  announcement.setAttribute('aria-atomic', 'true');
+export const getFocusableElements = (container: HTMLElement): HTMLElement[] => {
+  const selector = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+  return Array.from(container.querySelectorAll(selector)) as HTMLElement[];
+};
+
+/**
+ * Creates a skip link for improved keyboard navigation
+ */
+export const createSkipLink = (contentId: string): void => {
+  let skipLink = document.getElementById('skip-nav-link');
   
-  // Make it invisible but still available to screen readers
-  announcement.style.position = 'absolute';
-  announcement.style.width = '1px';
-  announcement.style.height = '1px';
-  announcement.style.padding = '0';
-  announcement.style.margin = '-1px';
-  announcement.style.overflow = 'hidden';
-  announcement.style.clip = 'rect(0, 0, 0, 0)';
-  announcement.style.whiteSpace = 'nowrap';
-  announcement.style.border = '0';
+  if (!skipLink) {
+    skipLink = document.createElement('a');
+    skipLink.id = 'skip-nav-link';
+    skipLink.className = 'sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 z-50 bg-primary text-primary-foreground px-4 py-2 rounded-md';
+    skipLink.innerText = 'Skip to content';
+    skipLink.href = `#${contentId}`;
+    document.body.insertBefore(skipLink, document.body.firstChild);
+  }
+};
+
+/**
+ * Announces a message to screen readers
+ */
+export const announceToScreenReader = (message: string, priority: 'polite' | 'assertive' = 'polite'): void => {
+  let announcer = document.getElementById('screen-reader-announcer');
   
-  // We need to add it to the DOM first without content
-  document.body.appendChild(announcement);
+  if (!announcer) {
+    announcer = document.createElement('div');
+    announcer.id = 'screen-reader-announcer';
+    announcer.setAttribute('aria-live', priority);
+    announcer.setAttribute('aria-atomic', 'true');
+    announcer.className = 'sr-only';
+    document.body.appendChild(announcer);
+  } else {
+    announcer.setAttribute('aria-live', priority);
+  }
   
-  // Small delay to ensure the screen reader picks up the content change
+  // Clear the announcer and then set the new content
+  announcer.textContent = '';
+  
+  // Use setTimeout to ensure the announcement happens after the screen reader 
+  // has a chance to detect that the content has been cleared
   setTimeout(() => {
-    announcement.textContent = message;
-    
-    // Remove it after it has been announced
-    setTimeout(() => {
-      document.body.removeChild(announcement);
-    }, 3000);
+    announcer.textContent = message;
   }, 50);
 };
 
 /**
- * Returns a formatted string describing state changes
- * for screen readers
+ * Function to trap focus within an element
  */
-export const formatStateChange = (state: string, entityName: string): string => {
-  return `${entityName} is now ${state}`;
-};
-
-/**
- * Creates an object with ARIA attributes for error states
- */
-export const getErrorAriaAttributes = (hasError: boolean, errorId?: string) => {
-  if (!hasError) return {};
+export const trapFocus = (container: HTMLElement): (() => void) => {
+  const focusableElements = getFocusableElements(container);
+  if (focusableElements.length === 0) return () => {};
   
-  return {
-    'aria-invalid': true,
-    'aria-errormessage': errorId,
-    'aria-describedby': errorId,
+  const firstElement = focusableElements[0];
+  const lastElement = focusableElements[focusableElements.length - 1];
+  
+  const handleKeyDown = (e: KeyboardEvent) => {
+    if (e.key !== 'Tab') return;
+    
+    if (e.shiftKey) {
+      // If shift + tab and on first element, move to last element
+      if (document.activeElement === firstElement) {
+        e.preventDefault();
+        lastElement.focus();
+      }
+    } else {
+      // If tab and on last element, move to first element
+      if (document.activeElement === lastElement) {
+        e.preventDefault();
+        firstElement.focus();
+      }
+    }
+  };
+  
+  document.addEventListener('keydown', handleKeyDown);
+  
+  // Return cleanup function
+  return () => {
+    document.removeEventListener('keydown', handleKeyDown);
   };
 };
 
 /**
- * Format a number to be properly announced by screen readers
+ * Handle escape key press
  */
-export const formatNumberForScreenReader = (value: number): string => {
-  // For percentages
-  if (value >= 0 && value <= 1) {
-    return `${Math.round(value * 100)}%`;
-  }
+export const handleEscapeKey = (callback: () => void): (() => void) => {
+  const handleKeyDown = (e: KeyboardEvent) => {
+    if (e.key === 'Escape') {
+      callback();
+    }
+  };
   
-  // For larger numbers - use localized formatting
-  return new Intl.NumberFormat().format(value);
-};
-
-/**
- * Generate an accessible description for a chart or visualization
- */
-export const generateChartDescription = (data: any[], titleField: string, valueField: string): string => {
-  if (!data || data.length === 0) return 'No data available';
+  document.addEventListener('keydown', handleKeyDown);
   
-  const intro = `Chart with ${data.length} data points.`;
-  const details = data.map(item => 
-    `${item[titleField]}: ${formatNumberForScreenReader(item[valueField])}`
-  ).join('. ');
-  
-  return `${intro} ${details}`;
-};
-
-/**
- * Checks if high contrast mode is enabled
- */
-export const isHighContrastMode = (): boolean => {
-  if (typeof window === 'undefined') return false;
-  return document.body.classList.contains('high-contrast');
+  return () => {
+    document.removeEventListener('keydown', handleKeyDown);
+  };
 };

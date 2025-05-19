@@ -1,6 +1,6 @@
 
 import { useEffect, useRef } from 'react';
-import { getFocusableElements, trapFocus, handleEscapeKey } from '@/lib/keyboard-utils';
+import { trapFocus, handleEscapeKey, getFocusableElements } from '@/lib/keyboard-utils/a11y-helpers';
 
 interface KeyboardNavigationOptions {
   trapFocus?: boolean;
@@ -26,7 +26,7 @@ export function useKeyboardNavigation(
   const previousFocusRef = useRef<HTMLElement | null>(null);
   
   useEffect(() => {
-    if (!enabled) return;
+    if (!enabled || !containerRef.current) return;
     
     // Store the currently focused element
     previousFocusRef.current = document.activeElement as HTMLElement;

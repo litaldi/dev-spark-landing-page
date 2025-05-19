@@ -1,6 +1,6 @@
 
 import React, { useEffect, useRef } from 'react';
-import { announceToScreenReader } from '@/lib/keyboard-utils';
+import { announceToScreenReader } from '@/lib/keyboard-utils/a11y-helpers';
 import { AlertTriangle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
