@@ -82,7 +82,7 @@ const PopoverContent = React.forwardRef<
     };
   }, [isOpen]);
 
-  // Handle the open state change and announcements
+  // Handle announcements with state changes
   const handleOpenStateChange = React.useCallback((open: boolean) => {
     if (announceChanges) {
       if (open) {
@@ -119,7 +119,8 @@ const PopoverContent = React.forwardRef<
         onCloseAutoFocus={(e) => {
           // Default behavior is fine for auto-focus on close
         }}
-        onOpenChange={handleOpenStateChange}
+        // Use Radix UI's onChange prop instead of onOpenChange
+        onOpenChange={(open) => handleOpenStateChange(open)}
         {...props}
       />
     </PopoverPrimitive.Portal>
