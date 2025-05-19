@@ -91,14 +91,15 @@ describe('Keyboard Navigation', () => {
     );
 
     // Tab to the theme toggle button
-    let activeElement = document.body;
-    while (activeElement && !activeElement.getAttribute('aria-label')?.includes('Change theme')) {
+    let activeElement: Element | null = document.body;
+    while (activeElement && 
+           !(activeElement as HTMLElement).getAttribute?.('aria-label')?.includes('Change theme')) {
       userEvent.tab();
       activeElement = document.activeElement;
     }
     
     // Verify we found the theme toggle
-    expect(activeElement?.getAttribute('aria-label')).toContain('Change theme');
+    expect((activeElement as HTMLElement)?.getAttribute('aria-label')).toContain('Change theme');
     
     // Press Enter to open dropdown
     fireEvent.keyDown(activeElement as HTMLElement, { key: 'Enter', code: 'Enter' });
