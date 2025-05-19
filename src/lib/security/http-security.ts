@@ -37,6 +37,9 @@ export function applySecurityDefenses(): void {
       document.head.appendChild(meta);
     }
     
+    // Add additional security meta tags if not present
+    addSecurityMetaTags();
+    
     // Strengthen session storage against XSS
     const originalSetItem = Storage.prototype.setItem;
     Storage.prototype.setItem = function(key: string, value: string) {
@@ -49,6 +52,26 @@ export function applySecurityDefenses(): void {
     // Log security defense application failure
     console.error('Failed to apply security defenses:', e);
   }
+}
+
+/**
+ * Add various security-related meta tags to the document head
+ */
+function addSecurityMetaTags(): void {
+  const metaTags = [
+    { httpEquiv: 'X-XSS-Protection', content: securityHeaders['X-XSS-Protection'] },
+    { httpEquiv: 'X-Content-Type-Options', content: securityHeaders['X-Content-Type-Options'] },
+    { httpEquiv: 'Referrer-Policy', content: securityHeaders['Referrer-Policy'] }
+  ];
+  
+  metaTags.forEach(tag => {
+    if (!document.querySelector(`meta[http-equiv="${tag.httpEquiv}"]`)) {
+      const meta = document.createElement('meta');
+      meta.setAttribute('http-equiv', tag.httpEquiv);
+      meta.setAttribute('content', tag.content);
+      document.head.appendChild(meta);
+    }
+  });
 }
 
 /**
