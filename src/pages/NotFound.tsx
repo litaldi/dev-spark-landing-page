@@ -1,54 +1,67 @@
 
-import { useLocation, Link } from "react-router-dom";
-import { useEffect } from "react";
+import React, { useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import Navbar from "@/components/landing/Navbar";
+import Footer from "@/components/landing/Footer";
+import { SkipNavLink, SkipNavContent } from "@/components/a11y/skip-nav";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Home } from "lucide-react";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { Home, ChevronLeft } from "lucide-react";
+import { announceToScreenReader } from "@/lib/keyboard-utils";
 
 const NotFound = () => {
-  const location = useLocation();
-  const isMobile = useIsMobile();
-
+  const navigate = useNavigate();
+  
+  // Announce to screen readers
   useEffect(() => {
-    console.error(
-      "404 Error: User attempted to access non-existent route:",
-      location.pathname
-    );
-  }, [location.pathname]);
-
+    announceToScreenReader("Page not found. The page you were looking for doesn't exist.", "assertive");
+  }, []);
+  
+  // Handle keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        navigate("/");
+      }
+    };
+    
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [navigate]);
+  
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-background p-4">
-      <div className="max-w-md w-full text-center space-y-6">
-        <div className="rounded-full bg-brand-50 dark:bg-brand-900/20 p-6 w-20 h-20 md:w-24 md:h-24 flex items-center justify-center mx-auto">
-          <span className="text-3xl md:text-4xl font-bold text-brand-600 dark:text-brand-400">404</span>
-        </div>
-        
-        <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Page not found</h1>
-        
-        <p className="text-muted-foreground text-sm md:text-base">
-          Sorry, we couldn't find the page you're looking for. It might have been moved or deleted.
-        </p>
-        
-        <div className="flex flex-col sm:flex-row gap-3 justify-center pt-4">
-          <Button asChild variant="default" className="w-full sm:w-auto">
-            <Link to="/" className="flex items-center justify-center gap-2">
-              {isMobile ? <Home className="h-4 w-4" /> : null}
-              {isMobile ? "Home" : "Return to Home"}
-            </Link>
-          </Button>
-          
-          <Button asChild variant="outline" className="w-full sm:w-auto">
-            <Link to="/dashboard" className="flex items-center justify-center gap-2">
-              {isMobile ? "Dashboard" : "Go to Dashboard"} 
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-          </Button>
-        </div>
-        
-        <p className="text-xs md:text-sm text-muted-foreground pt-4">
-          Need help? <Link to="/contact" className="text-brand-500 hover:text-brand-600 dark:text-brand-400 dark:hover:text-brand-300 underline">Contact support</Link>
-        </p>
-      </div>
+    <div className="min-h-screen flex flex-col bg-background">
+      <SkipNavLink>Skip to content</SkipNavLink>
+      <Navbar />
+      <main className="flex-1 flex items-center justify-center" id="main-content">
+        <SkipNavContent>
+          <div className="container max-w-md text-center py-16 px-4">
+            <div aria-hidden="true" className="mb-6 text-8xl font-bold text-primary/20">404</div>
+            <h1 className="text-3xl font-bold mb-2">Page Not Found</h1>
+            <p className="text-muted-foreground mb-8">
+              The page you were looking for doesn't exist or has been moved.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button 
+                variant="outline" 
+                className="flex items-center gap-2"
+                onClick={() => window.history.back()}
+              >
+                <ChevronLeft className="h-4 w-4" />
+                Go Back
+              </Button>
+              <Button className="flex items-center gap-2" asChild>
+                <Link to="/">
+                  <Home className="h-4 w-4" />
+                  Return Home
+                </Link>
+              </Button>
+            </div>
+          </div>
+        </SkipNavContent>
+      </main>
+      <Footer />
     </div>
   );
 };

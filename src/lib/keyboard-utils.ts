@@ -2,7 +2,7 @@
 // Re-export all keyboard utility functions from the new module structure
 // This maintains backward compatibility with existing imports
 
-// Re-export from focus-management.ts (with renamed function)
+// Re-export from focus-management.ts
 export {
   detectKeyboardNavigation,
   useKeyboardFocusDetection,

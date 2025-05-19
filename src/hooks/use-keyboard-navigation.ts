@@ -1,6 +1,10 @@
 
 import { useEffect, useRef } from 'react';
-import { trapFocus, handleEscapeKey, getFocusableElements } from '@/lib/keyboard-utils';
+import { 
+  trapFocus, 
+  handleEscapeKey, 
+  getFocusableElements 
+} from '@/lib/keyboard-utils';
 
 interface KeyboardNavigationOptions {
   trapFocus?: boolean;
@@ -10,6 +14,19 @@ interface KeyboardNavigationOptions {
   enabled?: boolean;
 }
 
+/**
+ * Hook for managing keyboard navigation within a container
+ * 
+ * Features:
+ * - Focus trapping within the container
+ * - Auto-focus first focusable element
+ * - Escape key handling
+ * - Return focus after unmounting
+ * 
+ * @param containerRef Reference to the container element
+ * @param options Configuration options
+ * @returns Object containing utilities for keyboard navigation
+ */
 export function useKeyboardNavigation(
   containerRef: React.RefObject<HTMLElement>,
   options: KeyboardNavigationOptions = {}

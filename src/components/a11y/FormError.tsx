@@ -1,6 +1,6 @@
 
 import React, { useEffect, useRef } from 'react';
-import { announceToScreenReader } from '@/lib/keyboard-utils/a11y-helpers';
+import { announceToScreenReader } from '@/lib/keyboard-utils';
 import { AlertTriangle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -45,7 +45,7 @@ export function FormError({
       role="alert"
       aria-live="assertive"
       className={cn(
-        "form-error-message text-destructive text-sm mt-1 flex items-center gap-1.5 transition-opacity animate-fade-in",
+        "text-destructive text-sm mt-1 flex items-center gap-1.5 transition-opacity animate-fade-in",
         className
       )}
     >

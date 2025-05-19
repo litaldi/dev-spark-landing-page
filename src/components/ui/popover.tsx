@@ -3,8 +3,7 @@ import * as React from "react"
 import * as PopoverPrimitive from "@radix-ui/react-popover"
 
 import { cn } from "@/lib/utils"
-import { announceToScreenReader } from "@/lib/keyboard-utils/a11y-helpers"
-import { getFocusableElements } from "@/lib/keyboard-utils/a11y-helpers"
+import { announceToScreenReader, getFocusableElements } from "@/lib/keyboard-utils"
 
 const Popover = PopoverPrimitive.Root;
 Popover.displayName = "Popover"
@@ -23,8 +22,13 @@ PopoverTrigger.displayName = PopoverPrimitive.Trigger.displayName
 
 const PopoverContent = React.forwardRef<
   React.ElementRef<typeof PopoverPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof PopoverPrimitive.Content>
->(({ className, align = "center", sideOffset = 4, ...props }, ref) => {
+  React.ComponentPropsWithoutRef<typeof PopoverPrimitive.Content> & {
+    /**
+     * Whether to announce the popover opening/closing to screen readers
+     */
+    announceChanges?: boolean
+  }
+>(({ className, align = "center", sideOffset = 4, announceChanges = true, ...props }, ref) => {
   const contentRef = React.useRef<HTMLDivElement>(null)
   const [isOpen, setIsOpen] = React.useState(false)
   
@@ -80,10 +84,12 @@ const PopoverContent = React.forwardRef<
 
   // Custom onOpenChange handler to announce popover state changes
   const handleOpenChange = (open: boolean) => {
-    if (open) {
-      announceToScreenReader('Popover opened', 'polite');
-    } else {
-      announceToScreenReader('Popover closed', 'polite');
+    if (announceChanges) {
+      if (open) {
+        announceToScreenReader('Popover opened', 'polite');
+      } else {
+        announceToScreenReader('Popover closed', 'polite');
+      }
     }
   };
 
@@ -110,6 +116,15 @@ const PopoverContent = React.forwardRef<
           className
         )}
         role="dialog"
+        aria-modal="true"
+        onOpenAutoFocus={(e) => {
+          // Let our custom focus management handle it
+          if (focusableElements) e.preventDefault();
+        }}
+        onCloseAutoFocus={(e) => {
+          // Default behavior is fine for auto-focus on close
+        }}
+        onOpenChange={handleOpenChange}
         {...props}
       />
     </PopoverPrimitive.Portal>

@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
+import { useKeyboardFocusDetection } from "@/lib/keyboard-utils";
 import Home from "./pages/Home";
 import NotFound from "./pages/NotFound";
 import Terms from "./pages/Terms";
@@ -39,9 +40,39 @@ const queryClient = new QueryClient({
 });
 
 function App() {
+  // Enable keyboard navigation detection
+  useKeyboardFocusDetection();
+  
   // Set html lang attribute
   useEffect(() => {
     document.documentElement.lang = "en";
+    
+    // Add meta description if it doesn't exist
+    if (!document.querySelector('meta[name="description"]')) {
+      const meta = document.createElement('meta');
+      meta.name = 'description';
+      meta.content = 'DevSpark - A platform for developers to learn and grow together';
+      document.head.appendChild(meta);
+    }
+    
+    // Announce application loaded for screen readers
+    const announcer = document.createElement('div');
+    announcer.setAttribute('id', 'app-loaded-announcer');
+    announcer.setAttribute('aria-live', 'polite');
+    announcer.setAttribute('aria-atomic', 'true');
+    announcer.className = 'sr-only';
+    document.body.appendChild(announcer);
+    
+    setTimeout(() => {
+      announcer.textContent = 'Application loaded';
+    }, 100);
+    
+    // Cleanup function
+    return () => {
+      if (announcer.parentNode) {
+        document.body.removeChild(announcer);
+      }
+    };
   }, []);
   
   return (
@@ -49,13 +80,12 @@ function App() {
       <ThemeProvider defaultTheme="light">
         <TooltipProvider>
           <div className="relative">
-            <Toaster />
-            <Sonner />
             <Router>
               <Routes>
                 {/* Home page route */}
                 <Route path="/" element={<Home />} />
                 
+                {/* Landing pages */}
                 <Route path="/about" element={<About />} />
                 <Route path="/faq" element={<FAQ />} />
                 <Route path="/help" element={<Help />} />
@@ -64,10 +94,13 @@ function App() {
                 <Route path="/terms" element={<Terms />} />
                 <Route path="/privacy" element={<Privacy />} />
                 <Route path="/accessibility" element={<Accessibility />} />
+                
+                {/* User related pages */}
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/settings" element={<Settings />} />
                 <Route path="/dashboard" element={<Dashboard />} />
 
+                {/* Auth pages */}
                 <Route path="/auth/login" element={<LoginPage />} />
                 <Route path="/auth/register" element={<RegisterPage />} />
                 <Route path="/auth/forgot-password" element={<ForgotPasswordPage />} />
@@ -80,6 +113,8 @@ function App() {
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </Router>
+            <Toaster />
+            <Sonner />
           </div>
         </TooltipProvider>
       </ThemeProvider>

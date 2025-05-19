@@ -1,180 +1,111 @@
 
-import { useState, useRef, useEffect } from "react";
-import { useToast } from "@/hooks/use-toast";
+import { useState, useCallback } from 'react';
+import { announceToScreenReader } from '@/lib/keyboard-utils';
+import { useToast } from '@/hooks/use-toast';
 
-interface FocusOptions {
-  focusId?: string;
-  focusDelay?: number;
-  announceResult?: boolean;
-}
-
-interface FormStateProps<T = any> {
-  onSubmit: (data?: T) => Promise<boolean>;
+interface FormStateOptions<T> {
+  onSubmit: (data: T) => Promise<boolean | void>;
   successMessage?: string;
   errorMessage?: string;
-  resetAfterSuccess?: boolean;
-  focusOptions?: FocusOptions;
+  focusOptions?: {
+    successElementId?: string;
+    errorElementId?: string;
+    announceResult?: boolean;
+  };
 }
 
-export function useFormState<T = any>({
+/**
+ * Hook for managing form state with accessibility enhancements
+ */
+export function useFormState<T>({
   onSubmit,
-  successMessage = "Success!",
-  errorMessage = "An error occurred. Please try again.",
-  resetAfterSuccess = false,
-  focusOptions,
-}: FormStateProps<T>) {
+  successMessage = 'Form submitted successfully',
+  errorMessage = 'An error occurred. Please try again.',
+  focusOptions
+}: FormStateOptions<T>) {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
+  const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
   
-  // Reference for screen reader announcements
-  const announceRef = useRef<HTMLDivElement | null>(null);
-  
-  // Add rate limiting to prevent abuse
-  const [lastSubmitTime, setLastSubmitTime] = useState(0);
-  const [submitCount, setSubmitCount] = useState(0);
-  
-  const handleSubmit = async (data?: T) => {
-    // Implement simple rate limiting
-    const now = Date.now();
-    const timeSinceLastSubmit = now - lastSubmitTime;
-    
-    // Prevent rapid form submissions (1 second cooldown)
-    if (timeSinceLastSubmit < 1000) {
-      toast({
-        title: "Please wait",
-        description: "You're submitting too quickly. Please wait a moment.",
-        variant: "destructive",
-      });
-      return false;
-    }
-    
-    // Limit number of submissions in a short period
-    if (submitCount > 10 && timeSinceLastSubmit < 60000) { // 10 submissions per minute
-      toast({
-        title: "Too many attempts",
-        description: "You've made too many submissions. Please try again later.",
-        variant: "destructive",
-      });
-      return false;
-    }
-    
-    // Update rate limiting state
-    setLastSubmitTime(now);
-    setSubmitCount(prev => prev + 1);
-    
-    // Begin actual submission
-    setIsSubmitting(true);
-    setError(null);
-    
-    try {
-      const result = await onSubmit(data);
-      setIsSuccess(result);
-      
-      if (result) {
+  const handleSubmit = useCallback(
+    async (data: T) => {
+      try {
+        setIsSubmitting(true);
+        setError(null);
+        
+        const result = await onSubmit(data);
+        
+        setSuccess(true);
+        
+        // Show success toast if there's a success message
         if (successMessage) {
           toast({
             title: "Success",
             description: successMessage,
+            variant: "success",
           });
         }
         
-        // Announce success to screen readers if enabled
+        // Announce success to screen readers
         if (focusOptions?.announceResult) {
-          announceToScreenReader(successMessage);
+          announceToScreenReader(successMessage, 'assertive');
         }
         
-        // Focus on the specified element after success
-        if (focusOptions?.focusId) {
-          setTimeout(() => {
-            focusElement(focusOptions.focusId as string);
-          }, focusOptions?.focusDelay || 100);
+        // Focus on success element if specified
+        if (focusOptions?.successElementId) {
+          const element = document.getElementById(focusOptions.successElementId);
+          if (element) {
+            element.focus();
+          }
         }
+        
+        return result;
+      } catch (err) {
+        setSuccess(false);
+        const message = err instanceof Error ? err.message : errorMessage;
+        setError(message);
+        
+        // Show error toast
+        toast({
+          title: "Error",
+          description: message,
+          variant: "destructive",
+        });
+        
+        // Announce error to screen readers
+        if (focusOptions?.announceResult) {
+          announceToScreenReader(`Error: ${message}`, 'assertive');
+        }
+        
+        // Focus on error element if specified
+        if (focusOptions?.errorElementId) {
+          const element = document.getElementById(focusOptions.errorElementId);
+          if (element) {
+            element.focus();
+          }
+        }
+        
+        return false;
+      } finally {
+        setIsSubmitting(false);
       }
-      
-      return result;
-    } catch (err) {
-      // Safely handle different error types
-      let message: string;
-      
-      if (typeof err === 'string') {
-        message = err;
-      } else if (err instanceof Error) {
-        message = err.message;
-      } else {
-        message = errorMessage;
-      }
-      
-      // Set a sanitized error message
-      setError(message);
-      
-      toast({
-        title: "Error",
-        description: message,
-        variant: "destructive",
-      });
-      
-      // Announce error to screen readers if enabled
-      if (focusOptions?.announceResult) {
-        announceToScreenReader(`Error: ${message}`);
-      }
-      
-      return false;
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const resetState = () => {
+    },
+    [onSubmit, successMessage, errorMessage, focusOptions, toast]
+  );
+  
+  const resetFormState = useCallback(() => {
     setIsSubmitting(false);
-    setIsSuccess(false);
+    setSuccess(false);
     setError(null);
-  };
-
-  // Focus a specific element by ID
-  const focusElement = (elementId: string) => {
-    const element = document.getElementById(elementId);
-    if (element && 'focus' in element) {
-      (element as HTMLElement).focus();
-    }
-  };
-  
-  // Announce message to screen readers
-  const announceToScreenReader = (message: string) => {
-    if (!announceRef.current) {
-      announceRef.current = document.createElement('div');
-      announceRef.current.setAttribute('aria-live', 'assertive');
-      announceRef.current.setAttribute('role', 'status');
-      announceRef.current.classList.add('sr-only'); // screen reader only
-      document.body.appendChild(announceRef.current);
-    }
-    
-    announceRef.current.textContent = message;
-    
-    // Clear the announcement after it's been read
-    setTimeout(() => {
-      if (announceRef.current) {
-        announceRef.current.textContent = '';
-      }
-    }, 3000);
-  };
-  
-  // Clean up the announcement div on unmount
-  useEffect(() => {
-    return () => {
-      if (announceRef.current) {
-        document.body.removeChild(announceRef.current);
-      }
-    };
   }, []);
 
   return {
     isSubmitting,
-    isSuccess,
+    success,
     error,
     handleSubmit,
-    resetState,
+    resetFormState,
     announceToScreenReader
   };
 }

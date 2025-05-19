@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 
 /**
  * Detects if user is navigating with keyboard
+ * @returns Cleanup function to remove event listeners
  */
 export const detectKeyboardNavigation = () => {
   const handleTabKey = (e: KeyboardEvent) => {
@@ -37,6 +38,7 @@ export const useKeyboardFocusDetection = () => {
 
 /**
  * Returns true if user prefers reduced motion
+ * @returns Boolean indicating if reduced motion is preferred
  */
 export const prefersReducedMotion = (): boolean => {
   if (typeof window === 'undefined') return false;
@@ -45,6 +47,7 @@ export const prefersReducedMotion = (): boolean => {
 
 /**
  * Moves focus to an element
+ * @param selector CSS selector for the element to focus
  */
 export const focusElement = (selector: string): void => {
   const element = document.querySelector(selector) as HTMLElement;
@@ -55,7 +58,8 @@ export const focusElement = (selector: string): void => {
 
 /**
  * React hook to trap focus within a container
- * Renamed from trapFocus to useTrapFocus to avoid naming conflicts
+ * @param containerRef Reference to container element
+ * @param active Whether focus trapping is active
  */
 export const useTrapFocus = (containerRef: React.RefObject<HTMLElement>, active: boolean = true) => {
   useEffect(() => {

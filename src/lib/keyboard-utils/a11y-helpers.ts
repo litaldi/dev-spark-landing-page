@@ -3,6 +3,8 @@ import React from 'react';
 
 /**
  * Returns all focusable elements within a container
+ * @param container HTML element to search within
+ * @returns Array of focusable HTML elements
  */
 export const getFocusableElements = (container: HTMLElement): HTMLElement[] => {
   const selector = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
@@ -11,6 +13,7 @@ export const getFocusableElements = (container: HTMLElement): HTMLElement[] => {
 
 /**
  * Creates a skip link for improved keyboard navigation
+ * @param contentId ID of the main content element to skip to
  */
 export const createSkipLink = (contentId: string): void => {
   let skipLink = document.getElementById('skip-nav-link');
@@ -28,6 +31,8 @@ export const createSkipLink = (contentId: string): void => {
 
 /**
  * Announces a message to screen readers
+ * @param message Text to announce
+ * @param priority Priority level for announcement (polite or assertive)
  */
 export const announceToScreenReader = (message: string, priority: 'polite' | 'assertive' = 'polite'): void => {
   let announcer = document.getElementById('screen-reader-announcer');
@@ -55,6 +60,8 @@ export const announceToScreenReader = (message: string, priority: 'polite' | 'as
 
 /**
  * Function to trap focus within an element
+ * @param container Element to trap focus within
+ * @returns Cleanup function to remove event listeners
  */
 export const trapFocus = (container: HTMLElement): (() => void) => {
   const focusableElements = getFocusableElements(container);
@@ -91,6 +98,8 @@ export const trapFocus = (container: HTMLElement): (() => void) => {
 
 /**
  * Handle escape key press
+ * @param callback Function to execute when escape key is pressed
+ * @returns Cleanup function to remove event listeners
  */
 export const handleEscapeKey = (callback: () => void): (() => void) => {
   const handleKeyDown = (e: KeyboardEvent) => {
