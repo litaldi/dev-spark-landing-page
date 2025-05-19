@@ -64,18 +64,6 @@ const DrawerContent = React.forwardRef<
     enabled: isOpen
   })
 
-  // Handle open state change
-  const handleOpenChange = (open: boolean) => {
-    setIsOpen(open)
-    // Call the original onOpenChange if provided
-    if (props.onOpenChange) {
-      props.onOpenChange(open)
-    }
-  }
-
-  // Extract onOpenChange from props to avoid passing it twice
-  const { onOpenChange, ...otherProps } = props
-
   return (
     <DrawerPortal>
       <DrawerOverlay />
@@ -86,12 +74,18 @@ const DrawerContent = React.forwardRef<
           else if (ref) ref.current = node
           contentRef.current = node
         }}
-        onOpenChange={handleOpenChange}
+        onOpenChange={open => {
+          setIsOpen(open)
+          // If the parent provided an onOpenChange, call it too
+          if (props.onOpenChange) {
+            props.onOpenChange(open)
+          }
+        }}
         className={cn(
           "fixed inset-x-0 bottom-0 z-50 mt-24 flex h-auto flex-col rounded-t-[10px] border bg-background focus:outline-none",
           className
         )}
-        {...otherProps}
+        {...props}
       >
         <div className="mx-auto mt-4 h-2 w-[100px] rounded-full bg-muted" />
         {children}
