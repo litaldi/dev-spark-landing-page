@@ -11,7 +11,7 @@ export const securityHeaders = {
   'X-Content-Type-Options': 'nosniff',
   'Referrer-Policy': 'strict-origin-when-cross-origin',
   'Strict-Transport-Security': 'max-age=63072000; includeSubDomains; preload',
-  'Permissions-Policy': 'camera=(), microphone=(), geolocation=(), interest-cohort=()',
+  'Permissions-Policy': 'camera=(), microphone=(), geolocation=(), interest-cohort=(), autoplay=(self)',
   'Cross-Origin-Embedder-Policy': 'require-corp',
   'Cross-Origin-Opener-Policy': 'same-origin',
   'Cross-Origin-Resource-Policy': 'same-origin'
@@ -39,6 +39,9 @@ export function applySecurityDefenses(): void {
     
     // Add additional security meta tags
     addSecurityMetaTags();
+    
+    // Add accessibility-related meta tags
+    addAccessibilityMetaTags();
     
     // Strengthen session storage against XSS
     const originalSetItem = Storage.prototype.setItem;
@@ -72,6 +75,51 @@ function addSecurityMetaTags(): void {
       document.head.appendChild(meta);
     }
   });
+}
+
+/**
+ * Add accessibility-related meta tags to the document head
+ */
+function addAccessibilityMetaTags(): void {
+  // Viewport meta tag with user-scalable=yes for accessibility
+  if (!document.querySelector('meta[name="viewport"]')) {
+    const viewportMeta = document.createElement('meta');
+    viewportMeta.setAttribute('name', 'viewport');
+    viewportMeta.setAttribute('content', 'width=device-width, initial-scale=1.0, user-scalable=yes');
+    document.head.appendChild(viewportMeta);
+  } else {
+    // Ensure existing viewport meta includes user-scalable=yes
+    const existingViewport = document.querySelector('meta[name="viewport"]');
+    if (existingViewport) {
+      const content = existingViewport.getAttribute('content') || '';
+      if (!content.includes('user-scalable=yes') && !content.includes('user-scalable=1')) {
+        existingViewport.setAttribute(
+          'content',
+          content.replace(/user-scalable=no/i, 'user-scalable=yes').replace(/maximum-scale=[0-9.]+/i, '')
+        );
+      }
+    }
+  }
+  
+  // Language meta tag for screen readers
+  if (!document.documentElement.hasAttribute('lang')) {
+    document.documentElement.setAttribute('lang', 'en');
+  }
+  
+  // Theme color meta tag for browser UI
+  if (!document.querySelector('meta[name="theme-color"]')) {
+    const themeColorMeta = document.createElement('meta');
+    themeColorMeta.setAttribute('name', 'theme-color');
+    themeColorMeta.setAttribute('content', '#ffffff');
+    document.head.appendChild(themeColorMeta);
+    
+    // Add dark mode theme color
+    const darkThemeColorMeta = document.createElement('meta');
+    darkThemeColorMeta.setAttribute('name', 'theme-color');
+    darkThemeColorMeta.setAttribute('content', '#1f2937');
+    darkThemeColorMeta.setAttribute('media', '(prefers-color-scheme: dark)');
+    document.head.appendChild(darkThemeColorMeta);
+  }
 }
 
 /**

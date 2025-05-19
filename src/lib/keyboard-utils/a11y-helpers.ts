@@ -22,10 +22,12 @@ function createScreenReaderAnnouncer(): HTMLElement {
  * Announces a message to screen readers
  * @param message The message to announce
  * @param politeness The politeness level (polite or assertive)
+ * @param timeout Optional timeout before announcing (useful for ensuring DOM updates complete)
  */
 export function announceToScreenReader(
   message: string, 
-  politeness: 'polite' | 'assertive' = 'polite'
+  politeness: 'polite' | 'assertive' = 'polite',
+  timeout: number = 50
 ): void {
   const announcer = createScreenReaderAnnouncer();
   
@@ -40,7 +42,7 @@ export function announceToScreenReader(
   // Using setTimeout to ensure the DOM update cycle has completed
   setTimeout(() => {
     announcer.textContent = message;
-  }, 50);
+  }, timeout);
 }
 
 /**
@@ -86,4 +88,21 @@ export function isVisibleToScreenReader(element: HTMLElement): boolean {
   }
   
   return true;
+}
+
+/**
+ * Checks if the user prefers reduced motion
+ * @returns Whether the user prefers reduced motion
+ */
+export function prefersReducedMotion(): boolean {
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+
+/**
+ * Generates an ID for an element that needs to be referenced by aria attributes
+ * @param prefix The prefix for the ID
+ * @returns A unique ID
+ */
+export function generateAriaId(prefix: string): string {
+  return `${prefix}-${Math.random().toString(36).substring(2, 9)}`;
 }

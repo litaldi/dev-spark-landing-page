@@ -13,20 +13,33 @@ import {
   Accessibility,
   Type,
   Keyboard,
-  Contrast
+  Contrast,
+  MousePointer,
+  MoveHorizontal,
+  Sparkles
 } from "lucide-react";
 import { useLocalStorage } from "@/hooks/use-local-storage";
+import { announceToScreenReader } from "@/lib/keyboard-utils";
+import { applyReducedMotionStyles } from "@/lib/motion-utils";
 
 export type AccessibilitySettings = {
   textSize: number;
   highContrast: boolean;
   keyboardMode: boolean;
+  reducedMotion: boolean;
+  largePointer: boolean;
+  lineHeight: number;
+  letterSpacing: number;
 };
 
 const defaultSettings: AccessibilitySettings = {
   textSize: 100, // 100%
   highContrast: false,
   keyboardMode: false,
+  reducedMotion: false,
+  largePointer: false,
+  lineHeight: 1.5, // Default line height
+  letterSpacing: 0, // Default letter spacing
 };
 
 export function AccessibilityMenu() {
@@ -34,6 +47,7 @@ export function AccessibilityMenu() {
     "accessibility-settings",
     defaultSettings
   );
+  const [isOpen, setIsOpen] = useState(false);
 
   // Apply settings on component mount and when they change
   useEffect(() => {
@@ -54,11 +68,30 @@ export function AccessibilityMenu() {
       document.body.classList.remove('keyboard-navigation');
     }
     
+    // Apply reduced motion
+    applyReducedMotionStyles(settings.reducedMotion);
+    
+    // Apply large pointer
+    if (settings.largePointer) {
+      document.documentElement.classList.add('large-pointer');
+    } else {
+      document.documentElement.classList.remove('large-pointer');
+    }
+    
+    // Apply line height
+    document.documentElement.style.setProperty('--a11y-line-height', settings.lineHeight.toString());
+    
+    // Apply letter spacing
+    document.documentElement.style.setProperty('--a11y-letter-spacing', `${settings.letterSpacing}px`);
+    
     return () => {
       // Clean up if component unmounts
       document.documentElement.style.fontSize = '';
       document.documentElement.classList.remove('high-contrast');
       document.body.classList.remove('keyboard-navigation');
+      document.documentElement.classList.remove('large-pointer');
+      document.documentElement.style.removeProperty('--a11y-line-height');
+      document.documentElement.style.removeProperty('--a11y-letter-spacing');
     };
   }, [settings]);
 
@@ -67,10 +100,50 @@ export function AccessibilityMenu() {
     value: AccessibilitySettings[K]
   ) => {
     setSettings({ ...settings, [key]: value });
+    
+    // Announce the change to screen readers
+    let message = '';
+    
+    switch (key) {
+      case 'textSize':
+        message = `Text size set to ${value}%`;
+        break;
+      case 'highContrast':
+        message = value ? 'High contrast mode enabled' : 'High contrast mode disabled';
+        break;
+      case 'keyboardMode':
+        message = value ? 'Keyboard navigation mode enabled' : 'Keyboard navigation mode disabled';
+        break;
+      case 'reducedMotion':
+        message = value ? 'Reduced motion mode enabled' : 'Reduced motion mode disabled';
+        break;
+      case 'largePointer':
+        message = value ? 'Large pointer enabled' : 'Large pointer disabled';
+        break;
+      case 'lineHeight':
+        message = `Line height set to ${value}`;
+        break;
+      case 'letterSpacing':
+        message = `Letter spacing set to ${value}`;
+        break;
+      default:
+        message = 'Accessibility setting updated';
+    }
+    
+    announceToScreenReader(message, 'polite');
+  };
+
+  const handleOpenChange = (open: boolean) => {
+    setIsOpen(open);
+    if (open) {
+      announceToScreenReader('Accessibility menu opened', 'polite');
+    } else {
+      announceToScreenReader('Accessibility menu closed', 'polite');
+    }
   };
 
   return (
-    <Popover>
+    <Popover open={isOpen} onOpenChange={handleOpenChange}>
       <PopoverTrigger asChild>
         <Button 
           variant="outline" 
@@ -94,18 +167,36 @@ export function AccessibilityMenu() {
             <div className="flex flex-col gap-2">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
-                  <Type className="h-4 w-4" />
+                  <Type className="h-4 w-4" aria-hidden="true" />
                   <Label htmlFor="text-size">Text Size: {settings.textSize}%</Label>
                 </div>
               </div>
               <Slider 
                 id="text-size"
                 min={75}
-                max={150}
+                max={200}
                 step={5}
                 value={[settings.textSize]}
                 onValueChange={(values) => updateSetting("textSize", values[0])}
                 aria-label="Adjust text size"
+              />
+            </div>
+            
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <MoveHorizontal className="h-4 w-4" aria-hidden="true" />
+                  <Label htmlFor="letter-spacing">Letter Spacing: {settings.letterSpacing}</Label>
+                </div>
+              </div>
+              <Slider 
+                id="letter-spacing"
+                min={0}
+                max={5}
+                step={0.5}
+                value={[settings.letterSpacing]}
+                onValueChange={(values) => updateSetting("letterSpacing", values[0])}
+                aria-label="Adjust letter spacing"
               />
             </div>
             
@@ -118,7 +209,7 @@ export function AccessibilityMenu() {
               />
               <div className="grid gap-1">
                 <Label htmlFor="high-contrast" className="flex items-center gap-2">
-                  <Contrast className="h-4 w-4" />
+                  <Contrast className="h-4 w-4" aria-hidden="true" />
                   High Contrast
                 </Label>
                 <p className="text-xs text-muted-foreground">
@@ -136,7 +227,7 @@ export function AccessibilityMenu() {
               />
               <div className="grid gap-1">
                 <Label htmlFor="keyboard-mode" className="flex items-center gap-2">
-                  <Keyboard className="h-4 w-4" />
+                  <Keyboard className="h-4 w-4" aria-hidden="true" />
                   Keyboard Navigation
                 </Label>
                 <p className="text-xs text-muted-foreground">
@@ -144,6 +235,46 @@ export function AccessibilityMenu() {
                 </p>
               </div>
             </div>
+            
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="reduced-motion"
+                checked={settings.reducedMotion}
+                onCheckedChange={(checked) => updateSetting("reducedMotion", checked)}
+                aria-label="Toggle reduced motion"
+              />
+              <div className="grid gap-1">
+                <Label htmlFor="reduced-motion" className="flex items-center gap-2">
+                  <Sparkles className="h-4 w-4" aria-hidden="true" />
+                  Reduced Motion
+                </Label>
+                <p className="text-xs text-muted-foreground">
+                  Minimizes animations and transitions.
+                </p>
+              </div>
+            </div>
+            
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="large-pointer"
+                checked={settings.largePointer}
+                onCheckedChange={(checked) => updateSetting("largePointer", checked)}
+                aria-label="Toggle large pointer"
+              />
+              <div className="grid gap-1">
+                <Label htmlFor="large-pointer" className="flex items-center gap-2">
+                  <MousePointer className="h-4 w-4" aria-hidden="true" />
+                  Large Pointer
+                </Label>
+                <p className="text-xs text-muted-foreground">
+                  Increases cursor size for better visibility.
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="text-xs text-muted-foreground mt-2">
+            <p>Press <kbd className="px-1 py-0.5 bg-muted border rounded text-xs">Tab</kbd> to navigate and <kbd className="px-1 py-0.5 bg-muted border rounded text-xs">Space</kbd> or <kbd className="px-1 py-0.5 bg-muted border rounded text-xs">Enter</kbd> to toggle options.</p>
           </div>
         </div>
       </PopoverContent>

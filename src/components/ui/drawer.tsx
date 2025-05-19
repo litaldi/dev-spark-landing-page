@@ -5,24 +5,33 @@ import { Drawer as DrawerPrimitive } from "vaul"
 import { cn } from "@/lib/utils"
 import { useKeyboardNavigation } from "@/hooks/use-keyboard-navigation"
 import { announceToScreenReader } from "@/lib/keyboard-utils"
+import { prefersReducedMotion } from "@/lib/keyboard-utils"
 
 const Drawer = ({
   shouldScaleBackground = true,
   children,
   ...props
 }: React.ComponentPropsWithoutRef<typeof DrawerPrimitive.Root>) => {
+  // Check for reduced motion preference
+  const shouldReduceMotion = prefersReducedMotion();
+  
   // Announce drawer state changes to screen readers
   const handleOpenChange = (open: boolean) => {
     if (open) {
-      announceToScreenReader('Drawer opened', 'polite')
+      announceToScreenReader('Drawer opened', 'polite');
     } else {
-      announceToScreenReader('Drawer closed', 'polite')
+      announceToScreenReader('Drawer closed', 'polite');
+    }
+    
+    // Call the original onOpenChange if provided
+    if (props.onOpenChange) {
+      props.onOpenChange(open);
     }
   }
 
   return (
     <DrawerPrimitive.Root
-      shouldScaleBackground={shouldScaleBackground}
+      shouldScaleBackground={shouldReduceMotion ? false : shouldScaleBackground}
       onOpenChange={handleOpenChange}
       {...props}
     >
@@ -32,11 +41,35 @@ const Drawer = ({
 }
 Drawer.displayName = "Drawer"
 
-const DrawerTrigger = DrawerPrimitive.Trigger
+const DrawerTrigger = React.forwardRef<
+  React.ElementRef<typeof DrawerPrimitive.Trigger>,
+  React.ComponentPropsWithoutRef<typeof DrawerPrimitive.Trigger>
+>(({ className, children, ...props }, ref) => (
+  <DrawerPrimitive.Trigger
+    ref={ref}
+    className={cn("focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2", className)}
+    {...props}
+  >
+    {children}
+  </DrawerPrimitive.Trigger>
+))
+DrawerTrigger.displayName = DrawerPrimitive.Trigger.displayName
 
 const DrawerPortal = DrawerPrimitive.Portal
 
-const DrawerClose = DrawerPrimitive.Close
+const DrawerClose = React.forwardRef<
+  React.ElementRef<typeof DrawerPrimitive.Close>,
+  React.ComponentPropsWithoutRef<typeof DrawerPrimitive.Close>
+>(({ className, children, ...props }, ref) => (
+  <DrawerPrimitive.Close
+    ref={ref}
+    className={cn("focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2", className)}
+    {...props}
+  >
+    {children}
+  </DrawerPrimitive.Close>
+))
+DrawerClose.displayName = DrawerPrimitive.Close.displayName
 
 const DrawerOverlay = React.forwardRef<
   React.ElementRef<typeof DrawerPrimitive.Overlay>,
@@ -56,6 +89,7 @@ const DrawerContent = React.forwardRef<
 >(({ className, children, ...props }, ref) => {
   const contentRef = React.useRef<HTMLDivElement>(null)
   const [isOpen, setIsOpen] = React.useState(false)
+  const firstFocusableElementRef = React.useRef<HTMLElement | null>(null);
   
   // Use keyboard navigation hook to trap focus and handle escape key
   useKeyboardNavigation(contentRef, {
@@ -73,6 +107,24 @@ const DrawerContent = React.forwardRef<
     setIsOpen(open)
     if (onOpenChange && typeof onOpenChange === 'function') {
       onOpenChange(open)
+    }
+    
+    if (open) {
+      // When opened, find the first focusable element and focus it
+      setTimeout(() => {
+        if (contentRef.current) {
+          const focusableElements = Array.from(
+            contentRef.current.querySelectorAll(
+              'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+            )
+          ) as HTMLElement[];
+          
+          if (focusableElements.length > 0) {
+            firstFocusableElementRef.current = focusableElements[0];
+            focusableElements[0].focus();
+          }
+        }
+      }, 100);
     }
   }
 
@@ -111,9 +163,33 @@ const DrawerContent = React.forwardRef<
           className
         )}
         {...contentProps}
+        role="dialog"
+        aria-modal="true"
       >
-        <div className="mx-auto mt-4 h-2 w-[100px] rounded-full bg-muted" />
+        <div 
+          className="mx-auto mt-4 h-2 w-[100px] rounded-full bg-muted" 
+          role="presentation" 
+          aria-hidden="true"
+        />
+        
+        {/* Skip to close button for keyboard users */}
+        <a 
+          href="#drawer-close" 
+          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:right-4"
+        >
+          Skip to close button
+        </a>
+        
         {children}
+        
+        {/* Ensure there's a way to close the drawer with keyboard */}
+        <button
+          id="drawer-close"
+          onClick={() => handleStateChange(false)}
+          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:right-4 focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded"
+        >
+          Close drawer
+        </button>
       </DrawerPrimitive.Content>
     </DrawerPortal>
   )

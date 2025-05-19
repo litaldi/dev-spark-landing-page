@@ -1,0 +1,114 @@
+
+/* High Contrast Mode Styles */
+.high-contrast {
+  /* Increase contrast for text */
+  --foreground: rgb(255, 255, 255);
+  --background: rgb(0, 0, 0);
+  --primary: rgb(255, 255, 255);
+  --secondary: rgb(200, 200, 200);
+  --muted: rgb(180, 180, 180);
+  --muted-foreground: rgb(220, 220, 220);
+  --accent: rgb(255, 220, 0);
+  --border: rgb(200, 200, 200);
+  
+  /* Ensure all text has high contrast */
+  color: var(--foreground);
+  background-color: var(--background);
+}
+
+.high-contrast button,
+.high-contrast a {
+  /* Increase contrast for interactive elements */
+  border: 2px solid currentColor !important;
+}
+
+.high-contrast input,
+.high-contrast select,
+.high-contrast textarea {
+  /* Increase contrast for form controls */
+  border: 2px solid rgb(255, 255, 255) !important;
+  background-color: rgb(0, 0, 0) !important;
+  color: rgb(255, 255, 255) !important;
+}
+
+/* Enhanced Focus States */
+.keyboard-navigation :focus {
+  outline: 3px solid rgb(64, 156, 255) !important;
+  outline-offset: 2px !important;
+}
+
+.keyboard-navigation button:focus,
+.keyboard-navigation a:focus,
+.keyboard-navigation input:focus,
+.keyboard-navigation select:focus,
+.keyboard-navigation textarea:focus,
+.keyboard-navigation [role="button"]:focus,
+.keyboard-navigation [tabindex]:focus {
+  box-shadow: 0 0 0 3px rgb(64, 156, 255) !important;
+  outline: 2px solid transparent !important;
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  
+  .animate-in,
+  .animate-out {
+    animation: none !important;
+  }
+}
+
+/* Skip Link Styling */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  padding: 0.5rem 1rem;
+  background: #fff;
+  color: #000;
+  z-index: 9999;
+  transition: top 0.2s ease;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
+/* Ensure form controls have visible labels */
+label {
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+/* Ensure error states are perceivable by all users */
+[aria-invalid="true"] {
+  border-color: rgb(220, 38, 38) !important;
+}
+
+.form-error-message {
+  color: rgb(220, 38, 38);
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+/* Improve visibility of focus for dark theme */
+.dark .keyboard-navigation :focus {
+  outline-color: rgb(129, 205, 255) !important;
+}
+
+.dark .keyboard-navigation button:focus,
+.dark .keyboard-navigation a:focus,
+.dark .keyboard-navigation input:focus,
+.dark .keyboard-navigation select:focus,
+.dark .keyboard-navigation textarea:focus,
+.dark .keyboard-navigation [role="button"]:focus,
+.dark .keyboard-navigation [tabindex]:focus {
+  box-shadow: 0 0 0 3px rgb(129, 205, 255) !important;
+}

@@ -5,6 +5,7 @@ import { Check, ChevronRight, Circle } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { announceToScreenReader } from "@/lib/keyboard-utils"
+import { trapFocus, getFocusableElements } from "@/lib/keyboard-utils"
 
 const DropdownMenu = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.Root>,
@@ -12,6 +13,10 @@ const DropdownMenu = React.forwardRef<
 >(({ children, ...props }, ref) => {
   // Announce dropdown state changes to screen readers
   const handleOpenChange = (open: boolean) => {
+    if (props.onOpenChange) {
+      props.onOpenChange(open);
+    }
+    
     if (open) {
       announceToScreenReader('Menu opened', 'polite');
     } else {
@@ -30,7 +35,22 @@ const DropdownMenu = React.forwardRef<
 })
 DropdownMenu.displayName = "DropdownMenu"
 
-const DropdownMenuTrigger = DropdownMenuPrimitive.Trigger
+const DropdownMenuTrigger = React.forwardRef<
+  React.ElementRef<typeof DropdownMenuPrimitive.Trigger>,
+  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Trigger>
+>(({ children, ...props }, ref) => (
+  <DropdownMenuPrimitive.Trigger 
+    ref={ref} 
+    className={cn(
+      "focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2", 
+      props.className
+    )}
+    {...props}
+  >
+    {children}
+  </DropdownMenuPrimitive.Trigger>
+))
+DropdownMenuTrigger.displayName = DropdownMenuPrimitive.Trigger.displayName
 
 const DropdownMenuGroup = DropdownMenuPrimitive.Group
 
@@ -49,14 +69,14 @@ const DropdownMenuSubTrigger = React.forwardRef<
   <DropdownMenuPrimitive.SubTrigger
     ref={ref}
     className={cn(
-      "flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none focus:bg-accent data-[state=open]:bg-accent",
+      "flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none focus:bg-accent focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 data-[state=open]:bg-accent",
       inset && "pl-8",
       className
     )}
     {...props}
   >
     {children}
-    <ChevronRight className="ml-auto h-4 w-4" />
+    <ChevronRight className="ml-auto h-4 w-4" aria-hidden="true" />
   </DropdownMenuPrimitive.SubTrigger>
 ))
 DropdownMenuSubTrigger.displayName =
@@ -83,7 +103,8 @@ const DropdownMenuContent = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Content>
 >(({ className, sideOffset = 4, ...props }, ref) => {
   const contentRef = React.useRef<HTMLDivElement>(null);
-
+  const [activeIndex, setActiveIndex] = React.useState<number>(-1);
+  
   // Handle keyboard navigation within the dropdown menu
   React.useEffect(() => {
     if (!contentRef.current) return;
@@ -105,18 +126,22 @@ const DropdownMenuContent = React.forwardRef<
       // Arrow up/down navigation
       if (e.key === 'ArrowDown') {
         e.preventDefault();
-        const nextIndex = currentIndex + 1 >= focusableElements.length ? 0 : currentIndex + 1;
+        const nextIndex = (currentIndex + 1) % focusableElements.length;
         focusableElements[nextIndex].focus();
+        setActiveIndex(nextIndex);
       } else if (e.key === 'ArrowUp') {
         e.preventDefault();
-        const prevIndex = currentIndex - 1 < 0 ? focusableElements.length - 1 : currentIndex - 1;
+        const prevIndex = currentIndex <= 0 ? focusableElements.length - 1 : currentIndex - 1;
         focusableElements[prevIndex].focus();
+        setActiveIndex(prevIndex);
       } else if (e.key === 'Home') {
         e.preventDefault();
         focusableElements[0].focus();
+        setActiveIndex(0);
       } else if (e.key === 'End') {
         e.preventDefault();
         focusableElements[focusableElements.length - 1].focus();
+        setActiveIndex(focusableElements.length - 1);
       }
     };
 
@@ -125,6 +150,31 @@ const DropdownMenuContent = React.forwardRef<
       contentRef.current?.removeEventListener('keydown', handleKeyDown);
     };
   }, []);
+  
+  // Set focus on first menuitem when content opens
+  const handleContentMount = React.useCallback(() => {
+    if (!contentRef.current) return;
+    
+    const focusableElements = Array.from(
+      contentRef.current.querySelectorAll('[role="menuitem"]:not([disabled])')
+    ) as HTMLElement[];
+    
+    if (focusableElements.length > 0) {
+      // Set a small timeout to ensure the DOM is ready
+      setTimeout(() => {
+        focusableElements[0].focus();
+        setActiveIndex(0);
+      }, 10);
+    }
+  }, []);
+  
+  // Announce menu is opening to screen readers
+  const handleOpenChange = (open: boolean) => {
+    if (open) {
+      announceToScreenReader('Menu content opened', 'polite');
+      handleContentMount();
+    }
+  };
   
   return (
     <DropdownMenuPrimitive.Portal>
@@ -136,10 +186,34 @@ const DropdownMenuContent = React.forwardRef<
           contentRef.current = node
         }}
         sideOffset={sideOffset}
+        onCloseAutoFocus={(event) => {
+          // Prevent the default behavior to properly handle focus
+          event.preventDefault();
+        }}
+        onEscapeKeyDown={() => {
+          announceToScreenReader('Menu closed', 'polite');
+        }}
+        onInteractOutside={() => {
+          announceToScreenReader('Menu closed', 'polite');
+        }}
+        onOpenAutoFocus={(event) => {
+          // Prevent the default autofocus behavior
+          event.preventDefault();
+        }}
         className={cn(
           "z-50 min-w-[8rem] overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
           className
         )}
+        onPointerDownOutside={(event) => {
+          if (props.onPointerDownOutside) {
+            props.onPointerDownOutside(event);
+          }
+        }}
+        onFocusOutside={(event) => {
+          if (props.onFocusOutside) {
+            props.onFocusOutside(event);
+          }
+        }}
         {...props}
       />
     </DropdownMenuPrimitive.Portal>
@@ -156,7 +230,7 @@ const DropdownMenuItem = React.forwardRef<
   <DropdownMenuPrimitive.Item
     ref={ref}
     className={cn(
-      "relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+      "relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
       inset && "pl-8",
       className
     )}
@@ -173,7 +247,7 @@ const DropdownMenuCheckboxItem = React.forwardRef<
   <DropdownMenuPrimitive.CheckboxItem
     ref={ref}
     className={cn(
-      "relative flex cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+      "relative flex cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
       className
     )}
     checked={checked}
@@ -181,7 +255,7 @@ const DropdownMenuCheckboxItem = React.forwardRef<
   >
     <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
       <DropdownMenuPrimitive.ItemIndicator>
-        <Check className="h-4 w-4" />
+        <Check className="h-4 w-4" aria-hidden="true" />
       </DropdownMenuPrimitive.ItemIndicator>
     </span>
     {children}
@@ -197,14 +271,14 @@ const DropdownMenuRadioItem = React.forwardRef<
   <DropdownMenuPrimitive.RadioItem
     ref={ref}
     className={cn(
-      "relative flex cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+      "relative flex cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
       className
     )}
     {...props}
   >
     <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
       <DropdownMenuPrimitive.ItemIndicator>
-        <Circle className="h-2 w-2 fill-current" />
+        <Circle className="h-2 w-2 fill-current" aria-hidden="true" />
       </DropdownMenuPrimitive.ItemIndicator>
     </span>
     {children}
@@ -238,6 +312,7 @@ const DropdownMenuSeparator = React.forwardRef<
     ref={ref}
     className={cn("-mx-1 my-1 h-px bg-muted", className)}
     {...props}
+    role="separator"
   />
 ))
 DropdownMenuSeparator.displayName = DropdownMenuPrimitive.Separator.displayName
@@ -250,6 +325,7 @@ const DropdownMenuShortcut = ({
     <span
       className={cn("ml-auto text-xs tracking-widest opacity-60", className)}
       {...props}
+      aria-hidden="true"
     />
   )
 }
