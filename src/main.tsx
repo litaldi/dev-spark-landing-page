@@ -2,16 +2,14 @@
 import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
+import { useKeyboardFocusDetection } from './lib/keyboard-utils/focus-management'
 
-// Add keyboard navigation detection for enhanced focus states
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Tab') {
-    document.body.classList.add('keyboard-navigation');
-  }
-});
+// Wrap App with keyboard focus detection
+const AppWithAccessibility = () => {
+  // Initialize keyboard focus detection
+  useKeyboardFocusDetection();
+  
+  return <App />;
+};
 
-document.addEventListener('mousedown', () => {
-  document.body.classList.remove('keyboard-navigation');
-});
-
-createRoot(document.getElementById("root")!).render(<App />);
+createRoot(document.getElementById("root")!).render(<AppWithAccessibility />);

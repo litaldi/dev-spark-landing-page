@@ -1,108 +1,94 @@
 
 /**
- * Creates an announcer element for screen readers if one doesn't exist
- * @returns The announcer element
+ * Announces a message to screen readers.
+ * 
+ * @param message - The message to announce
+ * @param politeness - The politeness level (assertive or polite)
  */
-function createScreenReaderAnnouncer(): HTMLElement {
-  let announcer = document.getElementById('screen-reader-announcer');
+export const announceToScreenReader = (message: string, politeness: 'assertive' | 'polite' = 'polite') => {
+  // Create a visually hidden element for announcements
+  const announcement = document.createElement('div');
+  announcement.setAttribute('aria-live', politeness);
+  announcement.setAttribute('role', politeness === 'assertive' ? 'alert' : 'status');
+  announcement.setAttribute('aria-atomic', 'true');
   
-  if (!announcer) {
-    announcer = document.createElement('div');
-    announcer.id = 'screen-reader-announcer';
-    announcer.setAttribute('aria-live', 'polite');
-    announcer.setAttribute('aria-atomic', 'true');
-    announcer.className = 'sr-only';
-    document.body.appendChild(announcer);
-  }
+  // Make it invisible but still available to screen readers
+  announcement.style.position = 'absolute';
+  announcement.style.width = '1px';
+  announcement.style.height = '1px';
+  announcement.style.padding = '0';
+  announcement.style.margin = '-1px';
+  announcement.style.overflow = 'hidden';
+  announcement.style.clip = 'rect(0, 0, 0, 0)';
+  announcement.style.whiteSpace = 'nowrap';
+  announcement.style.border = '0';
   
-  return announcer;
-}
-
-/**
- * Announces a message to screen readers
- * @param message The message to announce
- * @param politeness The politeness level (polite or assertive)
- * @param timeout Optional timeout before announcing (useful for ensuring DOM updates complete)
- */
-export function announceToScreenReader(
-  message: string, 
-  politeness: 'polite' | 'assertive' = 'polite',
-  timeout: number = 50
-): void {
-  const announcer = createScreenReaderAnnouncer();
+  // We need to add it to the DOM first without content
+  document.body.appendChild(announcement);
   
-  // Update politeness level if needed
-  if (announcer.getAttribute('aria-live') !== politeness) {
-    announcer.setAttribute('aria-live', politeness);
-  }
-  
-  // Set the message (using a slight delay to ensure screen readers catch it)
-  announcer.textContent = '';
-  
-  // Using setTimeout to ensure the DOM update cycle has completed
+  // Small delay to ensure the screen reader picks up the content change
   setTimeout(() => {
-    announcer.textContent = message;
-  }, timeout);
-}
+    announcement.textContent = message;
+    
+    // Remove it after it has been announced
+    setTimeout(() => {
+      document.body.removeChild(announcement);
+    }, 3000);
+  }, 50);
+};
 
 /**
- * Adds skip links to the page for keyboard navigation
- * @param mainContentId ID of the main content element
- * @returns The skip link element
+ * Returns a formatted string describing state changes
+ * for screen readers
  */
-export function createSkipLink(mainContentId: string = 'main-content'): HTMLElement {
-  const existingSkipLink = document.querySelector('.skip-link') as HTMLElement;
-  if (existingSkipLink) return existingSkipLink;
-  
-  const skipLink = document.createElement('a');
-  skipLink.href = `#${mainContentId}`;
-  skipLink.className = 'skip-link sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:bg-white focus:dark:bg-gray-900 focus:px-4 focus:py-2 focus:rounded focus:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500';
-  skipLink.textContent = 'Skip to content';
-  
-  document.body.prepend(skipLink);
-  return skipLink;
-}
+export const formatStateChange = (state: string, entityName: string): string => {
+  return `${entityName} is now ${state}`;
+};
 
 /**
- * Checks if an element is visible to screen readers
- * @param element The element to check
- * @returns Whether the element is visible to screen readers
+ * Creates an object with ARIA attributes for error states
  */
-export function isVisibleToScreenReader(element: HTMLElement): boolean {
-  const style = window.getComputedStyle(element);
+export const getErrorAriaAttributes = (hasError: boolean, errorId?: string) => {
+  if (!hasError) return {};
   
-  // Check if element is not hidden using CSS
-  if (style.display === 'none' || style.visibility === 'hidden') {
-    return false;
+  return {
+    'aria-invalid': true,
+    'aria-errormessage': errorId,
+    'aria-describedby': errorId,
+  };
+};
+
+/**
+ * Format a number to be properly announced by screen readers
+ */
+export const formatNumberForScreenReader = (value: number): string => {
+  // For percentages
+  if (value >= 0 && value <= 1) {
+    return `${Math.round(value * 100)}%`;
   }
   
-  // Check if element has aria-hidden="true"
-  if (element.getAttribute('aria-hidden') === 'true') {
-    return false;
-  }
-  
-  // Check if element has role="presentation" or role="none"
-  const role = element.getAttribute('role');
-  if (role === 'presentation' || role === 'none') {
-    return false;
-  }
-  
-  return true;
-}
+  // For larger numbers - use localized formatting
+  return new Intl.NumberFormat().format(value);
+};
 
 /**
- * Checks if the user prefers reduced motion
- * @returns Whether the user prefers reduced motion
+ * Generate an accessible description for a chart or visualization
  */
-export function prefersReducedMotion(): boolean {
-  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-}
+export const generateChartDescription = (data: any[], titleField: string, valueField: string): string => {
+  if (!data || data.length === 0) return 'No data available';
+  
+  const intro = `Chart with ${data.length} data points.`;
+  const details = data.map(item => 
+    `${item[titleField]}: ${formatNumberForScreenReader(item[valueField])}`
+  ).join('. ');
+  
+  return `${intro} ${details}`;
+};
 
 /**
- * Generates an ID for an element that needs to be referenced by aria attributes
- * @param prefix The prefix for the ID
- * @returns A unique ID
+ * Checks if high contrast mode is enabled
  */
-export function generateAriaId(prefix: string): string {
-  return `${prefix}-${Math.random().toString(36).substring(2, 9)}`;
-}
+export const isHighContrastMode = (): boolean => {
+  if (typeof window === 'undefined') return false;
+  return document.body.classList.contains('high-contrast');
+};

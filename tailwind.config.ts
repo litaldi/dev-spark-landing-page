@@ -65,18 +65,18 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				// Add custom colors for our landing page
+				// Update brand colors to blue palette
 				brand: {
-					50: '#f5f3ff',
-					100: '#ede9fe',
-					200: '#ddd6fe',
-					300: '#c4b5fd',
-					400: '#a78bfa',
-					500: '#9b87f5', // Primary purple
-					600: '#7e69ab', // Secondary purple
-					700: '#6e59a5', // Tertiary purple
-					800: '#1a1f2c', // Dark purple
-					900: '#0c0a15',
+					50: '#f0f7ff',
+					100: '#e0efff',
+					200: '#c0dfff',
+					300: '#80bfff',
+					400: '#4095ff',
+					500: '#0073e6', // Primary blue
+					600: '#0066cc', // Secondary blue
+					700: '#0052a3', // Tertiary blue
+					800: '#0a192f', // Dark blue
+					900: '#05101f',
 				}
 			},
 			fontFamily: {

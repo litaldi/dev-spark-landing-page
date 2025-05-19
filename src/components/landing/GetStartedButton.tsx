@@ -1,14 +1,14 @@
 
 import React from "react";
-import { Button } from "@/components/ui/button";
+import { EnhancedButton } from "@/components/ui/enhanced-button";
 import { useNavigate } from "react-router-dom";
 
 interface GetStartedButtonProps {
   className?: string;
   isMobile?: boolean;
   onMenuClose?: () => void;
-  size?: "default" | "sm" | "lg";
-  variant?: "default" | "outline" | "secondary";
+  size?: "default" | "sm" | "lg" | "xl";
+  variant?: "default" | "outline" | "secondary" | "blue";
   children?: React.ReactNode;
 }
 
@@ -17,7 +17,7 @@ const GetStartedButton: React.FC<GetStartedButtonProps> = ({
   isMobile = false,
   onMenuClose = () => {},
   size = "default",
-  variant = "default",
+  variant = "blue",
   children = "Get Started for Free"
 }) => {
   const navigate = useNavigate();
@@ -29,26 +29,17 @@ const GetStartedButton: React.FC<GetStartedButtonProps> = ({
     }
   };
 
-  // Handle keyboard events for better accessibility
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      handleClick();
-    }
-  };
-
   return (
-    <Button 
+    <EnhancedButton 
       size={isMobile ? "default" : size}
       variant={variant}
-      className={`bg-brand-500 hover:bg-brand-600 text-white transition-all duration-300 hover:scale-105 focus:ring-2 focus:ring-brand-400 focus:ring-offset-2 focus:outline-none ${className} ${isMobile ? "justify-start w-full" : ""}`}
+      className={`transition-all duration-300 hover:scale-105 focus:ring-2 focus:ring-brand-400 focus:ring-offset-2 focus:outline-none ${className} ${isMobile ? "justify-start w-full" : ""}`}
       onClick={handleClick}
-      onKeyDown={handleKeyDown}
       aria-label="Get started with a free account"
       data-testid="get-started-button"
     >
       {children}
-    </Button>
+    </EnhancedButton>
   );
 };
 

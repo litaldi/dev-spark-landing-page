@@ -1,28 +1,37 @@
 
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { announceToScreenReader } from '@/lib/keyboard-utils';
+import { AlertTriangle } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface FormErrorProps {
   id: string;
   error?: string | null;
   children?: React.ReactNode;
   autoAnnounce?: boolean;
+  className?: string;
+  icon?: boolean;
 }
 
 /**
- * A component that displays form errors with proper ARIA attributes
+ * An enhanced component that displays form errors with proper ARIA attributes
  * and announces errors to screen readers
  */
 export function FormError({
   id,
   error,
   children,
-  autoAnnounce = true
+  autoAnnounce = true,
+  className,
+  icon = true
 }: FormErrorProps) {
-  // Announce error to screen readers when it appears
-  React.useEffect(() => {
-    if (error && autoAnnounce) {
+  const prevErrorRef = useRef<string | null | undefined>(null);
+  
+  // Announce error to screen readers when it appears or changes
+  useEffect(() => {
+    if (error && autoAnnounce && error !== prevErrorRef.current) {
       announceToScreenReader(`Error: ${error}`, 'assertive');
+      prevErrorRef.current = error;
     }
   }, [error, autoAnnounce]);
   
@@ -35,9 +44,13 @@ export function FormError({
       id={id}
       role="alert"
       aria-live="assertive"
-      className="form-error-message text-destructive text-sm mt-1"
+      className={cn(
+        "form-error-message text-destructive text-sm mt-1 flex items-center gap-1.5 transition-opacity animate-fade-in",
+        className
+      )}
     >
-      {error || children}
+      {icon && <AlertTriangle className="h-3.5 w-3.5 flex-shrink-0" aria-hidden="true" />}
+      <span>{error || children}</span>
     </div>
   );
 }
@@ -57,9 +70,11 @@ export function useFormErrorAnnouncement() {
     
     // If there are new errors, announce them
     if (newErrors.length > 0) {
-      // Combine all new errors into a single message
-      const errorMessage = newErrors.join('. ');
-      announceToScreenReader(`Form has errors: ${errorMessage}`, 'assertive');
+      // Count the errors for the announcement
+      const errorCount = newErrors.length;
+      // Format the announcement properly
+      const announcement = `Form has ${errorCount} ${errorCount === 1 ? 'error' : 'errors'}: ${newErrors.join('. ')}`;
+      announceToScreenReader(announcement, 'assertive');
       
       // Add these errors to the announced list
       setAnnouncedErrors(prev => [...prev, ...newErrors]);

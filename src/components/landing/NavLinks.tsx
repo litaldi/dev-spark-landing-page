@@ -9,9 +9,11 @@ interface NavLinkProps {
   to: string
   label: string
   onClick?: () => void;
+  icon?: React.ReactNode;
+  badge?: React.ReactNode;
 }
 
-function NavLink({ to, label, onClick }: NavLinkProps) {
+function NavLink({ to, label, onClick, icon, badge }: NavLinkProps) {
   const location = useLocation()
   const isActive = location.pathname === to
 
@@ -20,16 +22,27 @@ function NavLink({ to, label, onClick }: NavLinkProps) {
       to={to}
       className={cn(
         buttonVariants({ variant: "ghost", size: "sm" }),
-        "font-medium transition-all duration-200 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
+        "font-medium transition-all duration-300 group relative",
         isActive
-          ? "bg-secondary text-secondary-foreground hover:bg-secondary/80"
-          : "hover:bg-accent hover:text-accent-foreground"
+          ? "bg-accent/80 text-accent-foreground hover:bg-accent hover:text-accent-foreground"
+          : "hover:bg-accent/80 hover:text-accent-foreground"
       )}
       onClick={onClick}
       aria-current={isActive ? "page" : undefined}
       data-testid={`nav-link-${label.toLowerCase()}`}
     >
-      {label}
+      <span className="flex items-center gap-2">
+        {icon && <span className="opacity-70 group-hover:opacity-100 transition-opacity">{icon}</span>}
+        {label}
+      </span>
+      {badge && (
+        <span className="absolute -top-1 -right-1">{badge}</span>
+      )}
+      {isActive && (
+        <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary transform-gpu animate-fade-in" 
+          aria-hidden="true"
+        />
+      )}
     </Link>
   )
 }
@@ -57,7 +70,7 @@ export function NavLinks({ isMobile = false, onLinkClick }: NavLinksProps) {
 
   return (
     <nav 
-      className={`${isMobile ? "" : "hidden md:flex"} items-center ${isMobile ? "flex-col" : "flex"} gap-1`}
+      className={`${isMobile ? "w-full" : "hidden md:flex"} items-center ${isMobile ? "flex-col" : "flex"} gap-2`}
       aria-label={isMobile ? "Mobile navigation" : "Main navigation"}
       role="navigation"
     >
@@ -66,7 +79,7 @@ export function NavLinks({ isMobile = false, onLinkClick }: NavLinksProps) {
           Mobile navigation menu is now open
         </div>
       )}
-      {navLinks.map((link, index) => (
+      {navLinks.map((link) => (
         <NavLink 
           key={link.label} 
           to={link.to} 

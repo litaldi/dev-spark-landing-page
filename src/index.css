@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -14,7 +13,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: 282 43% 30%; /* #5B2C6F */
+    --primary: 210 100% 40%; /* #0066cc - Main blue */
     --primary-foreground: 210 40% 98%;
 
     --secondary: 210 40% 96.1%;
@@ -23,7 +22,7 @@
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
 
-    --accent: 282 25% 92%;
+    --accent: 210 40% 92%; /* Light blue accent */
     --accent-foreground: 222.2 47.4% 11.2%;
 
     --destructive: 0 84.2% 60.2%;
@@ -31,18 +30,18 @@
 
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 282 43% 30%;
+    --ring: 210 100% 40%;
 
     --radius: 0.5rem;
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 282 43% 30%;
+    --sidebar-primary: 210 100% 40%;
     --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent: 210 20% 95.9%;
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 282 43% 30%;
+    --sidebar-ring: 210 100% 40%;
   }
 
   .dark {
@@ -55,7 +54,7 @@
     --popover: 240 10% 3.9%;
     --popover-foreground: 0 0% 98%;
 
-    --primary: 282 53% 62%; /* Brighter purple for dark mode to improve contrast */
+    --primary: 210 100% 60%; /* Brighter blue for dark mode to improve contrast */
     --primary-foreground: 0 0% 98%;
 
     --secondary: 240 3.7% 15.9%;
@@ -64,7 +63,7 @@
     --muted: 240 3.7% 15.9%;
     --muted-foreground: 240 5% 74.9%; /* Increased brightness for better visibility */
 
-    --accent: 282 25% 25%; /* Adjusted for better contrast in dark mode */
+    --accent: 210 40% 30%; /* Adjusted for better contrast in dark mode */
     --accent-foreground: 0 0% 98%;
 
     --destructive: 0 62.8% 50.6%; /* Brighter for dark mode */
@@ -72,16 +71,16 @@
 
     --border: 240 3.7% 25.9%; /* Brighter border for better visibility */
     --input: 240 3.7% 25.9%;
-    --ring: 282 53% 62%; /* Match primary for consistency */
+    --ring: 210 100% 60%; /* Match primary for consistency */
 
     --sidebar-background: 240 10% 3.9%;
     --sidebar-foreground: 0 0% 98%;
-    --sidebar-primary: 282 53% 62%;
+    --sidebar-primary: 210 100% 60%;
     --sidebar-primary-foreground: 0 0% 98%;
     --sidebar-accent: 240 3.7% 15.9%;
     --sidebar-accent-foreground: 0 0% 98%;
     --sidebar-border: 240 3.7% 25.9%;
-    --sidebar-ring: 282 53% 62%;
+    --sidebar-ring: 210 100% 60%;
   }
 
   /* High contrast mode styles */
