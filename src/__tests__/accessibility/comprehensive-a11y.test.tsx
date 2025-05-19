@@ -79,8 +79,14 @@ jest.mock('@/components/ui/card', () => ({
 
 jest.mock('@/components/ui/form', () => ({
   Form: ({ children, ...props }) => {
-    // Handle children as a function and pass mockFormReturn
-    return <form {...props}>{typeof children === 'function' ? children(mockFormReturn) : children}</form>;
+    // Fix TypeScript error by properly handling the children prop
+    return (
+      <form {...props}>
+        {typeof children === 'function' 
+          ? children(mockFormReturn) 
+          : children}
+      </form>
+    );
   },
   FormField: ({ name, render }) => render({
     field: { name, value: '', onChange: jest.fn() },
