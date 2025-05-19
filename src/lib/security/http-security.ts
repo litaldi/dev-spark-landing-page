@@ -37,7 +37,7 @@ export function applySecurityDefenses(): void {
       document.head.appendChild(meta);
     }
     
-    // Add additional security meta tags if not present
+    // Add additional security meta tags
     addSecurityMetaTags();
     
     // Strengthen session storage against XSS
