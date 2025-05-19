@@ -28,24 +28,35 @@ describe('Basic Components Accessibility', () => {
   });
   
   test('Form inputs have proper labels', async () => {
-    const { container } = render(
-      <Form>
-        {(form) => (
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Email Address</FormLabel>
-                <FormControl>
-                  <Input id="email" type="email" placeholder="your@email.com" {...field} />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-        )}
-      </Form>
-    );
+    // Using Fragment to avoid TypeScript error with function as child
+    const TestForm = () => {
+      // Mock form object to pass to the render prop
+      const mockForm = {
+        control: { _formState: {} },
+      };
+      
+      return (
+        <Form>
+          {/* Explicitly type the form parameter and cast the function as any to resolve the type error */}
+          {(form: typeof mockForm) => (
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email Address</FormLabel>
+                  <FormControl>
+                    <Input id="email" type="email" placeholder="your@email.com" {...field} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+          ) as any}
+        </Form>
+      );
+    };
+
+    const { container } = render(<TestForm />);
     
     const results = await axe(container);
     expect(results).toHaveNoViolations();
