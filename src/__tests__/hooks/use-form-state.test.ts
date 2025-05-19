@@ -39,7 +39,7 @@ describe('useFormState hook', () => {
     const { result } = renderHook(() => useFormState({ onSubmit }));
 
     expect(result.current.isSubmitting).toBe(false);
-    expect(result.current.isSuccess).toBe(false);
+    expect(result.current.success).toBe(false);
     expect(result.current.error).toBeNull();
   });
 
@@ -63,7 +63,7 @@ describe('useFormState hook', () => {
     
     // After submission is complete
     expect(result.current.isSubmitting).toBe(false);
-    expect(result.current.isSuccess).toBe(true);
+    expect(result.current.success).toBe(true);
     expect(result.current.error).toBeNull();
     expect(onSubmit).toHaveBeenCalledWith({ name: 'Test' });
     
@@ -72,6 +72,7 @@ describe('useFormState hook', () => {
     expect(toast).toHaveBeenCalledWith({
       title: 'Success',
       description: 'Success!',
+      variant: 'default',
     });
   });
 
@@ -86,7 +87,7 @@ describe('useFormState hook', () => {
     );
 
     act(() => {
-      result.current.handleSubmit();
+      result.current.handleSubmit({ data: 'test' });
     });
 
     // Check if submission state is correct
@@ -96,7 +97,7 @@ describe('useFormState hook', () => {
     
     // After submission is complete
     expect(result.current.isSubmitting).toBe(false);
-    expect(result.current.isSuccess).toBe(false);
+    expect(result.current.success).toBe(false);
     expect(result.current.error).toBe('An error occurred.');
     
     // Verify toast was called with error
@@ -115,19 +116,19 @@ describe('useFormState hook', () => {
     );
 
     act(() => {
-      result.current.handleSubmit();
+      result.current.handleSubmit({ data: 'test' });
     });
     
     await waitForNextUpdate();
     
-    expect(result.current.isSuccess).toBe(true);
+    expect(result.current.success).toBe(true);
     
     act(() => {
-      result.current.resetState();
+      result.current.resetFormState();
     });
     
     expect(result.current.isSubmitting).toBe(false);
-    expect(result.current.isSuccess).toBe(false);
+    expect(result.current.success).toBe(false);
     expect(result.current.error).toBeNull();
   });
 
@@ -141,14 +142,14 @@ describe('useFormState hook', () => {
       useFormState({ 
         onSubmit,
         focusOptions: {
-          focusId: 'test-element',
-          focusDelay: 0
+          successElementId: 'test-element',
+          announceResult: true
         }
       })
     );
 
     act(() => {
-      result.current.handleSubmit();
+      result.current.handleSubmit({ data: 'test' });
     });
     
     await waitForNextUpdate();

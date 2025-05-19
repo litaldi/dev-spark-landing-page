@@ -43,7 +43,7 @@ export function useFormState<T>({
           toast({
             title: "Success",
             description: successMessage,
-            variant: "success",
+            variant: "default",
           });
         }
         

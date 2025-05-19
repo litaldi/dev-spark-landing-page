@@ -35,10 +35,10 @@ const PopoverContent = React.forwardRef<
   // Focus the first focusable element when the popover opens
   React.useEffect(() => {
     if (isOpen && contentRef.current) {
-      const focusableElements = getFocusableElements(contentRef.current);
-      if (focusableElements.length > 0) {
+      const elements = getFocusableElements(contentRef.current);
+      if (elements.length > 0) {
         setTimeout(() => {
-          focusableElements[0].focus();
+          elements[0].focus();
         }, 50);
       }
     }
@@ -56,11 +56,11 @@ const PopoverContent = React.forwardRef<
       
       // Handle tab key for focus trapping
       if (e.key === 'Tab') {
-        const focusableElements = getFocusableElements(contentRef.current);
-        if (focusableElements.length === 0) return;
+        const elements = getFocusableElements(contentRef.current);
+        if (elements.length === 0) return;
         
-        const firstElement = focusableElements[0];
-        const lastElement = focusableElements[focusableElements.length - 1];
+        const firstElement = elements[0];
+        const lastElement = elements[elements.length - 1];
         const activeElement = document.activeElement;
         
         if (e.shiftKey && activeElement === firstElement) {
@@ -82,8 +82,8 @@ const PopoverContent = React.forwardRef<
     };
   }, [isOpen]);
 
-  // Custom onOpenChange handler to announce popover state changes
-  const handleOpenChange = (open: boolean) => {
+  // Custom handler for announcements
+  const handleStateChange = React.useCallback((open: boolean) => {
     if (announceChanges) {
       if (open) {
         announceToScreenReader('Popover opened', 'polite');
@@ -91,7 +91,9 @@ const PopoverContent = React.forwardRef<
         announceToScreenReader('Popover closed', 'polite');
       }
     }
-  };
+    
+    setIsOpen(open);
+  }, [announceChanges]);
 
   return (
     <PopoverPrimitive.Portal>
@@ -101,13 +103,6 @@ const PopoverContent = React.forwardRef<
           if (typeof ref === 'function') ref(node)
           else if (ref) ref.current = node
           contentRef.current = node
-          
-          // Set open state
-          if (node) {
-            setIsOpen(true);
-          } else {
-            setIsOpen(false);
-          }
         }}
         align={align}
         sideOffset={sideOffset}
@@ -119,12 +114,12 @@ const PopoverContent = React.forwardRef<
         aria-modal="true"
         onOpenAutoFocus={(e) => {
           // Let our custom focus management handle it
-          if (focusableElements) e.preventDefault();
+          e.preventDefault();
         }}
         onCloseAutoFocus={(e) => {
           // Default behavior is fine for auto-focus on close
         }}
-        onOpenChange={handleOpenChange}
+        onOpenChange={handleStateChange}
         {...props}
       />
     </PopoverPrimitive.Portal>

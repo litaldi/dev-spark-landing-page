@@ -97,7 +97,7 @@ export const requestOptimizedAnimationFrame = (callback: FrameRequestCallback): 
   }
   
   // Fallback to setTimeout
-  return window.setTimeout(callback, 16) as unknown as number;
+  return window.setTimeout(callback, 16);
 };
 
 /**
