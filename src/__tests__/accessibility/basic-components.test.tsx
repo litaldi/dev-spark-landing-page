@@ -28,32 +28,39 @@ describe('Basic Components Accessibility', () => {
   });
   
   test('Form inputs have proper labels', async () => {
-    // Using Fragment to avoid TypeScript error with function as child
+    // Create a proper TestForm component with mocked form context
     const TestForm = () => {
-      // Mock form object to pass to the render prop
+      // Create a more complete mock form object that satisfies the UseFormReturn interface
       const mockForm = {
         control: { _formState: {} },
+        // Add missing methods required by UseFormReturn
+        watch: jest.fn(),
+        getValues: jest.fn(),
+        getFieldState: jest.fn(),
+        setError: jest.fn(),
+        clearErrors: jest.fn(),
+        reset: jest.fn(),
+        resetField: jest.fn(),
+        setValue: jest.fn(),
+        trigger: jest.fn(),
+        unregister: jest.fn(),
+        formState: { errors: {} }
       };
       
       return (
-        <Form>
-          {/* Explicitly cast to React.ReactNode to fix the type error */}
-          {React.createElement(
-            'div',
-            {},
-            <FormField
-              control={mockForm.control as any}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email Address</FormLabel>
-                  <FormControl>
-                    <Input id="email" type="email" placeholder="your@email.com" {...field} />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-          )}
+        <Form {...mockForm as any}>
+          <FormField
+            control={mockForm.control as any}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Email Address</FormLabel>
+                <FormControl>
+                  <Input id="email" type="email" placeholder="your@email.com" {...field} />
+                </FormControl>
+              </FormItem>
+            )}
+          />
         </Form>
       );
     };
