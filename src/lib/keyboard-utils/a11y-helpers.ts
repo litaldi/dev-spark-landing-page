@@ -20,7 +20,8 @@ export const createSkipLink = (contentId: string): void => {
     skipLink.id = 'skip-nav-link';
     skipLink.className = 'sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 z-50 bg-primary text-primary-foreground px-4 py-2 rounded-md';
     skipLink.innerText = 'Skip to content';
-    skipLink.href = `#${contentId}`;
+    // Fix: Use setAttribute for href instead of direct property access
+    skipLink.setAttribute('href', `#${contentId}`);
     document.body.insertBefore(skipLink, document.body.firstChild);
   }
 };

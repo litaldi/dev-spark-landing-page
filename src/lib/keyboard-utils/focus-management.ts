@@ -54,9 +54,10 @@ export const focusElement = (selector: string): void => {
 };
 
 /**
- * Trap focus within a container
+ * React hook to trap focus within a container
+ * Renamed from trapFocus to useTrapFocus to avoid naming conflicts
  */
-export const trapFocus = (containerRef: React.RefObject<HTMLElement>, active: boolean = true) => {
+export const useTrapFocus = (containerRef: React.RefObject<HTMLElement>, active: boolean = true) => {
   useEffect(() => {
     if (!active || !containerRef.current) return;
 

@@ -1,6 +1,6 @@
 
 import { useEffect, useRef } from 'react';
-import { trapFocus, handleEscapeKey, getFocusableElements } from '@/lib/keyboard-utils/a11y-helpers';
+import { trapFocus, handleEscapeKey, getFocusableElements } from '@/lib/keyboard-utils';
 
 interface KeyboardNavigationOptions {
   trapFocus?: boolean;
