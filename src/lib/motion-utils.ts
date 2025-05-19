@@ -97,8 +97,8 @@ export const requestOptimizedAnimationFrame = (callback: FrameRequestCallback): 
   }
   
   // Fallback to setTimeout with proper typing for compatibility
-  // Using type assertion to make TypeScript happy
-  return setTimeout(() => callback(performance.now()), 16) as number;
+  // Convert to unknown first, then to number to satisfy TypeScript
+  return setTimeout(() => callback(performance.now()), 16) as unknown as number;
 };
 
 /**
@@ -114,5 +114,6 @@ export const cancelOptimizedAnimationFrame = (requestId: number): void => {
   }
   
   // Fallback to clearTimeout with proper handling
-  clearTimeout(requestId as number);
+  // Convert to unknown first, then to NodeJS.Timeout to satisfy TypeScript
+  clearTimeout(requestId as unknown as NodeJS.Timeout);
 };
