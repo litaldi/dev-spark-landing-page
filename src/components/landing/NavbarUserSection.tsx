@@ -30,7 +30,11 @@ const NavbarUserSection: React.FC<NavbarUserSectionProps> = ({
       
       {!isLoggedIn && (
         <div className="hidden md:block">
-          <GetStartedButton size="sm" className="bg-brand-500 hover:bg-brand-600" />
+          <GetStartedButton 
+            size="sm" 
+            className="bg-brand-500 hover:bg-brand-600" 
+            data-testid="nav-get-started-button"
+          />
         </div>
       )}
       
@@ -48,6 +52,7 @@ const NavbarUserSection: React.FC<NavbarUserSectionProps> = ({
         aria-expanded={mobileMenuOpen}
         aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
         aria-controls="mobile-menu"
+        data-testid="mobile-menu-toggle"
       >
         {mobileMenuOpen ? <X aria-hidden="true" /> : <Menu aria-hidden="true" />}
       </button>

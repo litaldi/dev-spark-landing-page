@@ -1,0 +1,111 @@
+
+import React from 'react';
+import { render, screen, fireEvent } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { BrowserRouter } from 'react-router-dom';
+import { ThemeProvider } from '@/components/theme/ThemeProvider';
+import Navbar from '@/components/landing/Navbar';
+
+// Mock hooks
+jest.mock('@/hooks/use-navbar-state', () => ({
+  useNavbarState: () => ({
+    isScrolled: false,
+    mobileMenuOpen: false,
+    isLoggedIn: false,
+    userName: null,
+    toggleMobileMenu: jest.fn(),
+    closeMobileMenu: jest.fn(),
+    handleLogout: jest.fn(),
+    toggleLoginState: jest.fn(),
+  }),
+}));
+
+describe('Keyboard Navigation', () => {
+  beforeEach(() => {
+    // Reset the DOM
+    document.body.innerHTML = '';
+  });
+
+  test('navigation links are keyboard accessible', async () => {
+    render(
+      <BrowserRouter>
+        <ThemeProvider>
+          <Navbar />
+        </ThemeProvider>
+      </BrowserRouter>
+    );
+    
+    // Focus the first link
+    const homeLink = screen.getByTestId('nav-link-home');
+    homeLink.focus();
+    expect(document.activeElement).toBe(homeLink);
+    
+    // Press tab to move to next link
+    userEvent.tab();
+    const dashboardLink = screen.getByTestId('nav-link-dashboard');
+    expect(document.activeElement).toBe(dashboardLink);
+    
+    // Press tab again
+    userEvent.tab();
+    const aboutLink = screen.getByTestId('nav-link-about');
+    expect(document.activeElement).toBe(aboutLink);
+  });
+
+  test('skip to content link appears on focus and works', async () => {
+    // Add a main content area to the document
+    const mainContent = document.createElement('div');
+    mainContent.id = 'skip-nav-content';
+    mainContent.tabIndex = -1; // Make it focusable
+    document.body.appendChild(mainContent);
+    
+    render(
+      <BrowserRouter>
+        <ThemeProvider>
+          <Navbar />
+        </ThemeProvider>
+      </BrowserRouter>
+    );
+    
+    // Tab into the page (should hit skip link first)
+    userEvent.tab();
+    
+    // Should focus on the skip link
+    const skipLink = screen.getByText('Skip to content');
+    expect(document.activeElement).toBe(skipLink);
+    
+    // Activate skip link with Enter key
+    fireEvent.keyDown(skipLink, { key: 'Enter', code: 'Enter' });
+    fireEvent.click(skipLink);
+    
+    // Main content should now have focus
+    expect(document.activeElement).toBe(mainContent);
+  });
+
+  test('theme toggle is keyboard accessible', async () => {
+    render(
+      <BrowserRouter>
+        <ThemeProvider>
+          <Navbar />
+        </ThemeProvider>
+      </BrowserRouter>
+    );
+
+    // Tab to the theme toggle button
+    let activeElement = document.body;
+    while (activeElement && !activeElement.getAttribute('aria-label')?.includes('Change theme')) {
+      userEvent.tab();
+      activeElement = document.activeElement;
+    }
+    
+    // Verify we found the theme toggle
+    expect(activeElement?.getAttribute('aria-label')).toContain('Change theme');
+    
+    // Press Enter to open dropdown
+    fireEvent.keyDown(activeElement as HTMLElement, { key: 'Enter', code: 'Enter' });
+    fireEvent.click(activeElement as HTMLElement);
+    
+    // Check dropdown is visible
+    const lightOption = screen.getByText('Light');
+    expect(lightOption).toBeInTheDocument();
+  });
+});

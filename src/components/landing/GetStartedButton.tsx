@@ -8,13 +8,17 @@ interface GetStartedButtonProps {
   isMobile?: boolean;
   onMenuClose?: () => void;
   size?: "default" | "sm" | "lg";
+  variant?: "default" | "outline" | "secondary";
+  children?: React.ReactNode;
 }
 
 const GetStartedButton: React.FC<GetStartedButtonProps> = ({ 
   className = "", 
   isMobile = false,
   onMenuClose = () => {},
-  size = "default"
+  size = "default",
+  variant = "default",
+  children = "Get Started for Free"
 }) => {
   const navigate = useNavigate();
 
@@ -28,11 +32,13 @@ const GetStartedButton: React.FC<GetStartedButtonProps> = ({
   return (
     <Button 
       size={isMobile ? "default" : size}
+      variant={variant}
       className={`bg-brand-500 hover:bg-brand-600 text-white transition-all duration-300 hover:scale-105 ${className} ${isMobile ? "justify-start w-full" : ""}`}
       onClick={handleClick}
-      aria-label="Get started for free"
+      aria-label="Get started with a free account"
+      data-testid="get-started-button"
     >
-      Get Started for Free
+      {children}
     </Button>
   );
 };

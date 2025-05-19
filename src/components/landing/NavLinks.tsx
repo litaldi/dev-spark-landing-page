@@ -27,6 +27,7 @@ function NavLink({ to, label, onClick }: NavLinkProps) {
       )}
       onClick={onClick}
       aria-current={isActive ? "page" : undefined}
+      data-testid={`nav-link-${label.toLowerCase()}`}
     >
       {label}
     </Link>
@@ -45,17 +46,28 @@ export function NavLinks({ isMobile = false, onLinkClick }: NavLinksProps) {
     }
   };
 
+  const navLinks = [
+    { to: "/", label: "Home" },
+    { to: "/dashboard", label: "Dashboard" },
+    { to: "/about", label: "About" },
+    { to: "/contact", label: "Contact" },
+    { to: "/help", label: "Help" },
+    { to: "/faq", label: "FAQ" }
+  ];
+
   return (
     <nav 
       className={`${isMobile ? "" : "hidden md:flex"} items-center ${isMobile ? "flex-col" : "flex"} gap-1`}
       aria-label={isMobile ? "Mobile navigation" : "Main navigation"}
     >
-      <NavLink to="/" label="Home" onClick={handleClick} />
-      <NavLink to="/dashboard" label="Dashboard" onClick={handleClick} />
-      <NavLink to="/about" label="About" onClick={handleClick} />
-      <NavLink to="/contact" label="Contact" onClick={handleClick} />
-      <NavLink to="/help" label="Help" onClick={handleClick} />
-      <NavLink to="/faq" label="FAQ" onClick={handleClick} />
+      {navLinks.map(link => (
+        <NavLink 
+          key={link.label} 
+          to={link.to} 
+          label={link.label} 
+          onClick={handleClick} 
+        />
+      ))}
     </nav>
   )
 }

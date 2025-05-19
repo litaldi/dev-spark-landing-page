@@ -6,6 +6,7 @@ import GetStartedButton from "./GetStartedButton";
 import AuthButtons from "./AuthButtons";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { AccessibilityMenu } from "@/components/a11y/AccessibilityMenu";
+import { sanitizeInput } from "@/lib/security";
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -26,6 +27,9 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
 }) => {
   if (!isOpen) return null;
 
+  // Sanitize user name for security
+  const sanitizedUserName = userName ? sanitizeInput(userName) : null;
+
   return (
     <Sheet open={isOpen} onOpenChange={onMenuClose}>
       <SheetContent
@@ -44,11 +48,11 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
         </div>
 
         <div className="flex-1 overflow-auto">
-          <div className="flex flex-col gap-y-4">
+          <nav className="flex flex-col gap-y-4" aria-label="Mobile navigation menu">
             <NavLinks isMobile={true} onLinkClick={onMenuClose} />
-          </div>
+          </nav>
 
-          <hr className="my-6 border-t border-gray-200 dark:border-gray-800" />
+          <hr className="my-6 border-t border-gray-200 dark:border-gray-800" aria-hidden="true" />
 
           <div className="space-y-4">
             {!isLoggedIn && (
@@ -65,6 +69,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
                       toggleLoginState();
                       onMenuClose();
                     }}
+                    aria-label="Try demo account"
                   >
                     Try Demo
                   </button>
@@ -74,6 +79,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
                       window.location.href = "/auth/login";
                       onMenuClose();
                     }}
+                    aria-label="Sign in to your account"
                   >
                     Sign In
                   </button>
@@ -84,7 +90,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
             {isLoggedIn && (
               <AuthButtons 
                 isLoggedIn={isLoggedIn} 
-                userName={userName}
+                userName={sanitizedUserName}
                 onLogout={onLogout}
                 isMobile={true}
               />
