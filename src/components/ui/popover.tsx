@@ -82,8 +82,8 @@ const PopoverContent = React.forwardRef<
     };
   }, [isOpen]);
 
-  // Custom handler for announcements
-  const handleOpenChange = React.useCallback((open: boolean) => {
+  // Handle the open state change and announcements
+  const handleOpenStateChange = React.useCallback((open: boolean) => {
     if (announceChanges) {
       if (open) {
         announceToScreenReader('Popover opened', 'polite');
@@ -119,7 +119,7 @@ const PopoverContent = React.forwardRef<
         onCloseAutoFocus={(e) => {
           // Default behavior is fine for auto-focus on close
         }}
-        onOpenChange={handleOpenChange}
+        onOpenChange={handleOpenStateChange}
         {...props}
       />
     </PopoverPrimitive.Portal>

@@ -97,7 +97,8 @@ export const requestOptimizedAnimationFrame = (callback: FrameRequestCallback): 
   }
   
   // Fallback to setTimeout with proper typing for compatibility
-  return window.setTimeout(() => callback(performance.now()), 16);
+  const timeoutId = window.setTimeout(() => callback(performance.now()), 16);
+  return timeoutId;
 };
 
 /**
