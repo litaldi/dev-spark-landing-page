@@ -97,8 +97,8 @@ export const requestOptimizedAnimationFrame = (callback: FrameRequestCallback): 
   }
   
   // Fallback to setTimeout with proper typing for compatibility
-  // Explicitly cast the return value to number to avoid 'never' type issues
-  return window.setTimeout(() => callback(performance.now()), 16) as unknown as number;
+  // Using type assertion to make TypeScript happy
+  return setTimeout(() => callback(performance.now()), 16) as number;
 };
 
 /**
@@ -114,5 +114,5 @@ export const cancelOptimizedAnimationFrame = (requestId: number): void => {
   }
   
   // Fallback to clearTimeout with proper handling
-  window.clearTimeout(requestId as unknown as number);
+  clearTimeout(requestId as number);
 };
