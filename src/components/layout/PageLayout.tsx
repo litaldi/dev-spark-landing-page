@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { SkipNavLink, SkipNavContent } from '@/components/a11y/skip-nav';
-import { Navbar } from '@/components/landing/Navbar';
+import Navbar from '@/components/landing/Navbar';
 import { prefersReducedMotion } from '@/lib/keyboard-utils';
 import { announceToScreenReader } from '@/lib/keyboard-utils';
 

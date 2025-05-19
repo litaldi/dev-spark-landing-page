@@ -78,11 +78,15 @@ export function AccessibilityMenu() {
       document.documentElement.classList.remove('large-pointer');
     }
     
-    // Apply line height
-    document.documentElement.style.setProperty('--a11y-line-height', settings.lineHeight.toString());
+    // Apply line height - Fix: Safely handle line height with null check
+    if (settings.lineHeight !== undefined && settings.lineHeight !== null) {
+      document.documentElement.style.setProperty('--a11y-line-height', settings.lineHeight.toString());
+    }
     
-    // Apply letter spacing
-    document.documentElement.style.setProperty('--a11y-letter-spacing', `${settings.letterSpacing}px`);
+    // Apply letter spacing - Fix: Safely handle letter spacing with null check
+    if (settings.letterSpacing !== undefined && settings.letterSpacing !== null) {
+      document.documentElement.style.setProperty('--a11y-letter-spacing', `${settings.letterSpacing}px`);
+    }
     
     return () => {
       // Clean up if component unmounts

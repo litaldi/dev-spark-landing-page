@@ -6,34 +6,7 @@ import { cn } from "@/lib/utils"
 import { announceToScreenReader } from "@/lib/keyboard-utils"
 import { getFocusableElements } from "@/lib/keyboard-utils"
 
-const Popover = React.forwardRef<
-  React.ElementRef<typeof PopoverPrimitive.Root>,
-  React.ComponentPropsWithoutRef<typeof PopoverPrimitive.Root>
->(({ children, ...props }, ref) => {
-  // Announce popover state changes to screen readers
-  const handleOpenChange = (open: boolean) => {
-    if (open) {
-      announceToScreenReader('Popover opened', 'polite');
-    } else {
-      announceToScreenReader('Popover closed', 'polite');
-    }
-    
-    // Call original onOpenChange if provided
-    if (props.onOpenChange) {
-      props.onOpenChange(open);
-    }
-  }
-
-  return (
-    <PopoverPrimitive.Root 
-      onOpenChange={handleOpenChange}
-      {...props}
-      ref={ref}
-    >
-      {children}
-    </PopoverPrimitive.Root>
-  )
-})
+const Popover = PopoverPrimitive.Root;
 Popover.displayName = "Popover"
 
 const PopoverTrigger = React.forwardRef<
@@ -105,6 +78,15 @@ const PopoverContent = React.forwardRef<
     };
   }, [isOpen]);
 
+  // Custom onOpenChange handler to announce popover state changes
+  const handleOpenChange = (open: boolean) => {
+    if (open) {
+      announceToScreenReader('Popover opened', 'polite');
+    } else {
+      announceToScreenReader('Popover closed', 'polite');
+    }
+  };
+
   return (
     <PopoverPrimitive.Portal>
       <PopoverPrimitive.Content
@@ -123,24 +105,12 @@ const PopoverContent = React.forwardRef<
         }}
         align={align}
         sideOffset={sideOffset}
-        onOpenAutoFocus={(e) => {
-          if (props.onOpenAutoFocus) {
-            props.onOpenAutoFocus(e);
-          }
-          // We'll handle focus manually
-          e.preventDefault();
-        }}
-        onCloseAutoFocus={(e) => {
-          if (props.onCloseAutoFocus) {
-            props.onCloseAutoFocus(e);
-          }
-        }}
         className={cn(
           "z-50 w-72 rounded-md border bg-popover p-4 text-popover-foreground shadow-md outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
           className
         )}
-        {...props}
         role="dialog"
+        {...props}
       />
     </PopoverPrimitive.Portal>
   )

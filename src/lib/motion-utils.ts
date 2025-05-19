@@ -1,4 +1,6 @@
 
+import React, { useState, useEffect } from 'react';
+
 /**
  * Utility functions for handling motion preferences
  */
@@ -29,9 +31,9 @@ export function applyReducedMotionStyles(shouldReduceMotion?: boolean): void {
  * Hook for accessing and responding to motion preferences
  */
 export function useReducedMotion() {
-  const [prefersReduced, setPrefersReduced] = React.useState(prefersReducedMotion());
+  const [prefersReduced, setPrefersReduced] = useState(prefersReducedMotion());
   
-  React.useEffect(() => {
+  useEffect(() => {
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
     
     // Update the state when the preference changes
