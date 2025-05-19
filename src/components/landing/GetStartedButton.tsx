@@ -29,12 +29,21 @@ const GetStartedButton: React.FC<GetStartedButtonProps> = ({
     }
   };
 
+  // Handle keyboard events for better accessibility
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      handleClick();
+    }
+  };
+
   return (
     <Button 
       size={isMobile ? "default" : size}
       variant={variant}
-      className={`bg-brand-500 hover:bg-brand-600 text-white transition-all duration-300 hover:scale-105 ${className} ${isMobile ? "justify-start w-full" : ""}`}
+      className={`bg-brand-500 hover:bg-brand-600 text-white transition-all duration-300 hover:scale-105 focus:ring-2 focus:ring-brand-400 focus:ring-offset-2 focus:outline-none ${className} ${isMobile ? "justify-start w-full" : ""}`}
       onClick={handleClick}
+      onKeyDown={handleKeyDown}
       aria-label="Get started with a free account"
       data-testid="get-started-button"
     >

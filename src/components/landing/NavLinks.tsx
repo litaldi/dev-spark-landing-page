@@ -59,13 +59,19 @@ export function NavLinks({ isMobile = false, onLinkClick }: NavLinksProps) {
     <nav 
       className={`${isMobile ? "" : "hidden md:flex"} items-center ${isMobile ? "flex-col" : "flex"} gap-1`}
       aria-label={isMobile ? "Mobile navigation" : "Main navigation"}
+      role="navigation"
     >
-      {navLinks.map(link => (
+      {isMobile && (
+        <div className="sr-only" aria-live="polite">
+          Mobile navigation menu is now open
+        </div>
+      )}
+      {navLinks.map((link, index) => (
         <NavLink 
           key={link.label} 
           to={link.to} 
           label={link.label} 
-          onClick={handleClick} 
+          onClick={handleClick}
         />
       ))}
     </nav>

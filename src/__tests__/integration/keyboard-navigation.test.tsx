@@ -5,6 +5,7 @@ import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
 import { ThemeProvider } from '@/components/theme/ThemeProvider';
 import Navbar from '@/components/landing/Navbar';
+import { announceToScreenReader } from '@/lib/keyboard-utils';
 
 // Mock hooks
 jest.mock('@/hooks/use-navbar-state', () => ({
@@ -49,6 +50,19 @@ describe('Keyboard Navigation', () => {
     userEvent.tab();
     const aboutLink = screen.getByTestId('nav-link-about');
     expect(document.activeElement).toBe(aboutLink);
+    
+    // Continue tabbing through remaining nav links
+    userEvent.tab();
+    const contactLink = screen.getByTestId('nav-link-contact');
+    expect(document.activeElement).toBe(contactLink);
+    
+    userEvent.tab();
+    const helpLink = screen.getByTestId('nav-link-help');
+    expect(document.activeElement).toBe(helpLink);
+    
+    userEvent.tab();
+    const faqLink = screen.getByTestId('nav-link-faq');
+    expect(document.activeElement).toBe(faqLink);
   });
 
   test('skip to content link appears on focus and works', async () => {
@@ -108,5 +122,29 @@ describe('Keyboard Navigation', () => {
     // Check dropdown is visible
     const lightOption = screen.getByText('Light');
     expect(lightOption).toBeInTheDocument();
+    
+    // Verify we can access the dropdown options
+    userEvent.tab();
+    
+    // At least one option should be focused
+    const focusedElement = document.activeElement;
+    expect(focusedElement).not.toBe(document.body);
+    
+    // Press Enter on the focused option
+    fireEvent.keyDown(focusedElement as HTMLElement, { key: 'Enter', code: 'Enter' });
+    fireEvent.click(focusedElement as HTMLElement);
+  });
+  
+  test('screen reader announcer works correctly', () => {
+    // Test the new helper for screen reader announcements
+    announceToScreenReader('Test announcement');
+    
+    // Check that the announcer element exists
+    const announcer = document.getElementById('screen-reader-announcer');
+    expect(announcer).not.toBeNull();
+    
+    // Check that it has the correct attributes
+    expect(announcer?.getAttribute('aria-live')).toBe('polite');
+    expect(announcer?.getAttribute('aria-atomic')).toBe('true');
   });
 });
