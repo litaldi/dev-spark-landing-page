@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { axe } from 'jest-axe';
@@ -78,10 +79,10 @@ jest.mock('@/components/ui/card', () => ({
 
 jest.mock('@/components/ui/form', () => ({
   Form: ({ children, ...props }) => {
-    // Fix TypeScript errors by converting children function result to React.ReactNode
+    // Use React.createElement to properly handle function children
     if (typeof children === 'function') {
       const formContent = children(mockFormReturn);
-      return <form {...props}>{formContent}</form>;
+      return React.createElement('form', props, formContent);
     }
     return <form {...props}>{children}</form>;
   },
