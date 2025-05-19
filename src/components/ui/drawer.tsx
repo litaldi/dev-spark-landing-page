@@ -6,10 +6,11 @@ import { cn } from "@/lib/utils"
 import { useKeyboardNavigation } from "@/hooks/use-keyboard-navigation"
 import { announceToScreenReader } from "@/lib/keyboard-utils"
 
-const Drawer = React.forwardRef<
-  React.ElementRef<typeof DrawerPrimitive.Root>,
-  React.ComponentPropsWithoutRef<typeof DrawerPrimitive.Root>
->(({ shouldScaleBackground = true, children, ...props }, ref) => {
+const Drawer = ({
+  shouldScaleBackground = true,
+  children,
+  ...props
+}: React.ComponentPropsWithoutRef<typeof DrawerPrimitive.Root>) => {
   // Announce drawer state changes to screen readers
   const handleOpenChange = (open: boolean) => {
     if (open) {
@@ -21,7 +22,6 @@ const Drawer = React.forwardRef<
 
   return (
     <DrawerPrimitive.Root
-      ref={ref}
       shouldScaleBackground={shouldScaleBackground}
       onOpenChange={handleOpenChange}
       {...props}
@@ -29,7 +29,7 @@ const Drawer = React.forwardRef<
       {children}
     </DrawerPrimitive.Root>
   )
-})
+}
 Drawer.displayName = "Drawer"
 
 const DrawerTrigger = DrawerPrimitive.Trigger
@@ -64,6 +64,18 @@ const DrawerContent = React.forwardRef<
     enabled: isOpen
   })
 
+  // Handle open state change
+  const handleOpenChange = (open: boolean) => {
+    setIsOpen(open)
+    // Call the original onOpenChange if provided
+    if (props.onOpenChange) {
+      props.onOpenChange(open)
+    }
+  }
+
+  // Extract onOpenChange from props to avoid passing it twice
+  const { onOpenChange, ...otherProps } = props
+
   return (
     <DrawerPortal>
       <DrawerOverlay />
@@ -74,12 +86,12 @@ const DrawerContent = React.forwardRef<
           else if (ref) ref.current = node
           contentRef.current = node
         }}
-        onOpenChange={(open) => setIsOpen(open)}
+        onOpenChange={handleOpenChange}
         className={cn(
           "fixed inset-x-0 bottom-0 z-50 mt-24 flex h-auto flex-col rounded-t-[10px] border bg-background focus:outline-none",
           className
         )}
-        {...props}
+        {...otherProps}
       >
         <div className="mx-auto mt-4 h-2 w-[100px] rounded-full bg-muted" />
         {children}

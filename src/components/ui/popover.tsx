@@ -5,10 +5,10 @@ import * as PopoverPrimitive from "@radix-ui/react-popover"
 import { cn } from "@/lib/utils"
 import { announceToScreenReader } from "@/lib/keyboard-utils"
 
-const Popover = React.forwardRef<
-  React.ElementRef<typeof PopoverPrimitive.Root>,
-  React.ComponentPropsWithoutRef<typeof PopoverPrimitive.Root>
->(({ children, ...props }, ref) => {
+const Popover = ({
+  children,
+  ...props
+}: React.ComponentPropsWithoutRef<typeof PopoverPrimitive.Root>) => {
   // Announce popover state changes to screen readers
   const handleOpenChange = (open: boolean) => {
     if (open) {
@@ -26,7 +26,7 @@ const Popover = React.forwardRef<
       {children}
     </PopoverPrimitive.Root>
   )
-})
+}
 Popover.displayName = "Popover"
 
 const PopoverTrigger = PopoverPrimitive.Trigger
