@@ -16,6 +16,7 @@ jest.mock('@/hooks/use-navbar-state', () => ({
     isLoggedIn: false,
     userName: null,
     handleLogout: jest.fn(),
+    toggleLoginState: jest.fn(),
   }),
 }));
 

@@ -1,92 +1,128 @@
 
-import React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { User } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuLabel, 
+  DropdownMenuSeparator, 
+  DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
+import { User, LogOut, Settings } from "lucide-react";
 
 interface AuthButtonsProps {
   isLoggedIn: boolean;
   userName: string | null;
-  isMobile?: boolean;
-  onMobileMenuClose?: () => void;
   onLogout: () => void;
+  isMobile?: boolean;
 }
 
-const AuthButtons: React.FC<AuthButtonsProps> = ({
-  isLoggedIn,
-  userName,
-  isMobile = false,
-  onMobileMenuClose = () => {},
-  onLogout
+const AuthButtons: React.FC<AuthButtonsProps> = ({ 
+  isLoggedIn, 
+  userName, 
+  onLogout,
+  isMobile = false
 }) => {
-  const navigate = useNavigate();
-
-  const handleLogoutClick = () => {
-    onLogout();
-    if (isMobile) {
-      onMobileMenuClose();
-    }
-  };
-
-  // Only handle logged in users now
-  if (!isLoggedIn) return null;
-
-  return (
-    <>
-      {!isMobile && (
-        <div className="hidden md:flex items-center gap-2">
-          <div className="flex items-center gap-2">
-            <User className="h-4 w-4 text-brand-500" aria-hidden="true" />
-            <p className="text-brand-700 dark:text-brand-300 font-medium truncate max-w-[120px] lg:max-w-none">
-              {userName}
-            </p>
-          </div>
-        </div>
-      )}
-
-      {/* User dropdown menu for logged in users */}
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
+  if (!isLoggedIn) {
+    return (
+      <div className={`flex ${isMobile ? "flex-col w-full" : "items-center gap-2"}`}>
+        <Link to="/auth/login">
           <Button 
             variant="ghost" 
-            size="sm" 
-            className="hidden md:inline-flex text-brand-600 dark:text-brand-300 hover:bg-brand-50 dark:hover:bg-brand-900/30 transition-all"
-            aria-label="User menu"
+            size={isMobile ? "default" : "sm"}
+            className={`${isMobile ? "w-full justify-start" : ""}`}
           >
-            <User className="h-4 w-4 mr-1" />
-            <span className="truncate max-w-[80px] lg:max-w-none">{userName}</span>
+            Sign In
           </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-48">
-          <DropdownMenuItem asChild>
-            <Link to="/dashboard">Dashboard</Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem asChild>
-            <Link to="/profile">Profile</Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem asChild>
-            <Link to="/settings">Settings</Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={handleLogoutClick}>
-            Log out
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+        </Link>
+      </div>
+    );
+  }
+
+  if (isMobile) {
+    return (
+      <div className="flex flex-col space-y-2 w-full">
+        <div className="flex items-center p-2 bg-muted rounded-md">
+          <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center text-primary mr-2">
+            <User size={16} />
+          </div>
+          <div>
+            <p className="text-sm font-medium">{userName || 'User'}</p>
+            <p className="text-xs text-muted-foreground">Signed in</p>
+          </div>
+        </div>
+        
+        <Link to="/dashboard" className="w-full">
+          <Button variant="secondary" className="w-full justify-start">
+            Dashboard
+          </Button>
+        </Link>
+        
+        <Link to="/profile" className="w-full">
+          <Button variant="ghost" className="w-full justify-start">
+            <User size={16} className="mr-2" />
+            Profile
+          </Button>
+        </Link>
+        
+        <Link to="/settings" className="w-full">
+          <Button variant="ghost" className="w-full justify-start">
+            <Settings size={16} className="mr-2" />
+            Settings
+          </Button>
+        </Link>
+        
+        <Button 
+          variant="ghost" 
+          className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10"
+          onClick={onLogout}
+        >
+          <LogOut size={16} className="mr-2" />
+          Sign Out
+        </Button>
+      </div>
+    );
+  }
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          className="flex items-center gap-2"
+          aria-label="User menu"
+        >
+          <div className="h-6 w-6 rounded-full bg-primary/20 flex items-center justify-center text-primary">
+            <User size={14} />
+          </div>
+          <span className="max-w-[100px] truncate">{userName || 'User'}</span>
+        </Button>
+      </DropdownMenuTrigger>
       
-      <Button 
-        className={`${isMobile ? 'justify-start text-white bg-brand-500 hover:bg-brand-600 w-full' : 'hidden md:inline-flex bg-brand-500 hover:bg-brand-600 text-white transition-all duration-300'}`}
-        asChild
-        onClick={isMobile ? onMobileMenuClose : undefined}
-      >
-        <Link to="/dashboard">Go to Dashboard</Link>
-      </Button>
-    </>
+      <DropdownMenuContent align="end" className="w-56">
+        <DropdownMenuLabel>Account</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem asChild>
+          <Link to="/dashboard" className="w-full cursor-pointer">Dashboard</Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link to="/profile" className="w-full cursor-pointer">Profile</Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link to="/settings" className="w-full cursor-pointer">Settings</Link>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem 
+          className="text-destructive focus:text-destructive cursor-pointer"
+          onClick={onLogout}
+        >
+          Sign out
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 };
 

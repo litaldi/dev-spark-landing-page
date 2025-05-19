@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import Navbar from '@/components/landing/Navbar';
 import * as useNavbarStateModule from '@/hooks/use-navbar-state';
@@ -52,7 +52,6 @@ describe('Navbar Integration', () => {
       closeMobileMenu: jest.fn(),
       isLoggedIn: false,
       userName: null,
-      isDemoUser: false,
       handleLogout: jest.fn(),
     });
   });
@@ -79,7 +78,6 @@ describe('Navbar Integration', () => {
       closeMobileMenu: jest.fn(),
       isLoggedIn: false,
       userName: null,
-      isDemoUser: false,
       handleLogout: jest.fn(),
     });
 
@@ -103,7 +101,6 @@ describe('Navbar Integration', () => {
       closeMobileMenu: jest.fn(),
       isLoggedIn: false,
       userName: null,
-      isDemoUser: false,
       handleLogout: jest.fn(),
     });
 
@@ -126,7 +123,6 @@ describe('Navbar Integration', () => {
       closeMobileMenu: mockCloseMenu,
       isLoggedIn: false,
       userName: null,
-      isDemoUser: false,
       handleLogout: jest.fn(),
     });
 
@@ -150,7 +146,6 @@ describe('Navbar Integration', () => {
       closeMobileMenu: jest.fn(),
       isLoggedIn: false,
       userName: null,
-      isDemoUser: false,
       handleLogout: jest.fn(),
     });
 
@@ -172,7 +167,6 @@ describe('Navbar Integration', () => {
       closeMobileMenu: jest.fn(),
       isLoggedIn: true,
       userName: 'Test User',
-      isDemoUser: false,
       handleLogout: jest.fn(),
     });
 

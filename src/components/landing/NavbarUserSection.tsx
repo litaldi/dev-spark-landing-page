@@ -28,6 +28,12 @@ const NavbarUserSection: React.FC<NavbarUserSectionProps> = ({
         <ThemeToggle />
       </div>
       
+      {!isLoggedIn && (
+        <div className="hidden md:block">
+          <GetStartedButton size="sm" className="bg-brand-500 hover:bg-brand-600" />
+        </div>
+      )}
+      
       {isLoggedIn && (
         <AuthButtons 
           isLoggedIn={isLoggedIn} 

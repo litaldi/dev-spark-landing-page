@@ -1,10 +1,11 @@
 
-import React, { useEffect } from "react";
+import React from "react";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { NavLinks } from "./NavLinks";
+import GetStartedButton from "./GetStartedButton";
+import AuthButtons from "./AuthButtons";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { AccessibilityMenu } from "@/components/a11y/AccessibilityMenu";
-import { NavLinks } from "./NavLinks";
-import AuthButtons from "./AuthButtons";
-import GetStartedButton from "./GetStartedButton";
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -12,7 +13,7 @@ interface MobileMenuProps {
   userName: string | null;
   onMenuClose: () => void;
   onLogout: () => void;
-  toggleLoginState?: () => void;
+  toggleLoginState: () => void;
 }
 
 const MobileMenu: React.FC<MobileMenuProps> = ({
@@ -23,75 +24,81 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
   onLogout,
   toggleLoginState
 }) => {
-  // Trap focus inside the modal when it's open
-  useEffect(() => {
-    if (isOpen) {
-      // Prevent scrolling when menu is open
-      document.body.style.overflow = 'hidden';
-      
-      // Add escape key listener
-      const handleEscapeKey = (e: KeyboardEvent) => {
-        if (e.key === 'Escape') onMenuClose();
-      };
-      
-      document.addEventListener('keydown', handleEscapeKey);
-      
-      return () => {
-        document.body.style.overflow = '';
-        document.removeEventListener('keydown', handleEscapeKey);
-      };
-    }
-  }, [isOpen, onMenuClose]);
-  
   if (!isOpen) return null;
 
   return (
-    <div 
-      className="md:hidden fixed inset-0 z-50 bg-background/95 backdrop-blur-sm"
-      role="dialog"
-      aria-modal="true"
-      aria-label="Mobile navigation"
-    >
-      <div 
-        className="fixed inset-0 overflow-y-auto pb-20"
-        onClick={(e) => {
-          // Close menu when clicking the background (but not on menu items)
-          if (e.target === e.currentTarget) onMenuClose();
-        }}
+    <Sheet open={isOpen} onOpenChange={onMenuClose}>
+      <SheetContent
+        side="left"
+        className="w-full sm:w-[350px] pt-12 flex flex-col"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Mobile navigation"
       >
-        <div 
-          className="pt-20 p-4 flex flex-col gap-6 min-h-[60vh]"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <nav className="flex flex-col gap-6">
-            <NavLinks isMobile={true} onLinkClick={onMenuClose} />
-          </nav>
-          
-          <div className="flex gap-4 mt-auto">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-lg font-medium">Menu</h2>
+          <div className="flex items-center gap-2">
             <AccessibilityMenu />
             <ThemeToggle />
           </div>
-          
-          <div className="flex flex-col gap-4">
+        </div>
+
+        <div className="flex-1 overflow-auto">
+          <div className="flex flex-col gap-y-4">
+            <NavLinks isMobile={true} onLinkClick={onMenuClose} />
+          </div>
+
+          <hr className="my-6 border-t border-gray-200 dark:border-gray-800" />
+
+          <div className="space-y-4">
             {!isLoggedIn && (
               <>
-                <GetStartedButton isMobile onMenuClose={onMenuClose} />
+                <GetStartedButton
+                  isMobile={true}
+                  onMenuClose={onMenuClose}
+                  className="mb-2"
+                />
+                <div className="flex gap-3">
+                  <button
+                    className="flex-1 py-2 px-4 text-center rounded-md border border-gray-300 dark:border-gray-700 transition-colors hover:bg-accent"
+                    onClick={() => {
+                      toggleLoginState();
+                      onMenuClose();
+                    }}
+                  >
+                    Try Demo
+                  </button>
+                  <button
+                    className="flex-1 py-2 px-4 text-center rounded-md border border-gray-300 dark:border-gray-700 transition-colors hover:bg-accent"
+                    onClick={() => {
+                      window.location.href = "/auth/login";
+                      onMenuClose();
+                    }}
+                  >
+                    Sign In
+                  </button>
+                </div>
               </>
             )}
-            
+
             {isLoggedIn && (
               <AuthButtons 
-                isLoggedIn={isLoggedIn}
+                isLoggedIn={isLoggedIn} 
                 userName={userName}
-                isMobile={true}
-                onMobileMenuClose={onMenuClose}
                 onLogout={onLogout}
+                isMobile={true}
               />
             )}
           </div>
         </div>
-      </div>
-    </div>
+
+        <div className="mt-auto pt-4">
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            &copy; {new Date().getFullYear()} DevAcademy. All rights reserved.
+          </p>
+        </div>
+      </SheetContent>
+    </Sheet>
   );
 };
 
