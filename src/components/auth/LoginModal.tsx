@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Dialog,
@@ -14,6 +14,8 @@ import { Github } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "react-router-dom";
 import { Separator } from "@/components/ui/separator";
+import { useKeyboardNavigation } from "@/hooks/use-keyboard-navigation";
+import { announceToScreenReader } from "@/lib/keyboard-utils";
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -23,6 +25,22 @@ interface LoginModalProps {
 const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
   const { toast } = useToast();
   const navigate = useNavigate();
+  const modalRef = useRef<HTMLDivElement>(null);
+  
+  // Use keyboard navigation hook for focus trapping and management
+  useKeyboardNavigation(modalRef, {
+    trapFocus: true,
+    escapeHandler: onClose,
+    autoFocus: true,
+    enabled: isOpen
+  });
+  
+  // Announce when the modal opens for screen readers
+  useEffect(() => {
+    if (isOpen) {
+      announceToScreenReader('Login dialog opened', 'polite');
+    }
+  }, [isOpen]);
 
   const handleLogin = (provider: string) => {
     // This would be replaced with actual authentication logic
@@ -32,6 +50,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
       duration: 3000,
     });
     
+    announceToScreenReader(`Attempting login with ${provider}`, 'polite');
     onClose();
   };
 
@@ -43,6 +62,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
         aria-describedby="login-description"
         role="dialog"
         aria-modal="true"
+        ref={modalRef}
       >
         <DialogHeader>
           <DialogTitle id="login-title" className="text-xl sm:text-2xl font-bold text-center">Log In or Sign Up</DialogTitle>
@@ -53,7 +73,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
         
         <div className="flex flex-col gap-4 py-4">
           <Button 
-            className="flex items-center justify-center gap-2 w-full transition-all hover:shadow-md"
+            className="flex items-center justify-center gap-2 w-full transition-all hover:shadow-md focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 focus:outline-none"
             onClick={() => handleLogin("Google")}
             aria-label="Continue with Google"
           >
@@ -68,7 +88,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
           
           <Button 
             variant="outline" 
-            className="flex items-center justify-center gap-2 w-full transition-all hover:border-gray-400 dark:hover:border-gray-600"
+            className="flex items-center justify-center gap-2 w-full transition-all hover:border-gray-400 dark:hover:border-gray-600 focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 focus:outline-none"
             onClick={() => handleLogin("GitHub")}
             aria-label="Continue with GitHub"
           >
@@ -83,7 +103,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
           
           <Button 
             variant="outline" 
-            className="flex items-center justify-center gap-2 w-full transition-all hover:border-gray-400 dark:hover:border-gray-600"
+            className="flex items-center justify-center gap-2 w-full transition-all hover:border-gray-400 dark:hover:border-gray-600 focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 focus:outline-none"
             onClick={() => handleLogin("Email")}
             aria-label="Sign in with email"
           >
@@ -95,14 +115,14 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
           </Button>
 
           <p className="text-xs text-center text-muted-foreground">
-            By logging in, you agree to our <Link to="/privacy" className="underline hover:text-foreground">Privacy Policy</Link> and <Link to="/terms" className="underline hover:text-foreground">Terms of Service</Link>
+            By logging in, you agree to our <Link to="/privacy" className="underline hover:text-foreground focus:ring-2 focus:ring-brand-500 focus:p-1 focus:rounded-sm focus:outline-none">Privacy Policy</Link> and <Link to="/terms" className="underline hover:text-foreground focus:ring-2 focus:ring-brand-500 focus:p-1 focus:rounded-sm focus:outline-none">Terms of Service</Link>
           </p>
         </div>
         
         <DialogFooter className="justify-center flex-col space-y-2">
           <Button 
             variant="link" 
-            className="text-sm text-brand-500 hover:text-brand-600 dark:text-brand-400 dark:hover:text-brand-300"
+            className="text-sm text-brand-500 hover:text-brand-600 dark:text-brand-400 dark:hover:text-brand-300 focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 focus:outline-none"
             asChild
           >
             <Link to="/auth/magic-link" onClick={onClose}>Sign in with Magic Link</Link>
@@ -113,7 +133,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
             <Button 
               variant="link" 
               asChild
-              className="p-0 h-auto text-brand-500 hover:text-brand-600 dark:text-brand-400 dark:hover:text-brand-300"
+              className="p-0 h-auto text-brand-500 hover:text-brand-600 dark:text-brand-400 dark:hover:text-brand-300 focus:ring-2 focus:ring-brand-500 focus:p-1 focus:rounded-sm focus:outline-none"
               onClick={onClose}
             >
               <Link to="/auth/register">Sign up for free</Link>

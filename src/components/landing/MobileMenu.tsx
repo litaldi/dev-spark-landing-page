@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useRef, useEffect } from "react";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { NavLinks } from "./NavLinks";
 import GetStartedButton from "./GetStartedButton";
@@ -7,6 +7,7 @@ import AuthButtons from "./AuthButtons";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { AccessibilityMenu } from "@/components/a11y/AccessibilityMenu";
 import { sanitizeInput } from "@/lib/security";
+import { announceToScreenReader } from "@/lib/keyboard-utils";
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -25,19 +26,34 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
   onLogout,
   toggleLoginState
 }) => {
+  const menuRef = useRef<HTMLDivElement>(null);
+  
+  // Announce menu state changes to screen readers
+  useEffect(() => {
+    if (isOpen) {
+      announceToScreenReader("Mobile menu opened", "polite");
+    }
+  }, [isOpen]);
+  
+  const handleMenuClose = () => {
+    announceToScreenReader("Mobile menu closed", "polite");
+    onMenuClose();
+  };
+
   if (!isOpen) return null;
 
   // Sanitize user name for security
   const sanitizedUserName = userName ? sanitizeInput(userName) : null;
 
   return (
-    <Sheet open={isOpen} onOpenChange={onMenuClose}>
+    <Sheet open={isOpen} onOpenChange={handleMenuClose}>
       <SheetContent
         side="left"
         className="w-full sm:w-[350px] pt-12 flex flex-col"
         role="dialog"
         aria-modal="true"
         aria-label="Mobile navigation"
+        ref={menuRef}
       >
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-lg font-medium">Menu</h2>
@@ -64,7 +80,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
                 />
                 <div className="flex gap-3">
                   <button
-                    className="flex-1 py-2 px-4 text-center rounded-md border border-gray-300 dark:border-gray-700 transition-colors hover:bg-accent"
+                    className="flex-1 py-2 px-4 text-center rounded-md border border-gray-300 dark:border-gray-700 transition-colors hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                     onClick={() => {
                       toggleLoginState();
                       onMenuClose();
@@ -74,7 +90,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
                     Try Demo
                   </button>
                   <button
-                    className="flex-1 py-2 px-4 text-center rounded-md border border-gray-300 dark:border-gray-700 transition-colors hover:bg-accent"
+                    className="flex-1 py-2 px-4 text-center rounded-md border border-gray-300 dark:border-gray-700 transition-colors hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                     onClick={() => {
                       window.location.href = "/auth/login";
                       onMenuClose();

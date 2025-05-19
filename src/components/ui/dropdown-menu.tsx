@@ -4,8 +4,31 @@ import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu"
 import { Check, ChevronRight, Circle } from "lucide-react"
 
 import { cn } from "@/lib/utils"
+import { announceToScreenReader } from "@/lib/keyboard-utils"
 
-const DropdownMenu = DropdownMenuPrimitive.Root
+const DropdownMenu = React.forwardRef<
+  React.ElementRef<typeof DropdownMenuPrimitive.Root>,
+  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Root>
+>(({ children, ...props }, ref) => {
+  // Announce dropdown state changes to screen readers
+  const handleOpenChange = (open: boolean) => {
+    if (open) {
+      announceToScreenReader('Menu opened', 'polite');
+    } else {
+      announceToScreenReader('Menu closed', 'polite');
+    }
+  }
+
+  return (
+    <DropdownMenuPrimitive.Root 
+      onOpenChange={handleOpenChange} 
+      {...props}
+    >
+      {children}
+    </DropdownMenuPrimitive.Root>
+  )
+})
+DropdownMenu.displayName = "DropdownMenu"
 
 const DropdownMenuTrigger = DropdownMenuPrimitive.Trigger
 
@@ -58,19 +81,70 @@ DropdownMenuSubContent.displayName =
 const DropdownMenuContent = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Content>
->(({ className, sideOffset = 4, ...props }, ref) => (
-  <DropdownMenuPrimitive.Portal>
-    <DropdownMenuPrimitive.Content
-      ref={ref}
-      sideOffset={sideOffset}
-      className={cn(
-        "z-50 min-w-[8rem] overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
-        className
-      )}
-      {...props}
-    />
-  </DropdownMenuPrimitive.Portal>
-))
+>(({ className, sideOffset = 4, ...props }, ref) => {
+  const contentRef = React.useRef<HTMLDivElement>(null);
+
+  // Handle keyboard navigation within the dropdown menu
+  React.useEffect(() => {
+    if (!contentRef.current) return;
+    
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!contentRef.current) return;
+      
+      const focusableElements = Array.from(
+        contentRef.current.querySelectorAll('[role="menuitem"]:not([disabled])')
+      ) as HTMLElement[];
+      
+      if (focusableElements.length === 0) return;
+
+      // Get current focused element
+      const currentIndex = focusableElements.findIndex(
+        elem => elem === document.activeElement
+      );
+      
+      // Arrow up/down navigation
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        const nextIndex = currentIndex + 1 >= focusableElements.length ? 0 : currentIndex + 1;
+        focusableElements[nextIndex].focus();
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        const prevIndex = currentIndex - 1 < 0 ? focusableElements.length - 1 : currentIndex - 1;
+        focusableElements[prevIndex].focus();
+      } else if (e.key === 'Home') {
+        e.preventDefault();
+        focusableElements[0].focus();
+      } else if (e.key === 'End') {
+        e.preventDefault();
+        focusableElements[focusableElements.length - 1].focus();
+      }
+    };
+
+    contentRef.current.addEventListener('keydown', handleKeyDown);
+    return () => {
+      contentRef.current?.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+  
+  return (
+    <DropdownMenuPrimitive.Portal>
+      <DropdownMenuPrimitive.Content
+        ref={(node) => {
+          // Handle both the forwarded ref and our local ref
+          if (typeof ref === 'function') ref(node)
+          else if (ref) ref.current = node
+          contentRef.current = node
+        }}
+        sideOffset={sideOffset}
+        className={cn(
+          "z-50 min-w-[8rem] overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+          className
+        )}
+        {...props}
+      />
+    </DropdownMenuPrimitive.Portal>
+  );
+})
 DropdownMenuContent.displayName = DropdownMenuPrimitive.Content.displayName
 
 const DropdownMenuItem = React.forwardRef<
@@ -87,6 +161,7 @@ const DropdownMenuItem = React.forwardRef<
       className
     )}
     {...props}
+    role="menuitem"
   />
 ))
 DropdownMenuItem.displayName = DropdownMenuPrimitive.Item.displayName

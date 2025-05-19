@@ -1,17 +1,35 @@
+
 import * as React from "react"
 import { Drawer as DrawerPrimitive } from "vaul"
 
 import { cn } from "@/lib/utils"
+import { useKeyboardNavigation } from "@/hooks/use-keyboard-navigation"
+import { announceToScreenReader } from "@/lib/keyboard-utils"
 
-const Drawer = ({
-  shouldScaleBackground = true,
-  ...props
-}: React.ComponentProps<typeof DrawerPrimitive.Root>) => (
-  <DrawerPrimitive.Root
-    shouldScaleBackground={shouldScaleBackground}
-    {...props}
-  />
-)
+const Drawer = React.forwardRef<
+  React.ElementRef<typeof DrawerPrimitive.Root>,
+  React.ComponentPropsWithoutRef<typeof DrawerPrimitive.Root>
+>(({ shouldScaleBackground = true, children, ...props }, ref) => {
+  // Announce drawer state changes to screen readers
+  const handleOpenChange = (open: boolean) => {
+    if (open) {
+      announceToScreenReader('Drawer opened', 'polite')
+    } else {
+      announceToScreenReader('Drawer closed', 'polite')
+    }
+  }
+
+  return (
+    <DrawerPrimitive.Root
+      ref={ref}
+      shouldScaleBackground={shouldScaleBackground}
+      onOpenChange={handleOpenChange}
+      {...props}
+    >
+      {children}
+    </DrawerPrimitive.Root>
+  )
+})
 Drawer.displayName = "Drawer"
 
 const DrawerTrigger = DrawerPrimitive.Trigger
@@ -35,22 +53,40 @@ DrawerOverlay.displayName = DrawerPrimitive.Overlay.displayName
 const DrawerContent = React.forwardRef<
   React.ElementRef<typeof DrawerPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof DrawerPrimitive.Content>
->(({ className, children, ...props }, ref) => (
-  <DrawerPortal>
-    <DrawerOverlay />
-    <DrawerPrimitive.Content
-      ref={ref}
-      className={cn(
-        "fixed inset-x-0 bottom-0 z-50 mt-24 flex h-auto flex-col rounded-t-[10px] border bg-background",
-        className
-      )}
-      {...props}
-    >
-      <div className="mx-auto mt-4 h-2 w-[100px] rounded-full bg-muted" />
-      {children}
-    </DrawerPrimitive.Content>
-  </DrawerPortal>
-))
+>(({ className, children, ...props }, ref) => {
+  const contentRef = React.useRef<HTMLDivElement>(null)
+  const [isOpen, setIsOpen] = React.useState(false)
+  
+  // Use keyboard navigation hook to trap focus and handle escape key
+  useKeyboardNavigation(contentRef, {
+    trapFocus: true,
+    autoFocus: true,
+    enabled: isOpen
+  })
+
+  return (
+    <DrawerPortal>
+      <DrawerOverlay />
+      <DrawerPrimitive.Content
+        ref={(node) => {
+          // Handle both the forwarded ref and our local ref
+          if (typeof ref === 'function') ref(node)
+          else if (ref) ref.current = node
+          contentRef.current = node
+        }}
+        onOpenChange={(open) => setIsOpen(open)}
+        className={cn(
+          "fixed inset-x-0 bottom-0 z-50 mt-24 flex h-auto flex-col rounded-t-[10px] border bg-background focus:outline-none",
+          className
+        )}
+        {...props}
+      >
+        <div className="mx-auto mt-4 h-2 w-[100px] rounded-full bg-muted" />
+        {children}
+      </DrawerPrimitive.Content>
+    </DrawerPortal>
+  )
+})
 DrawerContent.displayName = "DrawerContent"
 
 const DrawerHeader = ({

@@ -1,10 +1,34 @@
+
 import * as React from "react"
 import * as ContextMenuPrimitive from "@radix-ui/react-context-menu"
 import { Check, ChevronRight, Circle } from "lucide-react"
 
 import { cn } from "@/lib/utils"
+import { announceToScreenReader } from "@/lib/keyboard-utils"
 
-const ContextMenu = ContextMenuPrimitive.Root
+const ContextMenu = React.forwardRef<
+  React.ElementRef<typeof ContextMenuPrimitive.Root>,
+  React.ComponentPropsWithoutRef<typeof ContextMenuPrimitive.Root>
+>(({ children, ...props }, ref) => {
+  // Announce menu opening to screen readers
+  const handleOpenChange = (open: boolean) => {
+    if (open) {
+      announceToScreenReader('Context menu opened', 'polite')
+    } else {
+      announceToScreenReader('Context menu closed', 'polite')
+    }
+  }
+  
+  return (
+    <ContextMenuPrimitive.Root 
+      onOpenChange={handleOpenChange}
+      {...props}
+    >
+      {children}
+    </ContextMenuPrimitive.Root>
+  )
+})
+ContextMenu.displayName = "ContextMenu"
 
 const ContextMenuTrigger = ContextMenuPrimitive.Trigger
 

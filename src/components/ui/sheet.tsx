@@ -1,9 +1,12 @@
+
+import * as React from "react"
 import * as SheetPrimitive from "@radix-ui/react-dialog"
 import { cva, type VariantProps } from "class-variance-authority"
 import { X } from "lucide-react"
-import * as React from "react"
 
 import { cn } from "@/lib/utils"
+import { useKeyboardNavigation } from "@/hooks/use-keyboard-navigation"
+import { announceToScreenReader } from "@/lib/keyboard-utils"
 
 const Sheet = SheetPrimitive.Root
 
@@ -18,12 +21,12 @@ const SheetOverlay = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof SheetPrimitive.Overlay>
 >(({ className, ...props }, ref) => (
   <SheetPrimitive.Overlay
+    ref={ref}
     className={cn(
       "fixed inset-0 z-50 bg-black/80  data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
       className
     )}
     {...props}
-    ref={ref}
   />
 ))
 SheetOverlay.displayName = SheetPrimitive.Overlay.displayName
@@ -54,22 +57,62 @@ interface SheetContentProps
 const SheetContent = React.forwardRef<
   React.ElementRef<typeof SheetPrimitive.Content>,
   SheetContentProps
->(({ side = "right", className, children, ...props }, ref) => (
-  <SheetPortal>
-    <SheetOverlay />
-    <SheetPrimitive.Content
-      ref={ref}
-      className={cn(sheetVariants({ side }), className)}
-      {...props}
-    >
-      {children}
-      <SheetPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-secondary">
-        <X className="h-4 w-4" />
-        <span className="sr-only">Close</span>
-      </SheetPrimitive.Close>
-    </SheetPrimitive.Content>
-  </SheetPortal>
-))
+>(({ side = "right", className, children, ...props }, ref) => {
+  const contentRef = React.useRef<HTMLDivElement>(null)
+  const [isOpen, setIsOpen] = React.useState(false)
+
+  // Use keyboard navigation hook to trap focus and handle escape key
+  useKeyboardNavigation(contentRef, {
+    trapFocus: true,
+    autoFocus: true,
+    enabled: isOpen
+  })
+
+  // Announce sheet opening/closing to screen readers
+  React.useEffect(() => {
+    if (isOpen) {
+      announceToScreenReader(`${side} panel opened`, 'polite')
+    }
+  }, [isOpen, side])
+
+  // Track open state
+  const handleOpenChange = (open: boolean) => {
+    setIsOpen(open)
+  }
+
+  return (
+    <SheetPortal>
+      <SheetOverlay />
+      <SheetPrimitive.Content
+        ref={(node) => {
+          // Handle both the forwarded ref and our local ref
+          if (typeof ref === 'function') ref(node)
+          else if (ref) ref.current = node
+          contentRef.current = node
+        }}
+        onOpenAutoFocus={(e) => {
+          e.preventDefault() // Let our hook handle focus
+          setIsOpen(true)
+        }}
+        onCloseAutoFocus={(e) => {
+          e.preventDefault() // Let our hook handle focus
+          setIsOpen(false)
+        }}
+        onEscapeKeyDown={() => {
+          setIsOpen(false)
+        }}
+        className={cn(sheetVariants({ side }), className)}
+        {...props}
+      >
+        {children}
+        <SheetPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-secondary">
+          <X className="h-4 w-4" />
+          <span className="sr-only">Close</span>
+        </SheetPrimitive.Close>
+      </SheetPrimitive.Content>
+    </SheetPortal>
+  )
+})
 SheetContent.displayName = SheetPrimitive.Content.displayName
 
 const SheetHeader = ({

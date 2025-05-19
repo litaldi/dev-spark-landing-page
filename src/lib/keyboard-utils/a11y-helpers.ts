@@ -1,130 +1,89 @@
 
 /**
- * Announces a message to screen readers using aria-live
- * @param message Message to announce
- * @param priority Priority of the announcement (polite or assertive)
+ * Creates an announcer element for screen readers if one doesn't exist
+ * @returns The announcer element
  */
-export function announceToScreenReader(
-  message: string, 
-  priority: 'polite' | 'assertive' = 'polite'
-): void {
-  // Try to find existing announcer element
+function createScreenReaderAnnouncer(): HTMLElement {
   let announcer = document.getElementById('screen-reader-announcer');
   
-  // Create it if it doesn't exist
   if (!announcer) {
     announcer = document.createElement('div');
     announcer.id = 'screen-reader-announcer';
-    announcer.setAttribute('aria-live', priority);
+    announcer.setAttribute('aria-live', 'polite');
     announcer.setAttribute('aria-atomic', 'true');
-    announcer.setAttribute('role', 'status');
-    announcer.style.position = 'absolute';
-    announcer.style.width = '1px';
-    announcer.style.height = '1px';
-    announcer.style.padding = '0';
-    announcer.style.overflow = 'hidden';
-    announcer.style.clip = 'rect(0, 0, 0, 0)';
-    announcer.style.whiteSpace = 'nowrap';
-    announcer.style.border = '0';
+    announcer.className = 'sr-only';
     document.body.appendChild(announcer);
-  } else {
-    // Update priority if needed
-    announcer.setAttribute('aria-live', priority);
   }
   
-  // Set the message (clear and then set to ensure announcement)
+  return announcer;
+}
+
+/**
+ * Announces a message to screen readers
+ * @param message The message to announce
+ * @param politeness The politeness level (polite or assertive)
+ */
+export function announceToScreenReader(
+  message: string, 
+  politeness: 'polite' | 'assertive' = 'polite'
+): void {
+  const announcer = createScreenReaderAnnouncer();
+  
+  // Update politeness level if needed
+  if (announcer.getAttribute('aria-live') !== politeness) {
+    announcer.setAttribute('aria-live', politeness);
+  }
+  
+  // Set the message (using a slight delay to ensure screen readers catch it)
   announcer.textContent = '';
   
-  // Use setTimeout to ensure the clearing has time to process
+  // Using setTimeout to ensure the DOM update cycle has completed
   setTimeout(() => {
-    if (announcer) {
-      announcer.textContent = message;
-    }
+    announcer.textContent = message;
   }, 50);
 }
 
 /**
- * Creates an accessible label for an element with multiple text parts
- * @param parts Array of text parts to combine
- * @returns Combined accessible label
+ * Adds skip links to the page for keyboard navigation
+ * @param mainContentId ID of the main content element
+ * @returns The skip link element
  */
-export function createAccessibleLabel(...parts: (string | undefined | null)[]): string {
-  return parts.filter(Boolean).join(', ').trim();
+export function createSkipLink(mainContentId: string = 'main-content'): HTMLElement {
+  const existingSkipLink = document.querySelector('.skip-link') as HTMLElement;
+  if (existingSkipLink) return existingSkipLink;
+  
+  const skipLink = document.createElement('a');
+  skipLink.href = `#${mainContentId}`;
+  skipLink.className = 'skip-link sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:bg-white focus:dark:bg-gray-900 focus:px-4 focus:py-2 focus:rounded focus:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500';
+  skipLink.textContent = 'Skip to content';
+  
+  document.body.prepend(skipLink);
+  return skipLink;
 }
 
 /**
- * Sets a timer that's announced to screen readers
- * @param durationMs Duration in milliseconds
- * @param options Timer options
- * @returns Timer control object
+ * Checks if an element is visible to screen readers
+ * @param element The element to check
+ * @returns Whether the element is visible to screen readers
  */
-export function createAnnouncedTimer(
-  durationMs: number,
-  options: {
-    onComplete?: () => void;
-    announceInterval?: number;
-    startMessage?: string;
-    intervalMessage?: (timeLeft: number) => string;
-    completeMessage?: string;
-  } = {}
-) {
-  const {
-    onComplete,
-    announceInterval = 15000, // Default to 15 seconds
-    startMessage = `Timer started for ${Math.ceil(durationMs / 1000)} seconds`,
-    intervalMessage = (timeLeft) => `${Math.ceil(timeLeft / 1000)} seconds remaining`,
-    completeMessage = 'Timer complete'
-  } = options;
+export function isVisibleToScreenReader(element: HTMLElement): boolean {
+  const style = window.getComputedStyle(element);
   
-  let timeLeft = durationMs;
-  let timerId: number | null = null;
-  let intervalId: number | null = null;
+  // Check if element is not hidden using CSS
+  if (style.display === 'none' || style.visibility === 'hidden') {
+    return false;
+  }
   
-  const stop = () => {
-    if (timerId) window.clearTimeout(timerId);
-    if (intervalId) window.clearInterval(intervalId);
-    timerId = null;
-    intervalId = null;
-  };
+  // Check if element has aria-hidden="true"
+  if (element.getAttribute('aria-hidden') === 'true') {
+    return false;
+  }
   
-  const start = () => {
-    stop(); // Clear any existing timers
-    
-    // Announce start
-    if (startMessage) {
-      announceToScreenReader(startMessage, 'polite');
-    }
-    
-    timeLeft = durationMs;
-    
-    // Set completion timer
-    timerId = window.setTimeout(() => {
-      if (completeMessage) {
-        announceToScreenReader(completeMessage, 'polite');
-      }
-      
-      if (onComplete) {
-        onComplete();
-      }
-      
-      stop();
-    }, durationMs);
-    
-    // Set up interval announcements if needed
-    if (announceInterval && announceInterval < durationMs) {
-      intervalId = window.setInterval(() => {
-        timeLeft -= announceInterval;
-        
-        if (timeLeft > 0) {
-          announceToScreenReader(intervalMessage(timeLeft), 'polite');
-        }
-      }, announceInterval);
-    }
-  };
+  // Check if element has role="presentation" or role="none"
+  const role = element.getAttribute('role');
+  if (role === 'presentation' || role === 'none') {
+    return false;
+  }
   
-  return {
-    start,
-    stop,
-    getTimeLeft: () => timeLeft
-  };
+  return true;
 }
