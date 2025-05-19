@@ -119,8 +119,8 @@ const PopoverContent = React.forwardRef<
         onCloseAutoFocus={(e) => {
           // Default behavior is fine for auto-focus on close
         }}
-        // Use the correct prop name for this Radix component
-        onChange={handleOpenStateChange}
+        // The correct prop for Radix Popover component is onOpenChange
+        onOpenChange={handleOpenStateChange}
         {...props}
       />
     </PopoverPrimitive.Portal>
