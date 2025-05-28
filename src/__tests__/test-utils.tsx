@@ -1,9 +1,14 @@
 
 import React, { ReactElement } from 'react';
-import { render, RenderOptions, fireEvent } from '@testing-library/react';
+import { render, RenderOptions } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { ThemeProvider } from '@/components/theme/ThemeProvider';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+// Re-export everything from testing libraries
+export * from '@testing-library/react';
+export { screen, fireEvent, waitFor, act } from '@testing-library/react';
+export { default as userEvent } from '@testing-library/user-event';
 
 // Create a custom render function that includes providers
 const AllProviders = ({ children }: { children: React.ReactNode }) => {
@@ -31,12 +36,14 @@ const customRender = (
 
 // Helper function for testing hover effects
 const simulateHover = (element: Element) => {
+  const { fireEvent } = require('@testing-library/react');
   fireEvent.mouseEnter(element);
   fireEvent.mouseOver(element);
 };
 
 // Helper function for testing focus effects
 const simulateFocus = (element: Element) => {
+  const { fireEvent } = require('@testing-library/react');
   fireEvent.focus(element);
 };
 
@@ -110,6 +117,5 @@ const simulateScreenReader = (element: Element) => {
   };
 };
 
-// Re-export everything from RTL
-export * from '@testing-library/react';
+// Override the default render with our custom render
 export { customRender as render, simulateHover, simulateFocus, simulateTabNavigation, simulateScreenReader };
