@@ -1,81 +1,78 @@
+
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '../../test-utils';
 import { RegisterForm } from '@/components/auth/RegisterForm';
 
-describe('RegisterForm Component', () => {
-  const mockRegister = jest.fn();
-  const mockUseForm = {
+// Mock the register hook
+jest.mock('@/hooks/auth/use-register', () => ({
+  useRegister: () => ({
     register: jest.fn(),
-    handleSubmit: (fn: any) => fn,
-    formState: { errors: {} },
-    setError: jest.fn(),
-    clearErrors: jest.fn(),
-    watch: jest.fn(),
-    setValue: jest.fn(),
-    getValues: jest.fn(),
-    trigger: jest.fn(),
-  };
+    isLoading: false,
+    error: null,
+  }),
+}));
 
-  beforeEach(() => {
-    mockRegister.mockClear();
-    mockUseForm.register.mockClear();
-    mockUseForm.setError.mockClear();
-    mockUseForm.clearErrors.mockClear();
-    mockUseForm.watch.mockClear();
-    mockUseForm.setValue.mockClear();
-    mockUseForm.getValues.mockClear();
-    mockUseForm.trigger.mockClear();
-    mockRegister.mockImplementation((name) => ({
-      name,
-      onChange: jest.fn(),
-      onBlur: jest.fn(),
-      ref: jest.fn(),
-    }));
+describe('RegisterForm Component', () => {
+  test('renders all form fields correctly', () => {
+    render(<RegisterForm />);
+    
+    expect(screen.getByLabelText(/full name/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /create account/i })).toBeInTheDocument();
   });
 
-  test('renders correctly', () => {
-    render(<RegisterForm register={mockRegister} useForm={mockUseForm} registerAction={mockRegister} />);
-    expect(screen.getByText('Create an account')).toBeInTheDocument();
-  });
-
-  test('handles form submission', async () => {
-    render(<RegisterForm register={mockRegister} useForm={mockUseForm} registerAction={mockRegister} />);
+  test('displays validation errors for empty fields', async () => {
+    render(<RegisterForm />);
     
     const submitButton = screen.getByRole('button', { name: /create account/i });
     fireEvent.click(submitButton);
     
-    // Since handleSubmit is mocked, we can only check if the button is clickable
-    expect(submitButton).toBeEnabled();
+    await waitFor(() => {
+      expect(screen.getByText(/name is required/i)).toBeInTheDocument();
+      expect(screen.getByText(/email is required/i)).toBeInTheDocument();
+      expect(screen.getByText(/password is required/i)).toBeInTheDocument();
+    });
   });
 
-  test('displays validation errors', async () => {
-    const mockUseFormWithErrors = {
-      ...mockUseForm,
-      formState: {
-        errors: {
-          name: { type: 'required', message: 'Name is required' },
-          email: { type: 'required', message: 'Email is required' },
-          password: { type: 'required', message: 'Password is required' },
-        },
-      },
-    };
-
-    render(<RegisterForm register={mockRegister} useForm={mockUseFormWithErrors} registerAction={mockRegister} />);
+  test('displays validation errors for invalid data', async () => {
+    render(<RegisterForm />);
+    
+    const nameInput = screen.getByLabelText(/full name/i);
+    const emailInput = screen.getByLabelText(/email/i);
+    const passwordInput = screen.getByLabelText(/password/i);
+    const submitButton = screen.getByRole('button', { name: /create account/i });
+    
+    fireEvent.change(nameInput, { target: { value: 'A' } });
+    fireEvent.change(emailInput, { target: { value: 'invalid-email' } });
+    fireEvent.change(passwordInput, { target: { value: '123' } });
+    fireEvent.click(submitButton);
     
     await waitFor(() => {
-      expect(screen.getByText('Name is required')).toBeInTheDocument();
-      expect(screen.getByText('Email is required')).toBeInTheDocument();
-      expect(screen.getByText('Password is required')).toBeInTheDocument();
+      expect(screen.getByText(/name must be at least 2 characters/i)).toBeInTheDocument();
+      expect(screen.getByText(/please enter a valid email/i)).toBeInTheDocument();
+      expect(screen.getByText(/password must be at least 8 characters/i)).toBeInTheDocument();
     });
   });
 
-  test('updates tosAccepted state on checkbox change', () => {
-    render(<RegisterForm register={mockRegister} useForm={mockUseForm} registerAction={mockRegister} />);
+  test('submits form with valid data', async () => {
+    render(<RegisterForm />);
     
-    const tosCheckbox = screen.getByRole('checkbox', {
-      name: /i agree to the terms of service and privacy policy/i,
+    const nameInput = screen.getByLabelText(/full name/i);
+    const emailInput = screen.getByLabelText(/email/i);
+    const passwordInput = screen.getByLabelText(/password/i);
+    const submitButton = screen.getByRole('button', { name: /create account/i });
+    
+    fireEvent.change(nameInput, { target: { value: 'John Doe' } });
+    fireEvent.change(emailInput, { target: { value: 'john@example.com' } });
+    fireEvent.change(passwordInput, { target: { value: 'password123' } });
+    fireEvent.click(submitButton);
+    
+    // Form should be submitted without errors
+    await waitFor(() => {
+      expect(screen.queryByText(/name is required/i)).not.toBeInTheDocument();
+      expect(screen.queryByText(/email is required/i)).not.toBeInTheDocument();
+      expect(screen.queryByText(/password is required/i)).not.toBeInTheDocument();
     });
-    
-    fireEvent.click(tosCheckbox);
   });
 });

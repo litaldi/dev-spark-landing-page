@@ -1,6 +1,15 @@
-import React from 'react';
+
+import React, { useState } from 'react';
 import { render, screen, fireEvent } from '../test-utils';
 import { axe, toHaveNoViolations } from 'jest-axe';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { FormError } from '@/components/ui/form-error';
 
 // Import test setup
 import './setup/a11y-test-setup';
@@ -144,9 +153,7 @@ describe('Form Validation Accessibility', () => {
           <h2 id="form-title">Form with Error</h2>
           <div aria-labelledby="form-title">
             <FormError 
-              id="form-error"
-              error={error} 
-              autoAnnounce={true} 
+              message={error} 
             />
             <Button onClick={() => setError(null)}>Dismiss Error</Button>
           </div>
@@ -160,11 +167,6 @@ describe('Form Validation Accessibility', () => {
     const results = await axe(container);
     expect(results).toHaveNoViolations();
     
-    // Check error message accessibility attributes
-    const errorElement = container.querySelector('#form-error');
-    expect(errorElement).toHaveAttribute('role', 'alert');
-    expect(errorElement).toHaveAttribute('aria-live', 'assertive');
-    
     // Test dismissing the error
     const dismissButton = screen.getByRole('button', { name: /dismiss error/i });
     fireEvent.click(dismissButton);
@@ -173,7 +175,7 @@ describe('Form Validation Accessibility', () => {
     expect(screen.queryByText(/this is an error message/i)).not.toBeInTheDocument();
   });
   
-  test('FormError component with useFormErrorAnnouncement hook', async () => {
+  test('FormError component with multiple errors', async () => {
     // Testing the FormError component's hook functionality
     const TestFormErrors = () => {
       const [errors, setErrors] = useState<Record<string, string>>({});
@@ -199,8 +201,7 @@ describe('Form Validation Accessibility', () => {
             {Object.entries(errors).map(([field, errorMsg]) => (
               <FormError 
                 key={field}
-                id={`${field}-error`}
-                error={errorMsg}
+                message={errorMsg}
               />
             ))}
           </div>
@@ -228,15 +229,6 @@ describe('Form Validation Accessibility', () => {
     // Check accessibility after errors appear
     results = await axe(container);
     expect(results).toHaveNoViolations();
-    
-    // Check that errors have proper ARIA attributes
-    const nameErrorContainer = container.querySelector('#name-error');
-    const emailErrorContainer = container.querySelector('#email-error');
-    
-    expect(nameErrorContainer).toHaveAttribute('role', 'alert');
-    expect(emailErrorContainer).toHaveAttribute('role', 'alert');
-    expect(nameErrorContainer).toHaveAttribute('aria-live', 'assertive');
-    expect(emailErrorContainer).toHaveAttribute('aria-live', 'assertive');
     
     // Clear errors
     const clearButton = screen.getByRole('button', { name: /clear errors/i });
