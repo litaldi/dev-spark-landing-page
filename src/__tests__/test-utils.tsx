@@ -1,3 +1,4 @@
+
 import React, { ReactElement } from 'react';
 import { render as rtlRender, RenderOptions, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -9,11 +10,11 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 export * from '@testing-library/react';
 export { default as userEvent } from '@testing-library/user-event';
 
-// Import screen, fireEvent, and waitFor from their correct sources
-export { screen } from '@testing-library/react';
+// Import screen directly from @testing-library/react
+import { screen as testingScreen } from '@testing-library/react';
+export { testingScreen as screen };
 
-// For fireEvent and waitFor, we need to create them or import from dom-testing-library
-// Since they're not available in @testing-library/react v16+, let's create mock versions
+// Create a comprehensive fireEvent object with all the methods tests expect
 const fireEvent = {
   mouseEnter: (element: Element) => {
     const event = new MouseEvent('mouseenter', { bubbles: true });
@@ -31,6 +32,40 @@ const fireEvent = {
   click: (element: Element) => {
     const event = new MouseEvent('click', { bubbles: true });
     element.dispatchEvent(event);
+  },
+  change: (element: Element, eventOptions?: { target: { value: string | number } }) => {
+    const event = new Event('change', { bubbles: true });
+    if (eventOptions?.target && 'value' in element) {
+      (element as any).value = eventOptions.target.value;
+    }
+    element.dispatchEvent(event);
+  },
+  submit: (element: Element) => {
+    const event = new Event('submit', { bubbles: true, cancelable: true });
+    element.dispatchEvent(event);
+  },
+  keyDown: (element: Element, eventOptions?: { key: string; code?: string; keyCode?: number }) => {
+    const event = new KeyboardEvent('keydown', {
+      key: eventOptions?.key || '',
+      code: eventOptions?.code || '',
+      keyCode: eventOptions?.keyCode || 0,
+      bubbles: true
+    });
+    element.dispatchEvent(event);
+  },
+  keyUp: (element: Element, eventOptions?: { key: string; code?: string; keyCode?: number }) => {
+    const event = new KeyboardEvent('keyup', {
+      key: eventOptions?.key || '',
+      code: eventOptions?.code || '',
+      keyCode: eventOptions?.keyCode || 0,
+      bubbles: true
+    });
+    element.dispatchEvent(event);
+  },
+  blur: (element: Element) => {
+    if (element instanceof HTMLElement) {
+      element.blur();
+    }
   }
 };
 
