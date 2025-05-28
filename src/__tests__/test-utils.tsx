@@ -1,4 +1,5 @@
 
+
 import React, { ReactElement } from 'react';
 import { render as rtlRender, RenderOptions, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -13,12 +14,26 @@ export { default as userEvent } from '@testing-library/user-event';
 // Create a screen object that works with our setup
 const screen = {
   getByRole: (role: string, options?: any) => document.querySelector(`[role="${role}"]`) as HTMLElement,
+  getAllByRole: (role: string, options?: any) => Array.from(document.querySelectorAll(`[role="${role}"]`)) as HTMLElement[],
+  queryByRole: (role: string, options?: any) => document.querySelector(`[role="${role}"]`) as HTMLElement | null,
+  findByRole: async (role: string, options?: any) => {
+    return new Promise<HTMLElement>((resolve, reject) => {
+      const attempt = () => {
+        const element = document.querySelector(`[role="${role}"]`) as HTMLElement;
+        if (element) {
+          resolve(element);
+        } else {
+          setTimeout(attempt, 10);
+        }
+      };
+      attempt();
+      setTimeout(() => reject(new Error(`Unable to find role: ${role}`)), 1000);
+    });
+  },
   getByText: (text: string | RegExp) => {
     const walker = document.createTreeWalker(
       document.body,
-      NodeFilter.SHOW_TEXT,
-      null,
-      false
+      NodeFilter.SHOW_TEXT
     );
     
     let node;
@@ -29,6 +44,48 @@ const screen = {
       }
     }
     throw new Error(`Unable to find text: ${text}`);
+  },
+  getAllByText: (text: string | RegExp) => {
+    const walker = document.createTreeWalker(
+      document.body,
+      NodeFilter.SHOW_TEXT
+    );
+    
+    const results: HTMLElement[] = [];
+    let node;
+    while (node = walker.nextNode()) {
+      const content = node.textContent || '';
+      if (typeof text === 'string' ? content.includes(text) : text.test(content)) {
+        const element = node.parentElement as HTMLElement;
+        if (element && !results.includes(element)) {
+          results.push(element);
+        }
+      }
+    }
+    if (results.length === 0) {
+      throw new Error(`Unable to find text: ${text}`);
+    }
+    return results;
+  },
+  queryByText: (text: string | RegExp) => {
+    try {
+      return screen.getByText(text);
+    } catch {
+      return null;
+    }
+  },
+  findByText: async (text: string | RegExp) => {
+    return new Promise<HTMLElement>((resolve, reject) => {
+      const attempt = () => {
+        try {
+          resolve(screen.getByText(text));
+        } catch {
+          setTimeout(attempt, 10);
+        }
+      };
+      attempt();
+      setTimeout(() => reject(new Error(`Unable to find text: ${text}`)), 1000);
+    });
   },
   getByLabelText: (text: string | RegExp) => {
     const labels = Array.from(document.querySelectorAll('label'));
@@ -44,41 +101,40 @@ const screen = {
     }
     throw new Error(`Unable to find label: ${text}`);
   },
-  getByTestId: (testId: string) => document.querySelector(`[data-testid="${testId}"]`) as HTMLElement,
-  queryByText: (text: string | RegExp) => {
-    try {
-      return screen.getByText(text);
-    } catch {
-      return null;
-    }
-  },
-  queryByRole: (role: string, options?: any) => document.querySelector(`[role="${role}"]`) as HTMLElement | null,
-  findByText: async (text: string | RegExp) => {
-    return new Promise((resolve, reject) => {
+  findByLabelText: async (text: string | RegExp) => {
+    return new Promise<HTMLElement>((resolve, reject) => {
       const attempt = () => {
         try {
-          resolve(screen.getByText(text));
+          resolve(screen.getByLabelText(text));
         } catch {
           setTimeout(attempt, 10);
         }
       };
       attempt();
-      setTimeout(() => reject(new Error(`Unable to find text: ${text}`)), 1000);
+      setTimeout(() => reject(new Error(`Unable to find label: ${text}`)), 1000);
     });
   },
-  findByRole: async (role: string, options?: any) => {
-    return new Promise((resolve, reject) => {
-      const attempt = () => {
-        const element = document.querySelector(`[role="${role}"]`) as HTMLElement;
-        if (element) {
-          resolve(element);
-        } else {
-          setTimeout(attempt, 10);
-        }
-      };
-      attempt();
-      setTimeout(() => reject(new Error(`Unable to find role: ${role}`)), 1000);
-    });
+  getByTestId: (testId: string) => document.querySelector(`[data-testid="${testId}"]`) as HTMLElement,
+  queryByTestId: (testId: string) => document.querySelector(`[data-testid="${testId}"]`) as HTMLElement | null,
+  getByPlaceholderText: (text: string | RegExp) => {
+    const elements = Array.from(document.querySelectorAll('input, textarea'));
+    for (const element of elements) {
+      const placeholder = element.getAttribute('placeholder') || '';
+      if (typeof text === 'string' ? placeholder.includes(text) : text.test(placeholder)) {
+        return element as HTMLElement;
+      }
+    }
+    throw new Error(`Unable to find placeholder text: ${text}`);
+  },
+  getByDisplayValue: (value: string | RegExp) => {
+    const elements = Array.from(document.querySelectorAll('input, textarea, select'));
+    for (const element of elements) {
+      const elementValue = (element as HTMLInputElement).value || '';
+      if (typeof value === 'string' ? elementValue === value : value.test(elementValue)) {
+        return element as HTMLElement;
+      }
+    }
+    throw new Error(`Unable to find display value: ${value}`);
   }
 };
 
@@ -282,3 +338,4 @@ const announceToScreenReader = (message: string) => {
 
 // Override the default render with our custom render
 export { customRender as render, simulateHover, simulateFocus, simulateTabNavigation, simulateScreenReader, announceToScreenReader };
+
