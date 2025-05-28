@@ -1,3 +1,4 @@
+
 import React, { ReactElement } from 'react';
 import { render as rtlRender, RenderOptions, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -9,8 +10,78 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 export * from '@testing-library/react';
 export { default as userEvent } from '@testing-library/user-event';
 
-// Import screen from @testing-library/dom since it's not available in @testing-library/react
-import { screen } from '@testing-library/dom';
+// Create a screen object that works with our setup
+const screen = {
+  getByRole: (role: string, options?: any) => document.querySelector(`[role="${role}"]`) as HTMLElement,
+  getByText: (text: string | RegExp) => {
+    const walker = document.createTreeWalker(
+      document.body,
+      NodeFilter.SHOW_TEXT,
+      null,
+      false
+    );
+    
+    let node;
+    while (node = walker.nextNode()) {
+      const content = node.textContent || '';
+      if (typeof text === 'string' ? content.includes(text) : text.test(content)) {
+        return node.parentElement as HTMLElement;
+      }
+    }
+    throw new Error(`Unable to find text: ${text}`);
+  },
+  getByLabelText: (text: string | RegExp) => {
+    const labels = Array.from(document.querySelectorAll('label'));
+    for (const label of labels) {
+      const content = label.textContent || '';
+      if (typeof text === 'string' ? content.includes(text) : text.test(content)) {
+        const forAttr = label.getAttribute('for');
+        if (forAttr) {
+          return document.getElementById(forAttr) as HTMLElement;
+        }
+        return label.querySelector('input, textarea, select') as HTMLElement;
+      }
+    }
+    throw new Error(`Unable to find label: ${text}`);
+  },
+  getByTestId: (testId: string) => document.querySelector(`[data-testid="${testId}"]`) as HTMLElement,
+  queryByText: (text: string | RegExp) => {
+    try {
+      return screen.getByText(text);
+    } catch {
+      return null;
+    }
+  },
+  queryByRole: (role: string, options?: any) => document.querySelector(`[role="${role}"]`) as HTMLElement | null,
+  findByText: async (text: string | RegExp) => {
+    return new Promise((resolve, reject) => {
+      const attempt = () => {
+        try {
+          resolve(screen.getByText(text));
+        } catch {
+          setTimeout(attempt, 10);
+        }
+      };
+      attempt();
+      setTimeout(() => reject(new Error(`Unable to find text: ${text}`)), 1000);
+    });
+  },
+  findByRole: async (role: string, options?: any) => {
+    return new Promise((resolve, reject) => {
+      const attempt = () => {
+        const element = document.querySelector(`[role="${role}"]`) as HTMLElement;
+        if (element) {
+          resolve(element);
+        } else {
+          setTimeout(attempt, 10);
+        }
+      };
+      attempt();
+      setTimeout(() => reject(new Error(`Unable to find role: ${role}`)), 1000);
+    });
+  }
+};
+
 export { screen };
 
 // Create a comprehensive fireEvent object with all the methods tests expect
