@@ -1,14 +1,24 @@
 
 import React, { ReactElement } from 'react';
-import { render, RenderOptions } from '@testing-library/react';
+import { render as rtlRender, RenderOptions } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { ThemeProvider } from '@/components/theme/ThemeProvider';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 // Re-export everything from testing libraries
 export * from '@testing-library/react';
-export { screen, fireEvent, waitFor, act } from '@testing-library/react';
 export { default as userEvent } from '@testing-library/user-event';
+
+// Import specific utilities that we'll re-export
+import { 
+  screen, 
+  fireEvent, 
+  waitFor, 
+  act 
+} from '@testing-library/react';
+
+// Re-export the imported utilities
+export { screen, fireEvent, waitFor, act };
 
 // Create a custom render function that includes providers
 const AllProviders = ({ children }: { children: React.ReactNode }) => {
@@ -32,18 +42,16 @@ const AllProviders = ({ children }: { children: React.ReactNode }) => {
 const customRender = (
   ui: ReactElement,
   options?: Omit<RenderOptions, 'wrapper'>
-) => render(ui, { wrapper: AllProviders, ...options });
+) => rtlRender(ui, { wrapper: AllProviders, ...options });
 
 // Helper function for testing hover effects
 const simulateHover = (element: Element) => {
-  const { fireEvent } = require('@testing-library/react');
   fireEvent.mouseEnter(element);
   fireEvent.mouseOver(element);
 };
 
 // Helper function for testing focus effects
 const simulateFocus = (element: Element) => {
-  const { fireEvent } = require('@testing-library/react');
   fireEvent.focus(element);
 };
 

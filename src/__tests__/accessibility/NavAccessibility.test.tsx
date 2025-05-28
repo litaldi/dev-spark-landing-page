@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent } from '../test-utils';
 import { BrowserRouter } from 'react-router-dom';
 import Navbar from '@/components/landing/Navbar';
 import NavbarContent from '@/components/landing/NavbarContent';

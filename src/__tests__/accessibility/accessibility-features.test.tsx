@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen } from '../test-utils';
 import { axe } from 'jest-axe';
 import { a11yTests } from '../utils/a11y-test-utils';
 

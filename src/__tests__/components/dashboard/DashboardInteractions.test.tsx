@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent } from '../../test-utils';
 import { setupLocalStorageMock } from './__mocks__/dashboardMocks';
 import { setupDashboardActionsMocks, renderDashboard } from './utils/dashboardTestUtils';
 
