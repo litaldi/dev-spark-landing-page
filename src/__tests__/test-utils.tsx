@@ -1,6 +1,5 @@
-
 import React, { ReactElement } from 'react';
-import { render as rtlRender, RenderOptions, act, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render as rtlRender, RenderOptions, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
 import { ThemeProvider } from '@/components/theme/ThemeProvider';
@@ -10,8 +9,15 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 export * from '@testing-library/react';
 export { default as userEvent } from '@testing-library/user-event';
 
+// Import and re-export the utilities that are causing issues
+import { 
+  screen as testingScreen, 
+  fireEvent as testingFireEvent, 
+  waitFor as testingWaitFor 
+} from '@testing-library/react';
+
 // Re-export the imported utilities
-export { screen, fireEvent, waitFor, act };
+export { testingScreen as screen, testingFireEvent as fireEvent, testingWaitFor as waitFor, act };
 
 // Create a custom render function that includes providers
 const AllProviders = ({ children }: { children: React.ReactNode }) => {
