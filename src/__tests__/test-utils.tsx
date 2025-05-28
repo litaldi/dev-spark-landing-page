@@ -1,6 +1,6 @@
 import React, { ReactElement } from 'react';
-import { render as rtlRender, RenderOptions } from '@testing-library/react';
-import { screen, fireEvent, waitFor, act } from '@testing-library/react';
+import { render as rtlRender, RenderOptions, act } from '@testing-library/react';
+import { screen, fireEvent, waitFor } from '@testing-library/dom';
 import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
 import { ThemeProvider } from '@/components/theme/ThemeProvider';
