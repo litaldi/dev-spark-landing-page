@@ -1,61 +1,65 @@
 
-import { clsx, type ClassValue } from "clsx"
+import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
 
-/**
- * Combines multiple class names into a single string using tailwind-merge
- */
-export function cn(...inputs: ClassValue[]): string {
+export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
 /**
- * Formats a date according to the specified format
+ * Formats a date to a readable string
  */
-export function formatDate(date: Date | string, options: Intl.DateTimeFormatOptions = {}): string {
-  const defaultOptions: Intl.DateTimeFormatOptions = {
+export function formatDate(date: Date | string): string {
+  const d = new Date(date);
+  return d.toLocaleDateString('en-US', {
     year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    ...options
-  }
-  
-  return new Date(date).toLocaleDateString(undefined, defaultOptions)
+    month: 'long',
+    day: 'numeric'
+  });
 }
 
 /**
- * Truncates a string if it exceeds the maximum length
+ * Truncates text to a specified length
  */
-export function truncate(str: string, maxLength: number = 100): string {
-  if (str.length <= maxLength) return str
-  return str.slice(0, maxLength) + '...'
+export function truncateText(text: string, maxLength: number): string {
+  if (text.length <= maxLength) return text;
+  return text.slice(0, maxLength - 3) + '...';
 }
 
 /**
- * Generates a unique ID
+ * Generates a random ID
  */
 export function generateId(): string {
-  return Math.random().toString(36).substring(2, 9)
+  return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 }
 
 /**
- * Debounces a function to limit how often it can be called
+ * Debounce function for performance optimization
  */
 export function debounce<T extends (...args: any[]) => any>(
   func: T,
   wait: number
 ): (...args: Parameters<T>) => void {
-  let timeout: ReturnType<typeof setTimeout> | null = null
-  
-  return function(...args: Parameters<T>) {
-    const later = () => {
-      timeout = null
-      func(...args)
+  let timeout: NodeJS.Timeout;
+  return (...args: Parameters<T>) => {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func(...args), wait);
+  };
+}
+
+/**
+ * Throttle function for performance optimization
+ */
+export function throttle<T extends (...args: any[]) => any>(
+  func: T,
+  limit: number
+): (...args: Parameters<T>) => void {
+  let inThrottle: boolean;
+  return (...args: Parameters<T>) => {
+    if (!inThrottle) {
+      func(...args);
+      inThrottle = true;
+      setTimeout(() => inThrottle = false, limit);
     }
-    
-    if (timeout !== null) {
-      clearTimeout(timeout)
-    }
-    timeout = setTimeout(later, wait)
-  }
+  };
 }

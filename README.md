@@ -1,73 +1,185 @@
-# Welcome to your Lovable project
 
-## Project info
+# DevAI Learning Platform
 
-**URL**: https://lovable.dev/projects/bb84cd2a-8d80-4971-887b-076692b64f52
+A modern, accessible learning platform built with React and TypeScript. This application provides an interactive dashboard, personalized learning paths, and AI-powered recommendations to help users enhance their skills and achieve their learning goals.
 
-## How can I edit this code?
+## 🔗 Live Demo
 
-There are several ways of editing your application.
+[View Live Demo](https://bb84cd2a-8d80-4971-887b-076692b64f52.lovableproject.com) 
 
-**Use Lovable**
+## ✨ Features
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/bb84cd2a-8d80-4971-887b-076692b64f52) and start prompting.
+- **Personalized Learning Dashboard**: Track progress, view recommendations, and manage daily goals
+- **AI-Powered Study Assistant**: Get real-time help and smart content recommendations 
+- **Code Review Tool**: Submit code snippets for automated review and feedback
+- **Progress Tracking**: Visualize learning progress with interactive charts and statistics
+- **Gamification Elements**: Achievement badges and streak tracking to maintain motivation
+- **Collaborative Learning**: Join study groups and share resources with peers
+- **Fully Responsive Design**: Optimized for all devices from mobile to desktop
+- **Accessibility-First Approach**: WCAG compliant with robust keyboard navigation support
+- **Enterprise-Grade Security**: Input sanitization, CSRF protection, and rate limiting
 
-Changes made via Lovable will be committed automatically to this repo.
+## 🚀 Installation
 
-**Use your preferred IDE**
+Follow these steps to set up the project locally:
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+```bash
+# Clone the repository
+git clone https://github.com/your-username/devai-learning-platform.git
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+# Navigate to project directory
+cd devai-learning-platform
 
-Follow these steps:
+# Install dependencies
+npm install
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Start the development server
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+Your app should now be running on [http://localhost:5173](http://localhost:5173)
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## 📁 Folder Structure
 
-**Use GitHub Codespaces**
+```
+src/
+├── components/     # UI components organized by feature
+│   ├── a11y/       # Accessibility-specific components
+│   ├── auth/       # Authentication components
+│   ├── dashboard/  # Dashboard-related components
+│   ├── landing/    # Landing page components
+│   ├── ui/         # Generic UI components (shadcn/ui)
+│   └── ...
+├── hooks/          # Custom React hooks
+├── lib/            # Utility functions and modules
+│   ├── keyboard-utils/  # Keyboard navigation utilities
+│   ├── security/   # Security-related utilities
+│   └── ...
+├── pages/          # Main application pages
+├── __tests__/      # Test files organized by type
+├── main.tsx        # Application entry point
+└── ...
+```
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## 🛠️ Tech Stack
 
-## What technologies are used for this project?
+- **Frontend Framework**: React 18 with TypeScript
+- **Styling**: Tailwind CSS with shadcn/ui components
+- **State Management**: React Query and React Context
+- **Routing**: React Router
+- **Form Handling**: React Hook Form with Zod validation
+- **UI Components**: 
+  - Radix UI primitives
+  - shadcn/ui component system
+  - Lucide React for icons
+- **Testing**: Jest, Testing Library, and jest-axe for accessibility testing
+- **Data Visualization**: Recharts
+- **Toast Notifications**: Sonner
+- **Animations**: Framer Motion
+- **Build Tool**: Vite
 
-This project is built with:
+## ♿ Accessibility & Security
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+### Accessibility Features
 
-## How can I deploy this project?
+- WCAG 2.1 AA compliance
+- Keyboard navigation and focus management
+- Screen reader announcements
+- Skip navigation links
+- High contrast mode option
+- Text size adjustment controls
+- Robust ARIA attributes throughout
+- Accessible forms with clear error handling
 
-Simply open [Lovable](https://lovable.dev/projects/bb84cd2a-8d80-4971-887b-076692b64f52) and click on Share -> Publish.
+### Security Measures
 
-## Can I connect a custom domain to my Lovable project?
+- Input sanitization and validation using DOMPurify
+- CSRF protection for form submissions
+- Rate limiting to prevent brute force attacks
+- Strong password requirements
+- Content security policies
+- Prevention of common security vulnerabilities (XSS, CSRF)
 
-Yes, you can!
+## 🔧 Environment Variables
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+Create a `.env` file in the root directory:
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+```
+# API Configuration
+VITE_API_URL=your_api_url_here
+VITE_API_KEY=your_api_key_here
+
+# Authentication
+VITE_AUTH_DOMAIN=your_auth_domain_here
+
+# Feature Flags
+VITE_ENABLE_AI_FEATURES=true
+```
+
+## 📋 Available Scripts
+
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start development server |
+| `npm run build` | Build for production |
+| `npm run preview` | Preview production build locally |
+| `npm test` | Run tests |
+| `npm test -- --coverage` | Run tests with coverage report |
+| `npm run lint` | Run ESLint |
+| `npm run format` | Format code with Prettier |
+
+## 🧪 Testing
+
+This project uses Jest and React Testing Library for testing. All tests are located in the `src/__tests__` directory.
+
+```bash
+# Run all tests
+npm test
+
+# Run tests in watch mode
+npm test -- --watch
+
+# Run specific test file
+npm test -- src/__tests__/components/ui/Input.test.tsx
+
+# Generate test coverage report
+npm test -- --coverage
+```
+
+The project includes:
+- Unit tests for components
+- Integration tests for feature workflows
+- Accessibility tests with jest-axe
+- Hook tests with @testing-library/react-hooks
+
+## 🤝 Contributing
+
+Contributions are welcome! Please follow these steps:
+
+1. Fork the repository
+2. Create a new branch: `git checkout -b feature/amazing-feature`
+3. Make your changes and commit them: `git commit -m 'Add amazing feature'`
+4. Push to the branch: `git push origin feature/amazing-feature`
+5. Open a pull request
+
+Please ensure your code passes all tests and follows the project's coding standards.
+
+## 📄 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## 👏 Acknowledgements
+
+- [React](https://reactjs.org/)
+- [TypeScript](https://www.typescriptlang.org/)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [shadcn/ui](https://ui.shadcn.com/)
+- [Radix UI](https://www.radix-ui.com/)
+- [Lucide Icons](https://lucide.dev/)
+- [Jest](https://jestjs.io/)
+- [React Testing Library](https://testing-library.com/)
+- All contributors who have helped shape this project
+
+---
+
+*For support or questions, please contact the development team.*

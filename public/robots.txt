@@ -1,14 +1,12 @@
-User-agent: Googlebot
-Allow: /
-
-User-agent: Bingbot
-Allow: /
-
-User-agent: Twitterbot
-Allow: /
-
-User-agent: facebookexternalhit
-Allow: /
 
 User-agent: *
 Allow: /
+
+# Sitemap location
+Sitemap: https://bb84cd2a-8d80-4971-887b-076692b64f52.lovableproject.com/sitemap.xml
+
+# Common crawl rules
+Disallow: /api/
+Disallow: /admin/
+Disallow: /_next/
+Disallow: /private/

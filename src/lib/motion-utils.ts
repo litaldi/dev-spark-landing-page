@@ -1,119 +1,41 @@
 
 /**
- * Motion utility functions for animation and transition management
+ * Motion utilities for handling reduced motion preferences
  */
 
 /**
  * Applies reduced motion styles to the document
- * Used to respect user preferences for reduced motion
- * 
- * @param shouldReduce Whether motion should be reduced
+ * @param shouldReduce Whether to apply reduced motion styles
  */
-export const applyReducedMotionStyles = (shouldReduce: boolean): void => {
+export function applyReducedMotionStyles(shouldReduce: boolean): void {
   if (shouldReduce) {
     document.documentElement.classList.add('reduce-motion');
-    
-    // Add a style element with reduced motion styles if it doesn't exist
-    if (!document.getElementById('reduced-motion-styles')) {
-      const style = document.createElement('style');
-      style.id = 'reduced-motion-styles';
-      style.textContent = `
-        .reduce-motion * {
-          animation-duration: 0.001ms !important;
-          animation-iteration-count: 1 !important;
-          transition-duration: 0.001ms !important;
-          scroll-behavior: auto !important;
-        }
-      `;
-      document.head.appendChild(style);
-    }
   } else {
     document.documentElement.classList.remove('reduce-motion');
-    const style = document.getElementById('reduced-motion-styles');
-    if (style) {
-      style.remove();
-    }
   }
-};
+}
 
 /**
- * Creates a smooth scroll effect to an element
- * With fallback for browsers that don't support smooth scrolling
- * 
- * @param elementId ID of the element to scroll to
- * @param options Scroll options
+ * Checks if user prefers reduced motion
  */
-export const smoothScrollTo = (
-  elementId: string, 
-  options: { 
-    offset?: number; 
-    behavior?: ScrollBehavior;
-    respectReducedMotion?: boolean;
-  } = {}
-): void => {
-  const { 
-    offset = 0, 
-    behavior = 'smooth',
-    respectReducedMotion = true
-  } = options;
-  
-  const element = document.getElementById(elementId);
-  if (!element) return;
-  
-  const shouldUseReducedMotion = 
-    respectReducedMotion && 
-    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  
-  const actualBehavior = shouldUseReducedMotion ? 'auto' : behavior;
-  
-  const elementPosition = element.getBoundingClientRect().top;
-  const offsetPosition = elementPosition + window.pageYOffset - offset;
-  
-  window.scrollTo({
-    top: offsetPosition,
-    behavior: actualBehavior,
-  });
-};
+export function prefersReducedMotion(): boolean {
+  if (typeof window === 'undefined') return false;
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
 
 /**
- * Detects if the browser supports smooth scrolling
- * 
- * @returns Boolean indicating if smooth scrolling is supported
+ * Creates a safe animation configuration based on motion preferences
  */
-export const isSmoothScrollSupported = (): boolean => {
-  return 'scrollBehavior' in document.documentElement.style;
-};
-
-/**
- * Returns a performance-optimized animation frame request
- * 
- * @param callback Function to call on animation frame
- * @returns Request ID that can be used to cancel the request
- */
-export const requestOptimizedAnimationFrame = (callback: FrameRequestCallback): number => {
-  // Use requestAnimationFrame if available
-  if ('requestAnimationFrame' in window) {
-    return window.requestAnimationFrame(callback);
+export function createSafeAnimation(animation: any) {
+  const shouldReduce = prefersReducedMotion();
+  
+  if (shouldReduce) {
+    return {
+      ...animation,
+      duration: 0.001,
+      transition: { duration: 0.001 }
+    };
   }
   
-  // Fallback to setTimeout with proper typing for compatibility
-  // Convert to unknown first, then to number to satisfy TypeScript
-  return setTimeout(() => callback(performance.now()), 16) as unknown as number;
-};
-
-/**
- * Cancels an animation frame request
- * 
- * @param requestId Request ID to cancel
- */
-export const cancelOptimizedAnimationFrame = (requestId: number): void => {
-  // Use cancelAnimationFrame if available
-  if ('cancelAnimationFrame' in window) {
-    window.cancelAnimationFrame(requestId);
-    return;
-  }
-  
-  // Fallback to clearTimeout with proper handling
-  // Convert to unknown first, then to NodeJS.Timeout to satisfy TypeScript
-  clearTimeout(requestId as unknown as NodeJS.Timeout);
-};
+  return animation;
+}
