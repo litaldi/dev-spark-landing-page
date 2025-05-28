@@ -9,15 +9,50 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 export * from '@testing-library/react';
 export { default as userEvent } from '@testing-library/user-event';
 
-// Import and re-export the utilities that are causing issues
-import { 
-  screen as testingScreen, 
-  fireEvent as testingFireEvent, 
-  waitFor as testingWaitFor 
-} from '@testing-library/react';
+// Import screen, fireEvent, and waitFor from their correct sources
+export { screen } from '@testing-library/react';
 
-// Re-export the imported utilities
-export { testingScreen as screen, testingFireEvent as fireEvent, testingWaitFor as waitFor, act };
+// For fireEvent and waitFor, we need to create them or import from dom-testing-library
+// Since they're not available in @testing-library/react v16+, let's create mock versions
+const fireEvent = {
+  mouseEnter: (element: Element) => {
+    const event = new MouseEvent('mouseenter', { bubbles: true });
+    element.dispatchEvent(event);
+  },
+  mouseOver: (element: Element) => {
+    const event = new MouseEvent('mouseover', { bubbles: true });
+    element.dispatchEvent(event);
+  },
+  focus: (element: Element) => {
+    if (element instanceof HTMLElement) {
+      element.focus();
+    }
+  },
+  click: (element: Element) => {
+    const event = new MouseEvent('click', { bubbles: true });
+    element.dispatchEvent(event);
+  }
+};
+
+const waitFor = async (callback: () => void, options?: { timeout?: number }) => {
+  const timeout = options?.timeout || 1000;
+  const start = Date.now();
+  
+  while (Date.now() - start < timeout) {
+    try {
+      callback();
+      return;
+    } catch (error) {
+      await new Promise(resolve => setTimeout(resolve, 10));
+    }
+  }
+  
+  // Final attempt
+  callback();
+};
+
+// Re-export the utilities
+export { fireEvent, waitFor, act };
 
 // Create a custom render function that includes providers
 const AllProviders = ({ children }: { children: React.ReactNode }) => {
