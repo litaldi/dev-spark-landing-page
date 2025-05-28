@@ -1,4 +1,3 @@
-
 import React, { ReactElement } from 'react';
 import { render as rtlRender, RenderOptions, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -10,9 +9,9 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 export * from '@testing-library/react';
 export { default as userEvent } from '@testing-library/user-event';
 
-// Import screen directly from @testing-library/react
-import { screen as testingScreen } from '@testing-library/react';
-export { testingScreen as screen };
+// Import screen from @testing-library/dom since it's not available in @testing-library/react
+import { screen } from '@testing-library/dom';
+export { screen };
 
 // Create a comprehensive fireEvent object with all the methods tests expect
 const fireEvent = {
