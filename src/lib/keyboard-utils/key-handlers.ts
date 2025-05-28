@@ -1,73 +1,117 @@
 
 /**
- * Utility functions for handling keyboard interactions
+ * Keyboard event handlers and utilities
  */
 
 /**
- * Handle Enter and Space key presses for interactive elements
+ * Handles Enter and Space key events for custom interactive elements
  * @param callback Function to execute when Enter or Space is pressed
- * @returns Cleanup function to remove event listeners
+ * @returns Keyboard event handler
  */
-export const handleEnterAndSpace = (callback: () => void): (() => void) => {
-  const handleKeyDown = (e: KeyboardEvent) => {
-    if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
-      e.preventDefault();
+export const handleEnterAndSpace = (callback: () => void) => {
+  return (event: React.KeyboardEvent) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
       callback();
     }
-  };
-  
-  document.addEventListener('keydown', handleKeyDown);
-  
-  return () => {
-    document.removeEventListener('keydown', handleKeyDown);
   };
 };
 
 /**
- * Handle arrow key navigation
- * @param callbacks Object containing functions for each arrow key direction
- * @returns Cleanup function to remove event listeners
+ * Handles arrow key navigation for lists and menus
+ * @param items Array of focusable elements
+ * @param currentIndex Current focused item index
+ * @param onIndexChange Callback when index changes
+ * @param options Configuration options
  */
-export const handleArrowKeys = (callbacks: {
-  up?: () => void;
-  down?: () => void;
-  left?: () => void;
-  right?: () => void;
-}): (() => void) => {
-  const handleKeyDown = (e: KeyboardEvent) => {
-    switch (e.key) {
-      case 'ArrowUp':
-        if (callbacks.up) {
-          e.preventDefault();
-          callbacks.up();
-        }
-        break;
-      case 'ArrowDown':
-        if (callbacks.down) {
-          e.preventDefault();
-          callbacks.down();
-        }
-        break;
-      case 'ArrowLeft':
-        if (callbacks.left) {
-          e.preventDefault();
-          callbacks.left();
-        }
-        break;
-      case 'ArrowRight':
-        if (callbacks.right) {
-          e.preventDefault();
-          callbacks.right();
-        }
-        break;
-      default:
-        break;
+export const handleArrowKeys = (
+  items: HTMLElement[],
+  currentIndex: number,
+  onIndexChange: (index: number) => void,
+  options: {
+    loop?: boolean;
+    horizontal?: boolean;
+    preventDefault?: boolean;
+  } = {}
+) => {
+  const { loop = true, horizontal = false, preventDefault = true } = options;
+  
+  return (event: React.KeyboardEvent) => {
+    const { key } = event;
+    let newIndex = currentIndex;
+    
+    const upKey = horizontal ? 'ArrowLeft' : 'ArrowUp';
+    const downKey = horizontal ? 'ArrowRight' : 'ArrowDown';
+    
+    if (key === upKey) {
+      if (preventDefault) event.preventDefault();
+      newIndex = currentIndex > 0 ? currentIndex - 1 : (loop ? items.length - 1 : currentIndex);
+    } else if (key === downKey) {
+      if (preventDefault) event.preventDefault();
+      newIndex = currentIndex < items.length - 1 ? currentIndex + 1 : (loop ? 0 : currentIndex);
+    } else if (key === 'Home') {
+      if (preventDefault) event.preventDefault();
+      newIndex = 0;
+    } else if (key === 'End') {
+      if (preventDefault) event.preventDefault();
+      newIndex = items.length - 1;
+    }
+    
+    if (newIndex !== currentIndex) {
+      onIndexChange(newIndex);
+      items[newIndex]?.focus();
     }
   };
+};
+
+/**
+ * Creates a keyboard navigation handler for dropdown menus
+ */
+export const createDropdownKeyHandler = (
+  items: HTMLElement[],
+  onClose: () => void,
+  onSelect?: (index: number) => void
+) => {
+  let currentIndex = -1;
   
-  document.addEventListener('keydown', handleKeyDown);
-  
-  return () => {
-    document.removeEventListener('keydown', handleKeyDown);
+  return (event: React.KeyboardEvent) => {
+    switch (event.key) {
+      case 'Escape':
+        event.preventDefault();
+        onClose();
+        break;
+        
+      case 'ArrowDown':
+        event.preventDefault();
+        currentIndex = currentIndex < items.length - 1 ? currentIndex + 1 : 0;
+        items[currentIndex]?.focus();
+        break;
+        
+      case 'ArrowUp':
+        event.preventDefault();
+        currentIndex = currentIndex > 0 ? currentIndex - 1 : items.length - 1;
+        items[currentIndex]?.focus();
+        break;
+        
+      case 'Enter':
+      case ' ':
+        event.preventDefault();
+        if (currentIndex >= 0 && onSelect) {
+          onSelect(currentIndex);
+        }
+        break;
+        
+      case 'Home':
+        event.preventDefault();
+        currentIndex = 0;
+        items[currentIndex]?.focus();
+        break;
+        
+      case 'End':
+        event.preventDefault();
+        currentIndex = items.length - 1;
+        items[currentIndex]?.focus();
+        break;
+    }
   };
 };

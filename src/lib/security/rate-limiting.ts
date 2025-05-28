@@ -1,71 +1,114 @@
 
 /**
- * Rate limiting utility to prevent brute force attacks
- * @param key Identifier for the rate limit
- * @param maxAttempts Maximum number of attempts allowed
- * @param timeWindow Time window in ms (default: 60000ms = 1 minute)
- * @returns Boolean indicating if rate limit is exceeded
+ * Client-side rate limiting utilities
  */
-export function isRateLimited(key: string, maxAttempts: number, timeWindow = 60000): boolean {
+
+interface RateLimitEntry {
+  count: number;
+  firstAttempt: number;
+  windowStart: number;
+}
+
+const RATE_LIMIT_WINDOW = 60000; // 1 minute in milliseconds
+const RATE_LIMIT_STORAGE_KEY = 'rate_limits';
+
+/**
+ * Checks if an action is rate limited
+ * @param key Unique identifier for the action
+ * @param maxAttempts Maximum attempts allowed in the time window
+ * @param windowMs Time window in milliseconds (default: 1 minute)
+ */
+export function isRateLimited(
+  key: string, 
+  maxAttempts: number, 
+  windowMs: number = RATE_LIMIT_WINDOW
+): boolean {
   try {
     const now = Date.now();
-    const storageKey = `rateLimit_${key}`;
-    const storedData = localStorage.getItem(storageKey);
+    const stored = localStorage.getItem(RATE_LIMIT_STORAGE_KEY);
+    const rateLimits: Record<string, RateLimitEntry> = stored ? JSON.parse(stored) : {};
     
-    let attempts: {timestamp: number}[] = [];
-    if (storedData) {
-      attempts = JSON.parse(storedData);
-      // Filter out attempts outside the time window
-      attempts = attempts.filter(attempt => now - attempt.timestamp < timeWindow);
+    const entry = rateLimits[key];
+    
+    // If no entry exists, create one and allow the request
+    if (!entry) {
+      rateLimits[key] = {
+        count: 1,
+        firstAttempt: now,
+        windowStart: now
+      };
+      localStorage.setItem(RATE_LIMIT_STORAGE_KEY, JSON.stringify(rateLimits));
+      return false;
     }
     
-    // Check if max attempts exceeded
-    if (attempts.length >= maxAttempts) {
+    // Check if we're outside the time window
+    if (now - entry.windowStart > windowMs) {
+      // Reset the window
+      rateLimits[key] = {
+        count: 1,
+        firstAttempt: now,
+        windowStart: now
+      };
+      localStorage.setItem(RATE_LIMIT_STORAGE_KEY, JSON.stringify(rateLimits));
+      return false;
+    }
+    
+    // Check if we've exceeded the rate limit
+    if (entry.count >= maxAttempts) {
       return true;
     }
     
-    // Add new attempt
-    attempts.push({ timestamp: now });
-    localStorage.setItem(storageKey, JSON.stringify(attempts));
+    // Increment the count
+    entry.count++;
+    localStorage.setItem(RATE_LIMIT_STORAGE_KEY, JSON.stringify(rateLimits));
     return false;
+    
   } catch (error) {
     console.error('Rate limiting error:', error);
-    return false; // Fail open if storage is unavailable
+    // Fail open - allow the request if there's an error
+    return false;
   }
 }
 
 /**
- * Detects storage tampering attempts
- * This helps protect against some client-side attacks
+ * Clears rate limit data for a specific key
  */
-export function detectStorageTampering(key: string, expectedType: 'string' | 'boolean' | 'number' | 'object'): boolean {
+export function clearRateLimit(key: string): void {
   try {
-    const value = localStorage.getItem(key);
+    const stored = localStorage.getItem(RATE_LIMIT_STORAGE_KEY);
+    if (!stored) return;
     
-    // Check if the item exists
-    if (!value) return false;
+    const rateLimits: Record<string, RateLimitEntry> = JSON.parse(stored);
+    delete rateLimits[key];
+    localStorage.setItem(RATE_LIMIT_STORAGE_KEY, JSON.stringify(rateLimits));
+  } catch (error) {
+    console.error('Clear rate limit error:', error);
+  }
+}
+
+/**
+ * Gets remaining attempts for a rate limited action
+ */
+export function getRemainingAttempts(key: string, maxAttempts: number): number {
+  try {
+    const stored = localStorage.getItem(RATE_LIMIT_STORAGE_KEY);
+    if (!stored) return maxAttempts;
     
-    // Type checking based on expected type
-    switch (expectedType) {
-      case 'string':
-        return typeof value === 'string';
-      case 'boolean':
-        const boolValue = JSON.parse(value);
-        return typeof boolValue === 'boolean';
-      case 'number':
-        const numValue = JSON.parse(value);
-        return typeof numValue === 'number' && !isNaN(numValue);
-      case 'object':
-        try {
-          const objValue = JSON.parse(value);
-          return typeof objValue === 'object' && objValue !== null;
-        } catch {
-          return false;
-        }
-      default:
-        return false;
+    const rateLimits: Record<string, RateLimitEntry> = JSON.parse(stored);
+    const entry = rateLimits[key];
+    
+    if (!entry) return maxAttempts;
+    
+    const now = Date.now();
+    
+    // Check if we're outside the time window
+    if (now - entry.windowStart > RATE_LIMIT_WINDOW) {
+      return maxAttempts;
     }
-  } catch {
-    return false; // Any parsing error indicates tampering
+    
+    return Math.max(0, maxAttempts - entry.count);
+  } catch (error) {
+    console.error('Get remaining attempts error:', error);
+    return maxAttempts;
   }
 }

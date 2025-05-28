@@ -7,6 +7,8 @@ import { SkipNavLink, SkipNavContent } from "@/components/a11y/skip-nav";
 import { useToast } from "@/hooks/use-toast";
 import { AlertError } from "@/components/auth/AlertError";
 import { EnhancedDashboardContent } from "@/components/dashboard/EnhancedDashboardContent";
+import { OnboardingOverlay } from "@/components/onboarding/OnboardingOverlay";
+import { AccessibilityProvider } from "@/components/a11y/AccessibilityProvider";
 
 const Dashboard = () => {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
@@ -14,6 +16,7 @@ const Dashboard = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isFirstTimeUser, setIsFirstTimeUser] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [showOnboarding, setShowOnboarding] = useState<boolean>(false);
   const navigate = useNavigate();
   
   useEffect(() => {
@@ -39,37 +42,51 @@ const Dashboard = () => {
     
     // Check if first-time user (no lessons completed)
     const onboardingComplete = localStorage.getItem("onboardingComplete");
+    const onboardingOverlayComplete = localStorage.getItem("onboarding-completed");
+    
     setIsFirstTimeUser(onboardingComplete !== "true");
+    setShowOnboarding(onboardingOverlayComplete !== "true" && onboardingComplete !== "true");
 
     return () => clearTimeout(timer);
   }, [navigate]);
+
+  const handleOnboardingComplete = () => {
+    setShowOnboarding(false);
+  };
 
   if (!isLoggedIn) {
     return null; // Will redirect in useEffect
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
-      <SkipNavLink>Skip to content</SkipNavLink>
-      <Navbar />
-      <main className="flex-1 container py-6 md:py-10 lg:py-12" id="main-content">
-        <SkipNavContent>
-          <AlertError 
-            message={error}
-            onClose={() => setError(null)}
-            className="mb-6"
-          />
-          
-          <EnhancedDashboardContent
-            userName={userName}
-            isFirstTimeUser={isFirstTimeUser}
-            isLoading={isLoading}
-            onError={setError}
-          />
-        </SkipNavContent>
-      </main>
-      <Footer />
-    </div>
+    <AccessibilityProvider>
+      <div className="min-h-screen flex flex-col bg-background">
+        <SkipNavLink>Skip to content</SkipNavLink>
+        <Navbar />
+        <main className="flex-1 container py-6 md:py-10 lg:py-12" id="main-content">
+          <SkipNavContent>
+            <AlertError 
+              message={error}
+              onClose={() => setError(null)}
+              className="mb-6"
+            />
+            
+            <EnhancedDashboardContent
+              userName={userName}
+              isFirstTimeUser={isFirstTimeUser}
+              isLoading={isLoading}
+              onError={setError}
+            />
+          </SkipNavContent>
+        </main>
+        <Footer />
+        
+        {/* Onboarding Overlay */}
+        {showOnboarding && (
+          <OnboardingOverlay onComplete={handleOnboardingComplete} />
+        )}
+      </div>
+    </AccessibilityProvider>
   );
 };
 

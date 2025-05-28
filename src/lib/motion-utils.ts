@@ -1,41 +1,45 @@
 
 /**
- * Motion utilities for handling reduced motion preferences
+ * Motion and animation utilities for accessibility and performance
  */
 
 /**
- * Applies reduced motion styles to the document
- * @param shouldReduce Whether to apply reduced motion styles
+ * Checks if user prefers reduced motion
  */
-export function applyReducedMotionStyles(shouldReduce: boolean): void {
+export const prefersReducedMotion = (): boolean => {
+  if (typeof window === 'undefined') return false;
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+};
+
+/**
+ * Applies reduced motion styles when needed
+ */
+export const applyReducedMotionStyles = (forceReduce: boolean = false): void => {
+  const shouldReduce = forceReduce || prefersReducedMotion();
+  
   if (shouldReduce) {
     document.documentElement.classList.add('reduce-motion');
   } else {
     document.documentElement.classList.remove('reduce-motion');
   }
-}
+};
 
 /**
- * Checks if user prefers reduced motion
+ * Creates a motion-safe animation class
  */
-export function prefersReducedMotion(): boolean {
-  if (typeof window === 'undefined') return false;
-  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-}
+export const motionSafeClass = (animationClass: string): string => {
+  return prefersReducedMotion() ? '' : animationClass;
+};
 
 /**
- * Creates a safe animation configuration based on motion preferences
+ * Safe animation helper for React components
  */
-export function createSafeAnimation(animation: any) {
-  const shouldReduce = prefersReducedMotion();
+export const useMotionSafe = () => {
+  const isMotionSafe = !prefersReducedMotion();
   
-  if (shouldReduce) {
-    return {
-      ...animation,
-      duration: 0.001,
-      transition: { duration: 0.001 }
-    };
-  }
-  
-  return animation;
-}
+  return {
+    isMotionSafe,
+    safeClass: (animationClass: string) => isMotionSafe ? animationClass : '',
+    safeDuration: (duration: number) => isMotionSafe ? duration : 0
+  };
+};

@@ -1,8 +1,6 @@
 
 import React, { useState } from "react";
-import { CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Send } from "lucide-react";
 
 interface ChatInputProps {
@@ -15,31 +13,42 @@ export const ChatInput = ({ onSendMessage, isThinking }: ChatInputProps) => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!inputValue.trim() || isThinking) return;
     
-    if (!inputValue.trim()) return;
-    
-    onSendMessage(inputValue);
+    onSendMessage(inputValue.trim());
     setInputValue("");
   };
 
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSubmit(e);
+    }
+  };
+
   return (
-    <CardFooter className="p-3 border-t border-gray-200 dark:border-gray-700">
-      <form onSubmit={handleSubmit} className="flex w-full gap-2">
-        <Input
+    <form onSubmit={handleSubmit} className="p-3 border-t bg-gray-50 dark:bg-gray-800/50">
+      <div className="flex gap-2">
+        <textarea
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
-          placeholder="Ask a question..."
-          className="flex-1"
+          onKeyPress={handleKeyPress}
+          placeholder="Ask me anything about your learning..."
           disabled={isThinking}
+          rows={1}
+          className="flex-1 resize-none border border-gray-200 dark:border-gray-700 rounded-md px-3 py-2 text-sm bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
+          style={{ minHeight: '36px', maxHeight: '100px' }}
         />
-        <Button 
-          type="submit" 
-          size="icon" 
-          disabled={isThinking || !inputValue.trim()}
+        <Button
+          type="submit"
+          size="icon"
+          disabled={!inputValue.trim() || isThinking}
+          className="h-9 w-9 bg-brand-500 hover:bg-brand-600"
+          aria-label="Send message"
         >
           <Send className="h-4 w-4" />
         </Button>
-      </form>
-    </CardFooter>
+      </div>
+    </form>
   );
 };
