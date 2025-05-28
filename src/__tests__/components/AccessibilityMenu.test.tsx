@@ -1,6 +1,5 @@
-
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '../test-utils';
 import { AccessibilityMenu } from '@/components/a11y/AccessibilityMenu';
 import * as useLocalStorageModule from '@/hooks/use-local-storage';
 

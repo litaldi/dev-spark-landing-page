@@ -1,8 +1,6 @@
-
 import React from 'react';
-import { render, screen, fireEvent, act, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, act, waitFor } from '../test-utils';
 import { AccessibilityMenu } from '@/components/a11y/AccessibilityMenu';
-import * as useLocalStorageModule from '@/hooks/use-local-storage';
 
 // Mock local storage implementation for testing
 const mockLocalStorage = (() => {

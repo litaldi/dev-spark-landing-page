@@ -1,27 +1,11 @@
-
-import React, { useState } from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
-import { axe } from 'jest-axe';
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-
-import { 
-  Form,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormControl,
-  FormMessage 
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { FormError } from '@/components/a11y/FormError';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { a11yTests } from '../utils/a11y-test-utils';
+import React from 'react';
+import { render, screen, fireEvent } from '../test-utils';
+import { axe, toHaveNoViolations } from 'jest-axe';
 
 // Import test setup
 import './setup/a11y-test-setup';
+
+expect.extend(toHaveNoViolations);
 
 describe('Form Validation Accessibility', () => {
   // Test form with validation and error messages

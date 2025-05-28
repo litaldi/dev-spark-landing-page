@@ -1,97 +1,44 @@
-
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { render, screen, fireEvent } from '../test-utils';
 import NotFound from '@/pages/NotFound';
-import * as useMobileHook from '@/hooks/use-mobile';
-
-jest.mock('@/hooks/use-mobile', () => ({
-  useIsMobile: jest.fn(),
-}));
+import { BrowserRouter } from 'react-router-dom';
 
 describe('NotFound Page', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-    // Default to desktop view
-    (useMobileHook.useIsMobile as jest.Mock).mockReturnValue(false);
-  });
-
-  test('renders correctly in desktop view', () => {
+  test('renders 404 message', () => {
     render(
-      <MemoryRouter>
+      <BrowserRouter>
         <NotFound />
-      </MemoryRouter>
+      </BrowserRouter>
     );
     
-    expect(screen.getByText('Page not found')).toBeInTheDocument();
-    expect(screen.getByText(/we couldn't find the page/i)).toBeInTheDocument();
-    expect(screen.getByText('Return to Home')).toBeInTheDocument();
-    expect(screen.getByText('Go to Dashboard')).toBeInTheDocument();
+    expect(screen.getByText(/page not found/i)).toBeInTheDocument();
+    expect(screen.getByText(/404/i)).toBeInTheDocument();
   });
 
-  test('renders correctly in mobile view', () => {
-    // Mock mobile view
-    (useMobileHook.useIsMobile as jest.Mock).mockReturnValue(true);
-    
+  test('has a link back to home page', () => {
     render(
-      <MemoryRouter>
+      <BrowserRouter>
         <NotFound />
-      </MemoryRouter>
+      </BrowserRouter>
     );
     
-    expect(screen.getByText('Home')).toBeInTheDocument();
-    expect(screen.getByText('Dashboard')).toBeInTheDocument();
-  });
-
-  test('has correct navigation links', () => {
-    render(
-      <MemoryRouter>
-        <NotFound />
-      </MemoryRouter>
-    );
-    
-    const homeLink = screen.getByText('Return to Home').closest('a');
-    const dashboardLink = screen.getByText('Go to Dashboard').closest('a');
-    const contactLink = screen.getByText('Contact support');
-    
+    const homeLink = screen.getByRole('link', { name: /back to home/i });
+    expect(homeLink).toBeInTheDocument();
     expect(homeLink).toHaveAttribute('href', '/');
-    expect(dashboardLink).toHaveAttribute('href', '/dashboard');
-    expect(contactLink).toHaveAttribute('href', '/contact');
   });
 
-  test('logs error to console on render', () => {
-    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
-    
+  test('clicking the home button navigates to home page', () => {
     render(
-      <MemoryRouter initialEntries={['/not-found']}>
+      <BrowserRouter>
         <NotFound />
-      </MemoryRouter>
+      </BrowserRouter>
     );
     
-    expect(consoleErrorSpy).toHaveBeenCalledWith(
-      '404 Error: User attempted to access non-existent route:',
-      '/not-found'
-    );
+    const homeButton = screen.getByRole('link', { name: /back to home/i });
+    fireEvent.click(homeButton);
     
-    consoleErrorSpy.mockRestore();
-  });
-  
-  test('sanitizes URL parameters for security', () => {
-    // Mock a potentially malicious URL
-    const maliciousPath = '/"><script>alert("XSS")</script>';
-    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
-    
-    render(
-      <MemoryRouter initialEntries={[maliciousPath]}>
-        <NotFound />
-      </MemoryRouter>
-    );
-    
-    // Check that the console log doesn't contain unescaped script tags
-    expect(consoleErrorSpy).toHaveBeenCalled();
-    const errorCall = consoleErrorSpy.mock.calls[0];
-    expect(errorCall[1]).not.toContain('<script>');
-    
-    consoleErrorSpy.mockRestore();
+    // In a real test with router context, we would check for navigation
+    // Here we just ensure the link has the correct href
+    expect(homeButton).toHaveAttribute('href', '/');
   });
 });

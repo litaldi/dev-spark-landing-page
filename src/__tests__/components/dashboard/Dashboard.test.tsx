@@ -1,7 +1,5 @@
-
 import React from 'react';
-import { render, screen, act, waitFor } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { render, screen, waitFor } from '../../test-utils';
 import Dashboard from '@/pages/Dashboard';
 
 // Mock the components used in Dashboard

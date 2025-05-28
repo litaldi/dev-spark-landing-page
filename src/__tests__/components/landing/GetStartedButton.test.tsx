@@ -1,90 +1,59 @@
-
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
-import { BrowserRouter } from 'react-router-dom';
+import { render, screen, fireEvent } from '../../test-utils';
 import GetStartedButton from '@/components/landing/GetStartedButton';
 
-// Mock the GetStartedModal component
-jest.mock('@/components/landing/GetStartedModal', () => ({
-  __esModule: true,
-  default: ({ isOpen, onClose }) => (
-    isOpen ? (
-      <div data-testid="modal-content">
-        <button onClick={onClose} data-testid="close-modal">Close</button>
-      </div>
-    ) : null
-  )
-}));
-
 describe('GetStartedButton Component', () => {
-  test('renders correctly', () => {
-    render(
-      <BrowserRouter>
-        <GetStartedButton />
-      </BrowserRouter>
-    );
+  test('renders correctly with default props', () => {
+    render(<GetStartedButton />);
     
-    const button = screen.getByRole('button', { name: /get started for free/i });
-    expect(button).toBeInTheDocument();
+    const buttonElement = screen.getByRole('button', { name: 'Get Started for Free' });
+    expect(buttonElement).toBeInTheDocument();
   });
 
-  test('opens modal when clicked', () => {
-    render(
-      <BrowserRouter>
-        <GetStartedButton />
-      </BrowserRouter>
-    );
+  test('applies custom className', () => {
+    render(<GetStartedButton className="test-class" />);
     
-    const button = screen.getByRole('button', { name: /get started for free/i });
-    fireEvent.click(button);
-    
-    const modalContent = screen.getByTestId('modal-content');
-    expect(modalContent).toBeInTheDocument();
+    const buttonElement = screen.getByRole('button', { name: 'Get Started for Free' });
+    expect(buttonElement).toHaveClass('test-class');
   });
 
-  test('closes modal when close button is clicked', () => {
-    render(
-      <BrowserRouter>
-        <GetStartedButton />
-      </BrowserRouter>
-    );
+  test('navigates to the registration page on click', () => {
+    const navigate = jest.fn();
+    jest.mock('react-router-dom', () => ({
+      ...jest.requireActual('react-router-dom'),
+      useNavigate: () => navigate,
+    }));
     
-    // Open modal
-    const button = screen.getByRole('button', { name: /get started for free/i });
-    fireEvent.click(button);
+    render(<GetStartedButton />);
     
-    // Close modal
-    const closeButton = screen.getByTestId('close-modal');
-    fireEvent.click(closeButton);
+    const buttonElement = screen.getByRole('button', { name: 'Get Started for Free' });
+    fireEvent.click(buttonElement);
     
-    // Check that modal is closed
-    const modalContent = screen.queryByTestId('modal-content');
-    expect(modalContent).not.toBeInTheDocument();
+    expect(navigate).toHaveBeenCalledWith('/auth/register');
   });
 
-  test('applies mobile styling when isMobile is true', () => {
-    render(
-      <BrowserRouter>
-        <GetStartedButton isMobile={true} />
-      </BrowserRouter>
-    );
+  test('handles mobile menu close when isMobile is true', () => {
+    const onMenuClose = jest.fn();
+    render(<GetStartedButton isMobile={true} onMenuClose={onMenuClose} />);
     
-    const button = screen.getByRole('button', { name: /get started for free/i });
-    expect(button).toHaveClass('justify-start w-full');
+    const buttonElement = screen.getByRole('button', { name: 'Get Started for Free' });
+    fireEvent.click(buttonElement);
+    
+    expect(onMenuClose).toHaveBeenCalled();
   });
 
-  test('calls onMenuClose when clicked in mobile mode', () => {
-    const onMenuCloseMock = jest.fn();
+  test('applies custom size and variant', () => {
+    render(<GetStartedButton size="lg" variant="outline" />);
     
-    render(
-      <BrowserRouter>
-        <GetStartedButton isMobile={true} onMenuClose={onMenuCloseMock} />
-      </BrowserRouter>
-    );
+    const buttonElement = screen.getByRole('button', { name: 'Get Started for Free' });
+    expect(buttonElement).toHaveClass('lg');
+    expect(buttonElement).toHaveClass('outline');
+  });
+
+  test('renders custom children', () => {
+    render(<GetStartedButton>Sign Up Now</GetStartedButton>);
     
-    const button = screen.getByRole('button', { name: /get started for free/i });
-    fireEvent.click(button);
-    
-    expect(onMenuCloseMock).toHaveBeenCalled();
+    const buttonElement = screen.getByRole('button', { name: 'Sign Up Now' });
+    expect(buttonElement).toBeInTheDocument();
   });
 });
