@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '../test-utils';
 import { BrowserRouter } from 'react-router-dom';
@@ -58,7 +59,7 @@ describe('Login Flow Integration', () => {
     // Wait for the redirect to occur (you might need to adjust the timeout)
     await waitFor(() => {
       expect(localStorageMock.getItem('isLoggedIn')).toBe('true');
-    }, { timeout: 2000 });
+    });
   });
 
   test('failed login displays error message', async () => {
@@ -82,7 +83,7 @@ describe('Login Flow Integration', () => {
     fireEvent.click(submitButton);
 
     // Wait for the error message to appear
-    const errorMessage = await screen.findByText(/invalid credentials/i, { timeout: 2000 });
+    const errorMessage = await screen.findByText(/invalid credentials/i);
     expect(errorMessage).toBeInTheDocument();
   });
 });
