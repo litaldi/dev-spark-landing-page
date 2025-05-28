@@ -1,5 +1,6 @@
+
 import React from 'react';
-import { render, screen, fireEvent } from '../../test-utils';
+import { render, screen, fireEvent, userEvent } from '../../test-utils';
 import { Input } from '@/components/ui/input';
 import { axe } from 'jest-axe';
 

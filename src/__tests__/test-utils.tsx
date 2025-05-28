@@ -1,6 +1,8 @@
 
 import React, { ReactElement } from 'react';
 import { render as rtlRender, RenderOptions } from '@testing-library/react';
+import { screen, fireEvent, waitFor, act } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
 import { ThemeProvider } from '@/components/theme/ThemeProvider';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -8,14 +10,6 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 // Re-export everything from testing libraries
 export * from '@testing-library/react';
 export { default as userEvent } from '@testing-library/user-event';
-
-// Import specific utilities that we'll re-export
-import { 
-  screen, 
-  fireEvent, 
-  waitFor, 
-  act 
-} from '@testing-library/react';
 
 // Re-export the imported utilities
 export { screen, fireEvent, waitFor, act };
@@ -125,5 +119,21 @@ const simulateScreenReader = (element: Element) => {
   };
 };
 
+// Screen reader announcer function
+const announceToScreenReader = (message: string) => {
+  let announcer = document.getElementById('screen-reader-announcer');
+  
+  if (!announcer) {
+    announcer = document.createElement('div');
+    announcer.id = 'screen-reader-announcer';
+    announcer.setAttribute('aria-live', 'polite');
+    announcer.setAttribute('aria-atomic', 'true');
+    announcer.classList.add('sr-only');
+    document.body.appendChild(announcer);
+  }
+  
+  announcer.textContent = message;
+};
+
 // Override the default render with our custom render
-export { customRender as render, simulateHover, simulateFocus, simulateTabNavigation, simulateScreenReader };
+export { customRender as render, simulateHover, simulateFocus, simulateTabNavigation, simulateScreenReader, announceToScreenReader };

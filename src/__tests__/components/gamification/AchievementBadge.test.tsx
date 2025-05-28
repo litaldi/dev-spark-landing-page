@@ -1,6 +1,7 @@
+
 import React from 'react';
 import { render, screen } from '../../test-utils';
-import { AchievementBadge } from '@/components/gamification/AchievementBadge';
+import { AchievementBadge, Achievement } from '@/components/gamification/AchievementBadge';
 
 describe('AchievementBadge Component', () => {
   // Sample achievement for testing

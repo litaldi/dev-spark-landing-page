@@ -1,5 +1,6 @@
+
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '../test-utils';
+import { render, screen, fireEvent, waitFor, userEvent } from '../test-utils';
 import { BrowserRouter } from 'react-router-dom';
 import { LoginForm } from '@/components/auth/LoginForm';
 

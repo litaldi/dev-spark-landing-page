@@ -1,6 +1,9 @@
+
 import React from 'react';
-import { render, screen, fireEvent } from '../test-utils';
-import userEvent from '@testing-library/user-event';
+import { render, screen, fireEvent, userEvent, announceToScreenReader } from '../test-utils';
+import { BrowserRouter } from 'react-router-dom';
+import { ThemeProvider } from '@/components/theme/ThemeProvider';
+import Navbar from '@/components/landing/Navbar';
 
 // Mock hooks
 jest.mock('@/hooks/use-navbar-state', () => ({
