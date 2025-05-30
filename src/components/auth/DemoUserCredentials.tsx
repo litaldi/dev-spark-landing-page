@@ -8,9 +8,9 @@ interface DemoUserCredentialsProps {
 
 /**
  * This component previously displayed demo user credentials.
- * It's now a placeholder that doesn't render anything.
+ * It's now removed for production use.
  */
 export function DemoUserCredentials({ email, password }: DemoUserCredentialsProps) {
-  // Return null as we're removing demo functionality
+  // Component removed for production - no demo credentials should be displayed
   return null;
 }

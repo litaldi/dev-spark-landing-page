@@ -154,19 +154,27 @@ The project includes:
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please follow these steps:
-
-1. Fork the repository
-2. Create a new branch: `git checkout -b feature/amazing-feature`
-3. Make your changes and commit them: `git commit -m 'Add amazing feature'`
-4. Push to the branch: `git push origin feature/amazing-feature`
-5. Open a pull request
-
-Please ensure your code passes all tests and follows the project's coding standards.
+This is proprietary software. Contributions are only accepted from authorized team members. Please contact the development team for access and contribution guidelines.
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+**This project is proprietary software.**
+
+© 2025 DevAI Learning Platform. All rights reserved.
+
+This software is not open source. It may not be copied, distributed, or reused without express written consent from the creators. No part of this application may be copied, reproduced, or redistributed without express written permission.
+
+## 🧩 Third-Party Libraries
+
+This project uses the following open-source libraries under their respective licenses:
+- React (MIT License)
+- TypeScript (Apache 2.0 License)
+- Tailwind CSS (MIT License)
+- shadcn/ui (MIT License)
+- Radix UI (MIT License)
+- Lucide Icons (ISC License)
+
+All third-party libraries are used in compliance with their respective licenses for commercial use.
 
 ## 👏 Acknowledgements
 
@@ -178,8 +186,9 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - [Lucide Icons](https://lucide.dev/)
 - [Jest](https://jestjs.io/)
 - [React Testing Library](https://testing-library.com/)
-- All contributors who have helped shape this project
 
 ---
 
 *For support or questions, please contact the development team.*
+
+**© 2025 DevAI Learning Platform. All rights reserved.**

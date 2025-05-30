@@ -147,8 +147,11 @@ const Footer: React.FC = () => {
           </div>
         </div>
         
-        <div className="mt-8 pt-8 border-t border-border text-center text-xs text-muted-foreground">
-          <p>© {new Date().getFullYear()} DevAI Companion. All rights reserved.</p>
+        <div className="mt-8 pt-8 border-t border-border text-center">
+          <div className="text-xs text-muted-foreground space-y-1">
+            <p>© {new Date().getFullYear()} DevAI Learning Platform. All rights reserved.</p>
+            <p>No part of this application may be copied, reproduced, or redistributed without express written permission.</p>
+          </div>
         </div>
       </div>
     </footer>

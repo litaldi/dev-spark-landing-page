@@ -1,4 +1,3 @@
-
 import DOMPurify from 'dompurify';
 
 /**
@@ -99,4 +98,33 @@ export function validateFormSecurity(inputs: Record<string, string>): Record<str
   }
   
   return errors;
+}
+
+/**
+ * Comprehensive input sanitization for all user inputs
+ * This should be used before storing or displaying any user-generated content
+ */
+export function sanitizeUserInput(input: string, options: {
+  allowHtml?: boolean;
+  maxLength?: number;
+} = {}): string {
+  const { allowHtml = false, maxLength = 1000 } = options;
+  
+  if (typeof input !== 'string') return '';
+  
+  // Check length first
+  if (input.length > maxLength) {
+    throw new Error(`Input exceeds maximum length of ${maxLength} characters`);
+  }
+  
+  // If HTML is not allowed, strip all tags
+  if (!allowHtml) {
+    return DOMPurify.sanitize(input, { ALLOWED_TAGS: [] });
+  }
+  
+  // Otherwise, sanitize but allow safe HTML
+  return DOMPurify.sanitize(input, {
+    ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'p', 'br'],
+    ALLOWED_ATTR: []
+  });
 }
