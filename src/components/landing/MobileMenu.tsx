@@ -8,6 +8,7 @@ import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { AccessibilityMenu } from "@/components/a11y/AccessibilityMenu";
 import { sanitizeInput } from "@/lib/security";
 import { announceToScreenReader } from "@/lib/keyboard-utils";
+import { Separator } from "@/components/ui/separator";
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -49,14 +50,14 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
     <Sheet open={isOpen} onOpenChange={handleMenuClose}>
       <SheetContent
         side="left"
-        className="w-full sm:w-[350px] pt-12 flex flex-col"
+        className="w-full sm:w-[350px] pt-12 flex flex-col bg-background/95 backdrop-blur-md"
         role="dialog"
         aria-modal="true"
         aria-label="Mobile navigation"
         ref={menuRef}
       >
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-lg font-medium">Menu</h2>
+          <h2 className="text-lg font-semibold text-foreground">Menu</h2>
           <div className="flex items-center gap-2">
             <AccessibilityMenu />
             <ThemeToggle />
@@ -64,11 +65,11 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
         </div>
 
         <div className="flex-1 overflow-auto">
-          <nav className="flex flex-col gap-y-4" aria-label="Mobile navigation menu">
+          <nav className="space-y-2" aria-label="Mobile navigation menu">
             <NavLinks isMobile={true} onLinkClick={onMenuClose} />
           </nav>
 
-          <hr className="my-6 border-t border-gray-200 dark:border-gray-800" aria-hidden="true" />
+          <Separator className="my-6" />
 
           <div className="space-y-4">
             {!isLoggedIn && (
@@ -76,11 +77,11 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
                 <GetStartedButton
                   isMobile={true}
                   onMenuClose={onMenuClose}
-                  className="mb-2"
+                  className="w-full justify-center bg-primary hover:bg-primary/90"
                 />
-                <div className="flex gap-3">
+                <div className="grid grid-cols-2 gap-3">
                   <button
-                    className="flex-1 py-2 px-4 text-center rounded-md border border-gray-300 dark:border-gray-700 transition-colors hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                    className="py-2 px-4 text-center rounded-md border border-border bg-background hover:bg-accent transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                     onClick={() => {
                       toggleLoginState();
                       onMenuClose();
@@ -90,7 +91,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
                     Try Demo
                   </button>
                   <button
-                    className="flex-1 py-2 px-4 text-center rounded-md border border-gray-300 dark:border-gray-700 transition-colors hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                    className="py-2 px-4 text-center rounded-md border border-border bg-background hover:bg-accent transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                     onClick={() => {
                       window.location.href = "/auth/login";
                       onMenuClose();
@@ -114,8 +115,8 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
           </div>
         </div>
 
-        <div className="mt-auto pt-4">
-          <p className="text-sm text-gray-600 dark:text-gray-400">
+        <div className="mt-auto pt-4 border-t border-border">
+          <p className="text-sm text-muted-foreground text-center">
             &copy; {new Date().getFullYear()} DevAcademy. All rights reserved.
           </p>
         </div>
