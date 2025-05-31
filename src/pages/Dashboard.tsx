@@ -61,10 +61,10 @@ const Dashboard = () => {
   return (
     <AccessibilityProvider>
       <div className="min-h-screen flex flex-col bg-background">
-        <SkipNavLink>Skip to content</SkipNavLink>
+        <SkipNavLink contentId="main-content">Skip to content</SkipNavLink>
         <Navbar />
         <main className="flex-1 container py-6 md:py-10 lg:py-12" id="main-content">
-          <SkipNavContent>
+          <SkipNavContent id="main-content">
             <AlertError 
               message={error}
               onClose={() => setError(null)}

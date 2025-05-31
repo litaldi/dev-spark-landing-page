@@ -32,10 +32,10 @@ const NotFound = () => {
   
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <SkipNavLink>Skip to content</SkipNavLink>
+      <SkipNavLink contentId="main-content">Skip to content</SkipNavLink>
       <Navbar />
       <main className="flex-1 flex items-center justify-center" id="main-content">
-        <SkipNavContent>
+        <SkipNavContent id="main-content">
           <div className="container max-w-md text-center py-16 px-4">
             <div aria-hidden="true" className="mb-6 text-8xl font-bold text-primary/20">404</div>
             <h1 className="text-3xl font-bold mb-2">Page Not Found</h1>

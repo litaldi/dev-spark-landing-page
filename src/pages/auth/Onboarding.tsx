@@ -95,13 +95,13 @@ const OnboardingPage = () => {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-background p-4 md:p-6 lg:p-8 bg-gradient-to-b from-background to-background/80">
-      <SkipNavLink>Skip to content</SkipNavLink>
+      <SkipNavLink contentId="main-content">Skip to content</SkipNavLink>
       
       <div className="absolute top-4 right-4">
         <ThemeToggle />
       </div>
       
-      <SkipNavContent>
+      <SkipNavContent id="main-content">
         <div 
           className="w-full max-w-lg" 
           role="main" 

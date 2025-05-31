@@ -23,7 +23,10 @@ const NavbarContent: React.FC<NavbarContentProps> = ({
   return (
     <div className="flex items-center justify-between w-full px-4 sm:px-6 md:px-0">
       <div className="flex items-center gap-2">
-        <SkipNavLink className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-md">
+        <SkipNavLink 
+          contentId="main-content"
+          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-md"
+        >
           Skip to content
         </SkipNavLink>
         <NavbarLogo />

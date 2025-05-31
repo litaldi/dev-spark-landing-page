@@ -11,10 +11,10 @@ import { SkipNavLink, SkipNavContent } from "@/components/a11y/skip-nav";
 const Help = () => {
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <SkipNavLink>Skip to content</SkipNavLink>
+      <SkipNavLink contentId="main-content">Skip to content</SkipNavLink>
       <Navbar />
       <main className="flex-1">
-        <SkipNavContent>
+        <SkipNavContent id="main-content">
           <section className="py-16 lg:py-24 bg-gradient-to-br from-brand-50 to-white dark:from-gray-900 dark:to-gray-800">
             <div className="container text-center">
               <h1 className="text-4xl md:text-5xl font-bold text-gray-800 dark:text-white mb-6">Help Center</h1>

@@ -54,13 +54,13 @@ const RegisterPage: React.FC = () => {
       className="min-h-screen flex flex-col items-center justify-center bg-background p-4 bg-gradient-to-b from-background to-background/80"
       aria-labelledby="register-page-title"
     >
-      <SkipNavLink>Skip to content</SkipNavLink>
+      <SkipNavLink contentId="main-content">Skip to content</SkipNavLink>
       
       <div className="absolute top-4 right-4 flex items-center gap-2">
         <ThemeToggle />
       </div>
       
-      <SkipNavContent>
+      <SkipNavContent id="main-content">
         <div className="w-full max-w-md">
           <div className="mb-4 sm:mb-6 text-center">
             <Link to="/" className="inline-block">
