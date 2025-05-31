@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Menu, X } from "lucide-react";
+import { Menu, X, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { WebFirstNavigation } from "@/components/navigation/WebFirstNavigation";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
@@ -30,8 +30,8 @@ export function WebFirstHeader() {
       className={cn(
         "sticky top-0 z-50 w-full border-b transition-all duration-300",
         isScrolled 
-          ? "bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 shadow-sm" 
-          : "bg-background/80 backdrop-blur-sm"
+          ? "bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 shadow-lg border-border/50" 
+          : "bg-background/80 backdrop-blur-sm border-border/30"
       )}
       role="banner"
     >
@@ -39,16 +39,16 @@ export function WebFirstHeader() {
         {/* Logo */}
         <Link 
           to="/" 
-          className="flex items-center gap-3 font-bold text-xl hover:opacity-80 transition-opacity focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-md"
+          className="flex items-center gap-3 font-bold text-xl hover:opacity-80 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-md group"
           aria-label="DevAI Home"
         >
           <div 
-            className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center text-primary-foreground font-bold text-xl" 
+            className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center text-primary-foreground font-bold text-xl transition-transform duration-200 group-hover:scale-105" 
             aria-hidden="true"
           >
             D
           </div>
-          <span className="hidden sm:inline">DevAI</span>
+          <span className="hidden sm:inline text-foreground">DevAI</span>
         </Link>
 
         {/* Desktop Navigation */}
@@ -72,7 +72,7 @@ export function WebFirstHeader() {
               <Button
                 variant="ghost"
                 size="icon"
-                className="lg:hidden"
+                className="lg:hidden hover:bg-accent/80 transition-colors"
                 aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
               >
                 {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
