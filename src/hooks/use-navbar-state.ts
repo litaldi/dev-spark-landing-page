@@ -1,67 +1,65 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect } from 'react';
 
-export function useNavbarState() {
+interface NavbarState {
+  isScrolled: boolean;
+  mobileMenuOpen: boolean;
+  isLoggedIn: boolean;
+  userName: string | null;
+  toggleMobileMenu: () => void;
+  closeMobileMenu: () => void;
+  handleLogout: () => void;
+  toggleLoginState: () => void;
+}
+
+export function useNavbarState(): NavbarState {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userName, setUserName] = useState<string | null>(null);
 
-  // Handle scroll effect
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
     };
 
-    window.addEventListener("scroll", handleScroll);
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Check login status from localStorage
+  // Check for stored user session
   useEffect(() => {
-    // Check login status from localStorage
-    const loginStatus = localStorage.getItem("isLoggedIn");
-    setIsLoggedIn(loginStatus === "true");
-    
-    // Get user name from localStorage
-    const storedUserName = localStorage.getItem("userName");
-    if (storedUserName) {
-      setUserName(storedUserName);
+    const storedUser = localStorage.getItem('demo-user');
+    if (storedUser) {
+      setIsLoggedIn(true);
+      setUserName(storedUser);
     }
   }, []);
-
-  const handleLogout = () => {
-    // Clear all authentication data
-    localStorage.removeItem("isLoggedIn");
-    localStorage.removeItem("userName");
-    localStorage.removeItem("userEmail");
-    setIsLoggedIn(false);
-    setUserName(null);
-  };
-
-  const toggleLoginState = () => {
-    const newState = !isLoggedIn;
-    setIsLoggedIn(newState);
-    localStorage.setItem("isLoggedIn", String(newState));
-    
-    if (newState) {
-      // Mock user data for testing purposes
-      setUserName("Test User");
-      localStorage.setItem("userName", "Test User");
-    } else {
-      setUserName(null);
-      localStorage.removeItem("userName");
-    }
-  };
 
   const toggleMobileMenu = () => {
-    setMobileMenuOpen(!mobileMenuOpen);
+    setMobileMenuOpen(prev => !prev);
   };
 
   const closeMobileMenu = () => {
     setMobileMenuOpen(false);
+  };
+
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    setUserName(null);
+    localStorage.removeItem('demo-user');
+    closeMobileMenu();
+  };
+
+  const toggleLoginState = () => {
+    if (isLoggedIn) {
+      handleLogout();
+    } else {
+      const demoUser = 'Demo User';
+      setIsLoggedIn(true);
+      setUserName(demoUser);
+      localStorage.setItem('demo-user', demoUser);
+    }
   };
 
   return {
@@ -72,6 +70,6 @@ export function useNavbarState() {
     toggleMobileMenu,
     closeMobileMenu,
     handleLogout,
-    toggleLoginState
+    toggleLoginState,
   };
 }

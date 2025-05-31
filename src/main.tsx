@@ -1,25 +1,23 @@
 
-import { createRoot } from 'react-dom/client'
-import App from './App.tsx'
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import { BrowserRouter } from 'react-router-dom'
+import App from './App'
 import './index.css'
-import { useKeyboardFocusDetection } from './lib/keyboard-utils/focus-management'
-import { applySecurityDefenses } from './lib/security/http-security'
-import { AccessibilityProvider } from './components/a11y/AccessibilityProvider'
+import { ThemeProvider } from '@/components/theme/ThemeProvider'
+import { initializeCSRF } from '@/lib/security/csrf-protection'
+import { applySecurityDefenses } from '@/lib/security/http-security'
 
-// Apply security defenses immediately on app initialization
+// Initialize security features
+initializeCSRF();
 applySecurityDefenses();
 
-// Wrap App with accessibility features
-const AppWithAccessibility = () => {
-  // Initialize keyboard focus detection
-  useKeyboardFocusDetection();
-  
-  return (
-    <AccessibilityProvider>
-      <App />
-    </AccessibilityProvider>
-  );
-};
-
-// Initialize the application
-createRoot(document.getElementById("root")!).render(<AppWithAccessibility />);
+ReactDOM.createRoot(document.getElementById('root')!).render(
+  <React.StrictMode>
+    <BrowserRouter>
+      <ThemeProvider>
+        <App />
+      </ThemeProvider>
+    </BrowserRouter>
+  </React.StrictMode>,
+)

@@ -3,112 +3,76 @@
  * Client-side rate limiting utilities
  */
 
-interface RateLimitEntry {
-  count: number;
-  firstAttempt: number;
-  windowStart: number;
+interface RateLimitConfig {
+  maxRequests: number;
+  windowMs: number;
+  blockDurationMs: number;
 }
 
-const RATE_LIMIT_WINDOW = 60000; // 1 minute in milliseconds
-const RATE_LIMIT_STORAGE_KEY = 'rate_limits';
+const DEFAULT_CONFIG: RateLimitConfig = {
+  maxRequests: 10,
+  windowMs: 60000, // 1 minute
+  blockDurationMs: 300000, // 5 minutes
+};
+
+const requestCounts: Record<string, { count: number; firstRequest: number; blocked?: number }> = {};
 
 /**
- * Checks if an action is rate limited
- * @param key Unique identifier for the action
- * @param maxAttempts Maximum attempts allowed in the time window
- * @param windowMs Time window in milliseconds (default: 1 minute)
+ * Check if an action is rate limited
+ * @param key Unique identifier for the action (e.g., 'login', 'search')
+ * @param config Rate limiting configuration
  */
-export function isRateLimited(
-  key: string, 
-  maxAttempts: number, 
-  windowMs: number = RATE_LIMIT_WINDOW
-): boolean {
-  try {
-    const now = Date.now();
-    const stored = localStorage.getItem(RATE_LIMIT_STORAGE_KEY);
-    const rateLimits: Record<string, RateLimitEntry> = stored ? JSON.parse(stored) : {};
-    
-    const entry = rateLimits[key];
-    
-    // If no entry exists, create one and allow the request
-    if (!entry) {
-      rateLimits[key] = {
-        count: 1,
-        firstAttempt: now,
-        windowStart: now
-      };
-      localStorage.setItem(RATE_LIMIT_STORAGE_KEY, JSON.stringify(rateLimits));
-      return false;
-    }
-    
-    // Check if we're outside the time window
-    if (now - entry.windowStart > windowMs) {
-      // Reset the window
-      rateLimits[key] = {
-        count: 1,
-        firstAttempt: now,
-        windowStart: now
-      };
-      localStorage.setItem(RATE_LIMIT_STORAGE_KEY, JSON.stringify(rateLimits));
-      return false;
-    }
-    
-    // Check if we've exceeded the rate limit
-    if (entry.count >= maxAttempts) {
-      return true;
-    }
-    
-    // Increment the count
-    entry.count++;
-    localStorage.setItem(RATE_LIMIT_STORAGE_KEY, JSON.stringify(rateLimits));
-    return false;
-    
-  } catch (error) {
-    console.error('Rate limiting error:', error);
-    // Fail open - allow the request if there's an error
+export function isRateLimited(key: string, config: Partial<RateLimitConfig> = {}): boolean {
+  const { maxRequests, windowMs, blockDurationMs } = { ...DEFAULT_CONFIG, ...config };
+  const now = Date.now();
+  
+  if (!requestCounts[key]) {
+    requestCounts[key] = { count: 1, firstRequest: now };
     return false;
   }
+  
+  const record = requestCounts[key];
+  
+  // Check if currently blocked
+  if (record.blocked && now - record.blocked < blockDurationMs) {
+    return true;
+  }
+  
+  // Reset if window has passed
+  if (now - record.firstRequest > windowMs) {
+    record.count = 1;
+    record.firstRequest = now;
+    record.blocked = undefined;
+    return false;
+  }
+  
+  // Increment count
+  record.count++;
+  
+  // Check if limit exceeded
+  if (record.count > maxRequests) {
+    record.blocked = now;
+    return true;
+  }
+  
+  return false;
 }
 
 /**
- * Clears rate limit data for a specific key
+ * Get remaining requests for a key
+ */
+export function getRemainingRequests(key: string, config: Partial<RateLimitConfig> = {}): number {
+  const { maxRequests } = { ...DEFAULT_CONFIG, ...config };
+  const record = requestCounts[key];
+  
+  if (!record) return maxRequests;
+  
+  return Math.max(0, maxRequests - record.count);
+}
+
+/**
+ * Clear rate limit for a key
  */
 export function clearRateLimit(key: string): void {
-  try {
-    const stored = localStorage.getItem(RATE_LIMIT_STORAGE_KEY);
-    if (!stored) return;
-    
-    const rateLimits: Record<string, RateLimitEntry> = JSON.parse(stored);
-    delete rateLimits[key];
-    localStorage.setItem(RATE_LIMIT_STORAGE_KEY, JSON.stringify(rateLimits));
-  } catch (error) {
-    console.error('Clear rate limit error:', error);
-  }
-}
-
-/**
- * Gets remaining attempts for a rate limited action
- */
-export function getRemainingAttempts(key: string, maxAttempts: number): number {
-  try {
-    const stored = localStorage.getItem(RATE_LIMIT_STORAGE_KEY);
-    if (!stored) return maxAttempts;
-    
-    const rateLimits: Record<string, RateLimitEntry> = JSON.parse(stored);
-    const entry = rateLimits[key];
-    
-    if (!entry) return maxAttempts;
-    
-    const now = Date.now();
-    
-    // Check if we're outside the time window
-    if (now - entry.windowStart > RATE_LIMIT_WINDOW) {
-      return maxAttempts;
-    }
-    
-    return Math.max(0, maxAttempts - entry.count);
-  } catch (error) {
-    console.error('Get remaining attempts error:', error);
-    return maxAttempts;
-  }
+  delete requestCounts[key];
 }

@@ -1,74 +1,55 @@
 
 /**
- * CSRF token management and protection utilities
+ * CSRF Protection utilities
  */
 
-// Store CSRF token in memory (not accessible from other scripts)
-let csrfToken: string | null = null;
+// Generate a random CSRF token
+export function generateCSRFToken(): string {
+  const array = new Uint8Array(32);
+  crypto.getRandomValues(array);
+  return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
+}
 
 /**
- * Generates a cryptographically secure random CSRF token
+ * Set CSRF token in localStorage and return it
  */
-export function generateCsrfToken(): string {
-  // Use crypto API for more secure token generation
-  const buffer = new Uint8Array(32);
-  if (window.crypto && window.crypto.getRandomValues) {
-    window.crypto.getRandomValues(buffer);
-    const token = btoa(String.fromCharCode.apply(null, [...buffer]))
-      .replace(/\+/g, '-')
-      .replace(/\//g, '_')
-      .replace(/=+$/, '');
-    csrfToken = token;
-    return token;
-  }
-  
-  // Fallback for older browsers (less secure)
-  console.warn('Crypto API not available, using less secure CSRF token generation');
-  const token = Math.random().toString(36).substring(2, 15) + 
-               Math.random().toString(36).substring(2, 15) +
-               Math.random().toString(36).substring(2, 15);
-  csrfToken = token;
+export function setCSRFToken(): string {
+  const token = generateCSRFToken();
+  localStorage.setItem('csrf-token', token);
   return token;
 }
 
 /**
- * Validates a CSRF token against the stored one
+ * Get CSRF token from localStorage
  */
-export function validateCsrfToken(token: string): boolean {
-  return token === csrfToken && !!token;
+export function getCSRFToken(): string | null {
+  return localStorage.getItem('csrf-token');
 }
 
 /**
- * Gets the current CSRF token or generates a new one
+ * Validate CSRF token
  */
-export function getCsrfToken(): string {
-  if (!csrfToken) {
-    return generateCsrfToken();
+export function validateCSRFToken(token: string): boolean {
+  const storedToken = getCSRFToken();
+  return storedToken !== null && storedToken === token;
+}
+
+/**
+ * Add CSRF token to form data
+ */
+export function addCSRFToFormData(formData: FormData): FormData {
+  const token = getCSRFToken();
+  if (token) {
+    formData.append('csrf_token', token);
   }
-  return csrfToken;
+  return formData;
 }
 
 /**
- * Adds a meta tag with CSRF token to document head
- * This helps with framework integration
+ * Initialize CSRF protection on app start
  */
-export function addCsrfTokenMeta(token: string): void {
-  let metaTag = document.querySelector('meta[name="csrf-token"]');
-  
-  if (!metaTag) {
-    metaTag = document.createElement('meta');
-    metaTag.setAttribute('name', 'csrf-token');
-    document.head.appendChild(metaTag);
+export function initializeCSRF(): void {
+  if (!getCSRFToken()) {
+    setCSRFToken();
   }
-  
-  metaTag.setAttribute('content', token);
-}
-
-/**
- * Gets CSRF token from meta tag in document head
- * Useful when tokens are generated server-side
- */
-export function getCsrfTokenFromMeta(): string {
-  const metaTag = document.querySelector('meta[name="csrf-token"]');
-  return metaTag ? metaTag.getAttribute('content') || '' : '';
 }

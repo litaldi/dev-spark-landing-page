@@ -1,126 +1,84 @@
 
 import React from 'react';
-import { toast } from 'sonner';
-import { CheckCircle, XCircle, AlertCircle, Info, Loader2 } from 'lucide-react';
+import { CheckCircle, XCircle, AlertCircle, Info, Loader } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-type FeedbackType = 'success' | 'error' | 'warning' | 'info' | 'loading';
-
-interface FeedbackOptions {
-  title?: string;
-  description?: string;
-  duration?: number;
-  action?: {
-    label: string;
-    onClick: () => void;
-  };
-  dismissible?: boolean;
-}
-
-const feedbackConfig = {
-  success: {
-    icon: CheckCircle,
-    className: 'text-green-600 dark:text-green-400',
-    defaultDuration: 4000
-  },
-  error: {
-    icon: XCircle,
-    className: 'text-red-600 dark:text-red-400',
-    defaultDuration: 6000
-  },
-  warning: {
-    icon: AlertCircle,
-    className: 'text-yellow-600 dark:text-yellow-400',
-    defaultDuration: 5000
-  },
-  info: {
-    icon: Info,
-    className: 'text-blue-600 dark:text-blue-400',
-    defaultDuration: 4000
-  },
-  loading: {
-    icon: Loader2,
-    className: 'text-gray-600 dark:text-gray-400 animate-spin',
-    defaultDuration: Infinity
-  }
-};
-
-export function showFeedback(
-  type: FeedbackType,
-  message: string,
-  options: FeedbackOptions = {}
-) {
-  const config = feedbackConfig[type];
-  const Icon = config.icon;
-  
-  const duration = options.duration ?? config.defaultDuration;
-  
-  return toast(message, {
-    duration: duration,
-    icon: <Icon className={cn('h-4 w-4', config.className)} />,
-    description: options.description,
-    action: options.action ? {
-      label: options.action.label,
-      onClick: options.action.onClick
-    } : undefined,
-    dismissible: options.dismissible ?? true,
-    className: 'border shadow-lg',
-  });
-}
-
-// Convenience functions
-export const feedback = {
-  success: (message: string, options?: FeedbackOptions) =>
-    showFeedback('success', message, options),
-    
-  error: (message: string, options?: FeedbackOptions) =>
-    showFeedback('error', message, options),
-    
-  warning: (message: string, options?: FeedbackOptions) =>
-    showFeedback('warning', message, options),
-    
-  info: (message: string, options?: FeedbackOptions) =>
-    showFeedback('info', message, options),
-    
-  loading: (message: string, options?: FeedbackOptions) =>
-    showFeedback('loading', message, options),
-    
-  promise: <T,>(
-    promise: Promise<T>,
-    messages: {
-      loading: string;
-      success: string | ((data: T) => string);
-      error: string | ((error: any) => string);
-    }
-  ) =>
-    toast.promise(promise, {
-      loading: messages.loading,
-      success: messages.success,
-      error: messages.error,
-    })
-};
-
-// Form feedback component for inline validation
-interface FormFeedbackProps {
-  type: 'success' | 'error' | 'warning';
+interface FeedbackMessageProps {
+  type: 'success' | 'error' | 'warning' | 'info' | 'loading';
   message: string;
+  className?: string;
+  onDismiss?: () => void;
+}
+
+export function FeedbackMessage({ type, message, className, onDismiss }: FeedbackMessageProps) {
+  const icons = {
+    success: CheckCircle,
+    error: XCircle,
+    warning: AlertCircle,
+    info: Info,
+    loading: Loader,
+  };
+
+  const styles = {
+    success: 'bg-green-50 text-green-800 border-green-200 dark:bg-green-900/20 dark:text-green-300 dark:border-green-800',
+    error: 'bg-red-50 text-red-800 border-red-200 dark:bg-red-900/20 dark:text-red-300 dark:border-red-800',
+    warning: 'bg-yellow-50 text-yellow-800 border-yellow-200 dark:bg-yellow-900/20 dark:text-yellow-300 dark:border-yellow-800',
+    info: 'bg-blue-50 text-blue-800 border-blue-200 dark:bg-blue-900/20 dark:text-blue-300 dark:border-blue-800',
+    loading: 'bg-gray-50 text-gray-800 border-gray-200 dark:bg-gray-900/20 dark:text-gray-300 dark:border-gray-800',
+  };
+
+  const Icon = icons[type];
+
+  return (
+    <div
+      className={cn(
+        'flex items-center gap-3 p-4 border rounded-lg',
+        styles[type],
+        className
+      )}
+      role="alert"
+      aria-live="polite"
+    >
+      <Icon 
+        className={cn(
+          'h-5 w-5 flex-shrink-0',
+          type === 'loading' && 'animate-spin'
+        )} 
+        aria-hidden="true" 
+      />
+      <span className="flex-1 text-sm font-medium">{message}</span>
+      {onDismiss && (
+        <button
+          onClick={onDismiss}
+          className="flex-shrink-0 hover:opacity-70 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-current rounded"
+          aria-label="Dismiss message"
+        >
+          <XCircle className="h-4 w-4" />
+        </button>
+      )}
+    </div>
+  );
+}
+
+interface EmptyStateProps {
+  icon?: React.ComponentType<{ className?: string }>;
+  title: string;
+  description: string;
+  action?: React.ReactNode;
   className?: string;
 }
 
-export function FormFeedback({ type, message, className }: FormFeedbackProps) {
-  const config = feedbackConfig[type];
-  const Icon = config.icon;
-  
+export function EmptyState({ icon: Icon, title, description, action, className }: EmptyStateProps) {
   return (
-    <div className={cn(
-      'flex items-center gap-2 text-sm p-3 rounded-md border',
-      type === 'success' && 'bg-green-50 border-green-200 text-green-800 dark:bg-green-950 dark:border-green-800 dark:text-green-200',
-      type === 'error' && 'bg-red-50 border-red-200 text-red-800 dark:bg-red-950 dark:border-red-800 dark:text-red-200',
-      type === 'warning' && 'bg-yellow-50 border-yellow-200 text-yellow-800 dark:bg-yellow-950 dark:border-yellow-800 dark:text-yellow-200',
-      className
-    )}>
-      <Icon className="h-4 w-4 flex-shrink-0" />
-      <span>{message}</span>
+    <div className={cn('text-center py-12 px-4', className)}>
+      {Icon && (
+        <div className="mx-auto w-16 h-16 mb-4 text-muted-foreground/50">
+          <Icon className="w-full h-full" aria-hidden="true" />
+        </div>
+      )}
+      <h3 className="text-lg font-semibold text-foreground mb-2">{title}</h3>
+      <p className="text-muted-foreground mb-6 max-w-md mx-auto">{description}</p>
+      {action && <div>{action}</div>}
     </div>
   );
 }
