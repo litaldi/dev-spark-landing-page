@@ -3,9 +3,9 @@ import {
   sanitizeInput, 
   isValidEmail, 
   isStrongPassword,
-  generateCsrfToken,
-  validateCsrfToken,
-  getCsrfToken,
+  generateCSRFToken,
+  validateCSRFToken,
+  getCSRFToken,
   isRateLimited
 } from '@/lib/security';
 
@@ -58,29 +58,29 @@ describe('Security Utilities', () => {
   
   describe('CSRF Protection', () => {
     it('generates a token with correct format', () => {
-      const token = generateCsrfToken();
+      const token = generateCSRFToken();
       expect(typeof token).toBe('string');
       expect(token.length).toBeGreaterThan(10);
     });
     
     it('validates a valid token', () => {
-      const token = generateCsrfToken();
-      expect(validateCsrfToken(token)).toBe(true);
+      const token = generateCSRFToken();
+      expect(validateCSRFToken(token)).toBe(true);
     });
     
     it('rejects an invalid token', () => {
-      generateCsrfToken(); // Create a real token first
-      expect(validateCsrfToken('fake-token')).toBe(false);
+      generateCSRFToken(); // Create a real token first
+      expect(validateCSRFToken('fake-token')).toBe(false);
     });
     
     it('gets existing token or generates a new one', () => {
       // First call should generate a new token
-      const token1 = getCsrfToken();
+      const token1 = getCSRFToken();
       expect(typeof token1).toBe('string');
       expect(token1.length).toBeGreaterThan(10);
       
       // Second call should return the same token
-      const token2 = getCsrfToken();
+      const token2 = getCSRFToken();
       expect(token2).toBe(token1);
     });
   });
@@ -97,35 +97,35 @@ describe('Security Utilities', () => {
     });
     
     it('allows requests under the limit', () => {
-      expect(isRateLimited('test', 3)).toBe(false); // First attempt
-      expect(isRateLimited('test', 3)).toBe(false); // Second attempt
-      expect(isRateLimited('test', 3)).toBe(false); // Third attempt
+      expect(isRateLimited('test', { maxRequests: 3 })).toBe(false); // First attempt
+      expect(isRateLimited('test', { maxRequests: 3 })).toBe(false); // Second attempt
+      expect(isRateLimited('test', { maxRequests: 3 })).toBe(false); // Third attempt
     });
     
     it('blocks requests over the limit', () => {
-      expect(isRateLimited('test', 2)).toBe(false); // First attempt
-      expect(isRateLimited('test', 2)).toBe(false); // Second attempt
-      expect(isRateLimited('test', 2)).toBe(true);  // Third attempt - blocked
+      expect(isRateLimited('test', { maxRequests: 2 })).toBe(false); // First attempt
+      expect(isRateLimited('test', { maxRequests: 2 })).toBe(false); // Second attempt
+      expect(isRateLimited('test', { maxRequests: 2 })).toBe(true);  // Third attempt - blocked
     });
     
     it('uses different limits for different keys', () => {
-      expect(isRateLimited('login', 2)).toBe(false); 
-      expect(isRateLimited('login', 2)).toBe(false);
-      expect(isRateLimited('register', 1)).toBe(false);
+      expect(isRateLimited('login', { maxRequests: 2 })).toBe(false); 
+      expect(isRateLimited('login', { maxRequests: 2 })).toBe(false);
+      expect(isRateLimited('register', { maxRequests: 1 })).toBe(false);
       
       // login is at limit, register is not
-      expect(isRateLimited('login', 2)).toBe(true);  // Blocked
-      expect(isRateLimited('register', 1)).toBe(true); // Also at limit now
+      expect(isRateLimited('login', { maxRequests: 2 })).toBe(true);  // Blocked
+      expect(isRateLimited('register', { maxRequests: 1 })).toBe(true); // Also at limit now
     });
     
     it('resets after time window', () => {
-      expect(isRateLimited('test', 1)).toBe(false); // First attempt
-      expect(isRateLimited('test', 1)).toBe(true);  // Second attempt - blocked
+      expect(isRateLimited('test', { maxRequests: 1 })).toBe(false); // First attempt
+      expect(isRateLimited('test', { maxRequests: 1 })).toBe(true);  // Second attempt - blocked
       
       // Advance time past the window
       jest.spyOn(Date, 'now').mockImplementation(() => 70000); // 70 seconds later
       
-      expect(isRateLimited('test', 1)).toBe(false); // Should be allowed again
+      expect(isRateLimited('test', { maxRequests: 1 })).toBe(false); // Should be allowed again
     });
   });
 });

@@ -3,9 +3,9 @@ import {
   sanitizeInput, 
   isValidEmail, 
   isStrongPassword,
-  validateCsrfToken,
-  getCsrfToken,
-  generateCsrfToken
+  validateCSRFToken,
+  getCSRFToken,
+  generateCSRFToken
 } from '@/lib/security';
 
 describe('Input Sanitization and Validation', () => {
@@ -69,14 +69,14 @@ describe('Input Sanitization and Validation', () => {
   
   describe('CSRF Protection', () => {
     it('generates, validates, and retrieves tokens correctly', () => {
-      const token = generateCsrfToken();
+      const token = generateCSRFToken();
       expect(typeof token).toBe('string');
       expect(token.length).toBeGreaterThan(10);
       
-      expect(validateCsrfToken(token)).toBe(true);
-      expect(validateCsrfToken('fake-token')).toBe(false);
+      expect(validateCSRFToken(token)).toBe(true);
+      expect(validateCSRFToken('fake-token')).toBe(false);
       
-      expect(getCsrfToken()).toBe(token); // Should return the same token
+      expect(getCSRFToken()).toBe(token); // Should return the same token
     });
   });
 });

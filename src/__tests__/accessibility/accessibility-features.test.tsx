@@ -15,11 +15,11 @@ describe('Accessibility Features', () => {
   test('SkipNav is properly implemented', async () => {
     const { container } = render(
       <>
-        <SkipNavLink>Skip to content</SkipNavLink>
+        <SkipNavLink contentId="main-content">Skip to content</SkipNavLink>
         <header>
           <nav>Navigation</nav>
         </header>
-        <SkipNavContent>
+        <SkipNavContent id="main-content">
           <main>Main content</main>
         </SkipNavContent>
       </>
