@@ -1,8 +1,7 @@
-
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowUp } from "lucide-react";
-import GetStartedModal from "./GetStartedModal";
+import { GetStartedModal } from "./GetStartedModal";
 
 const StickyCTABar: React.FC = () => {
   const [isVisible, setIsVisible] = useState(false);
