@@ -1,99 +1,89 @@
 
-import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
-import { isRateLimited } from '@/lib/security';
+import { isRateLimited } from '@/lib/security/rate-limiting';
 
-interface DashboardActions {
-  startFirstLesson: () => void;
-  startSession: () => void;
-  startLesson: (lessonId?: string) => void;
-  handleAction: (action: string) => void;
-}
-
-export const useDashboardActions = (onError: (error: string | null) => void): DashboardActions => {
+export function useDashboardActions(onError: (error: string | null) => void) {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const startFirstLesson = useCallback(() => {
+  const startFirstLesson = () => {
     // Check rate limiting
-    if (isRateLimited('start-lesson', 5)) {
-      onError('Too many attempts. Please wait a moment before trying again.');
+    if (isRateLimited('lesson-start', { maxRequests: 5 })) {
+      onError('Too many lesson attempts. Please wait before trying again.');
       return;
     }
 
     try {
-      // Mark onboarding as complete
-      localStorage.setItem('onboardingComplete', 'true');
+      // Mark first lesson as started
       localStorage.setItem('firstLessonStarted', 'true');
+      localStorage.setItem('currentLesson', 'javascript-basics');
+      localStorage.setItem('lastActivity', new Date().toISOString());
       
       toast({
-        title: 'Welcome to your first lesson!',
-        description: 'Let\'s start with the basics of web development.',
+        title: "Welcome to your first lesson!",
+        description: "Let's start with JavaScript basics. You're about to begin an exciting journey!",
       });
       
-      // Navigate to first lesson or simulate starting
-      console.log('Starting first lesson...');
+      // Navigate to lesson (you can customize this route)
+      navigate('/lessons/javascript-basics');
     } catch (error) {
-      console.error('Error starting first lesson:', error);
-      onError('Failed to start the lesson. Please try again.');
+      onError('Failed to start lesson. Please try again.');
     }
-  }, [onError, toast]);
+  };
 
-  const startSession = useCallback(() => {
+  const startSession = () => {
     // Check rate limiting
-    if (isRateLimited('start-session', 10)) {
-      onError('Too many session starts. Please wait a moment.');
+    if (isRateLimited('session-start', { maxRequests: 10 })) {
+      onError('Too many session attempts. Please wait before trying again.');
       return;
     }
 
     try {
-      // Update last session date
-      localStorage.setItem('lastSessionDate', new Date().toISOString());
+      // Update session info
+      const sessionDate = new Date().toISOString().split('T')[0];
+      localStorage.setItem('lastSessionDate', sessionDate);
+      localStorage.setItem('currentSessionStarted', 'true');
+      localStorage.setItem('lastActivity', new Date().toISOString());
       
       toast({
-        title: 'Session started!',
-        description: 'Ready to continue your learning journey.',
+        title: "Session started!",
+        description: "Welcome back! Ready to continue your learning journey?",
       });
       
-      console.log('Starting learning session...');
+      // You can add navigation or other session start logic here
     } catch (error) {
-      console.error('Error starting session:', error);
-      onError('Failed to start the session. Please try again.');
+      onError('Failed to start session. Please try again.');
     }
-  }, [onError, toast]);
+  };
 
-  const startLesson = useCallback((lessonId?: string) => {
+  const startLesson = (lessonId: string) => {
     // Check rate limiting
-    if (isRateLimited('start-lesson', 5)) {
-      onError('Too many lesson starts. Please wait a moment.');
+    if (isRateLimited('lesson-start', { maxRequests: 5 })) {
+      onError('Too many lesson attempts. Please wait before trying again.');
       return;
     }
 
     try {
-      const lesson = lessonId || 'default-lesson';
+      localStorage.setItem('currentLesson', lessonId);
+      localStorage.setItem('lastActivity', new Date().toISOString());
       
       toast({
-        title: 'Lesson started!',
-        description: `Beginning lesson: ${lesson}`,
+        title: "Lesson started!",
+        description: `Starting lesson: ${lessonId}`,
       });
       
-      console.log(`Starting lesson: ${lesson}`);
+      navigate(`/lessons/${lessonId}`);
     } catch (error) {
-      console.error('Error starting lesson:', error);
-      onError('Failed to start the lesson. Please try again.');
+      onError('Failed to start lesson. Please try again.');
     }
-  }, [onError, toast]);
+  };
 
-  const handleAction = useCallback((action: string) => {
+  const handleAction = (action: string) => {
     try {
       switch (action) {
         case 'help':
-          toast({
-            title: 'Help Center',
-            description: 'Opening help documentation...',
-          });
-          // Could navigate to help page or open help modal
+          navigate('/help');
           break;
         case 'settings':
           navigate('/settings');
@@ -102,13 +92,12 @@ export const useDashboardActions = (onError: (error: string | null) => void): Da
           navigate('/profile');
           break;
         default:
-          console.log(`Handling action: ${action}`);
+          console.log(`Action not implemented: ${action}`);
       }
     } catch (error) {
-      console.error('Error handling action:', error);
-      onError('Failed to complete the action. Please try again.');
+      onError('Failed to perform action. Please try again.');
     }
-  }, [navigate, onError, toast]);
+  };
 
   return {
     startFirstLesson,
@@ -116,4 +105,4 @@ export const useDashboardActions = (onError: (error: string | null) => void): Da
     startLesson,
     handleAction
   };
-};
+}

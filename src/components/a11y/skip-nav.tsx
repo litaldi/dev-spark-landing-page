@@ -5,9 +5,10 @@ import { cn } from '@/lib/utils';
 interface SkipNavLinkProps {
   contentId: string;
   className?: string;
+  children?: React.ReactNode;
 }
 
-export function SkipNavLink({ contentId, className }: SkipNavLinkProps) {
+export function SkipNavLink({ contentId, className, children = "Skip to main content" }: SkipNavLinkProps) {
   return (
     <a
       href={`#${contentId}`}
@@ -19,7 +20,7 @@ export function SkipNavLink({ contentId, className }: SkipNavLinkProps) {
         className
       )}
     >
-      Skip to main content
+      {children}
     </a>
   );
 }

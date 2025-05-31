@@ -1,9 +1,16 @@
 
-// Export all security-related modules from a central point
-export * from './input-validation';
+// Export all security utilities from a central location
 export * from './csrf-protection';
 export * from './rate-limiting';
 export * from './http-security';
+export * from './input-validation';
 
-// Re-exporting all the security functions from the old security.ts file ensures 
-// backward compatibility with existing code that imports from '@/lib/security'
+// Re-export with legacy names for backward compatibility
+export {
+  generateCSRFToken as generateCsrfToken,
+  getCSRFToken as getCsrfToken,
+  setCSRFToken as setCsrfToken,
+  validateCSRFToken as validateCsrfToken,
+  addCSRFToFormData as addCsrfToFormData,
+  initializeCSRF as initializeCsrf
+} from './csrf-protection';
