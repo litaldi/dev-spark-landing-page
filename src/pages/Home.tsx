@@ -6,6 +6,7 @@ import HeroSection from "@/components/landing/HeroSection";
 import FeatureGrid from "@/components/landing/FeatureGrid"; 
 import TestimonialCard from "@/components/landing/TestimonialCard";
 import JoinNowSection from "@/components/landing/JoinNowSection";
+import StickyCTABar from "@/components/landing/StickyCTABar";
 import { SkipNavLink, SkipNavContent } from "@/components/a11y/skip-nav";
 
 const Home = () => {
@@ -39,6 +40,7 @@ const Home = () => {
         </SkipNavContent>
       </main>
       <Footer />
+      <StickyCTABar />
     </div>
   );
 };
