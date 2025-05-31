@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowUp } from "lucide-react";
@@ -34,6 +35,13 @@ const StickyCTABar: React.FC = () => {
       top: 0,
       behavior: "smooth"
     });
+  };
+
+  const handleGetStarted = () => {
+    // Close modal and redirect to registration or login
+    setModalOpen(false);
+    // In a real app, this would redirect to the registration page
+    console.log("Redirecting to registration...");
   };
 
   if (!isVisible) {
@@ -85,7 +93,11 @@ const StickyCTABar: React.FC = () => {
       </div>
 
       {/* Get Started Modal */}
-      <GetStartedModal isOpen={modalOpen} onClose={() => setModalOpen(false)} />
+      <GetStartedModal 
+        isOpen={modalOpen} 
+        onClose={() => setModalOpen(false)}
+        onGetStarted={handleGetStarted}
+      />
     </>
   );
 };
