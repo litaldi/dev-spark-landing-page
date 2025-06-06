@@ -7,7 +7,7 @@ import { SkipNavLink, SkipNavContent } from "@/components/a11y/skip-nav";
 import { useToast } from "@/hooks/use-toast";
 import { AlertError } from "@/components/auth/AlertError";
 import { EnhancedDashboardContent } from "@/components/dashboard/EnhancedDashboardContent";
-import { OnboardingOverlay } from "@/components/onboarding/OnboardingOverlay";
+import { EnhancedOnboardingOverlay } from "@/components/onboarding/EnhancedOnboardingOverlay";
 import { AccessibilityProvider } from "@/components/a11y/AccessibilityProvider";
 
 const Dashboard = () => {
