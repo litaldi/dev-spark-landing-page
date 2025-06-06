@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { X, ArrowRight, ArrowLeft, Lightbulb, MessageSquare, Award, BarChart3, Sparkles } from 'lucide-react';
+import { X, ArrowRight, ArrowLeft, MessageSquare, Award, BarChart3, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLocalStorage } from '@/hooks/use-local-storage';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -69,6 +69,30 @@ export const EnhancedOnboardingOverlay = ({ onComplete }: EnhancedOnboardingOver
     }
   }, [hasCompletedOnboarding]);
 
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        handleComplete();
+      } else if (event.key === 'ArrowRight' || event.key === 'Enter') {
+        handleNext();
+      } else if (event.key === 'ArrowLeft') {
+        handlePrevious();
+      }
+    };
+
+    if (isVisible) {
+      document.addEventListener('keydown', handleKeyDown);
+      // Trap focus within the modal
+      document.body.style.overflow = 'hidden';
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = 'unset';
+    };
+  }, [isVisible, currentStep]);
+
   const currentStepData = onboardingSteps[currentStep];
   const isLastStep = currentStep === onboardingSteps.length - 1;
 
@@ -97,7 +121,13 @@ export const EnhancedOnboardingOverlay = ({ onComplete }: EnhancedOnboardingOver
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm">
+    <div 
+      className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="onboarding-title"
+      aria-describedby="onboarding-description"
+    >
       <div className="flex items-center justify-center min-h-screen p-4">
         <AnimatePresence mode="wait">
           <motion.div
@@ -142,17 +172,23 @@ export const EnhancedOnboardingOverlay = ({ onComplete }: EnhancedOnboardingOver
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3, duration: 0.4 }}
                 >
-                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
+                  <h2 
+                    id="onboarding-title"
+                    className="text-2xl font-bold text-gray-900 dark:text-white mb-3"
+                  >
                     {currentStepData.title}
                   </h2>
-                  <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-4">
+                  <p 
+                    id="onboarding-description"
+                    className="text-gray-600 dark:text-gray-400 leading-relaxed mb-4"
+                  >
                     {currentStepData.description}
                   </p>
                   
                   {/* Benefits list */}
-                  <div className="space-y-2 mb-6">
+                  <ul className="space-y-2 mb-6" role="list">
                     {currentStepData.benefits.map((benefit, index) => (
-                      <motion.div
+                      <motion.li
                         key={benefit}
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
@@ -161,9 +197,9 @@ export const EnhancedOnboardingOverlay = ({ onComplete }: EnhancedOnboardingOver
                       >
                         <div className="w-1.5 h-1.5 bg-brand-500 rounded-full mr-3 flex-shrink-0" />
                         {benefit}
-                      </motion.div>
+                      </motion.li>
                     ))}
-                  </div>
+                  </ul>
                 </motion.div>
 
                 {/* Enhanced Progress Indicator */}
@@ -172,6 +208,11 @@ export const EnhancedOnboardingOverlay = ({ onComplete }: EnhancedOnboardingOver
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.5 }}
+                  role="progressbar"
+                  aria-valuenow={currentStep + 1}
+                  aria-valuemin={1}
+                  aria-valuemax={onboardingSteps.length}
+                  aria-label={`Step ${currentStep + 1} of ${onboardingSteps.length}`}
                 >
                   {onboardingSteps.map((_, index) => (
                     <motion.div
@@ -202,18 +243,23 @@ export const EnhancedOnboardingOverlay = ({ onComplete }: EnhancedOnboardingOver
                     onClick={handlePrevious}
                     disabled={currentStep === 0}
                     className="flex items-center transition-all duration-200 hover:scale-105"
+                    aria-label="Go to previous step"
                   >
                     <ArrowLeft className="h-4 w-4 mr-1" />
                     Previous
                   </Button>
 
-                  <span className="text-sm text-gray-500 dark:text-gray-400 font-medium">
+                  <span 
+                    className="text-sm text-gray-500 dark:text-gray-400 font-medium"
+                    aria-live="polite"
+                  >
                     {currentStep + 1} of {onboardingSteps.length}
                   </span>
 
                   <Button
                     onClick={handleNext}
                     className="flex items-center bg-brand-500 hover:bg-brand-600 transition-all duration-200 hover:scale-105"
+                    aria-label={isLastStep ? 'Complete onboarding and start learning' : 'Go to next step'}
                   >
                     {isLastStep ? 'Start Learning' : 'Next'}
                     <ArrowRight className="h-4 w-4 ml-1" />
@@ -230,6 +276,7 @@ export const EnhancedOnboardingOverlay = ({ onComplete }: EnhancedOnboardingOver
                     variant="ghost"
                     onClick={handleComplete}
                     className="w-full text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
+                    aria-label="Skip onboarding tutorial"
                   >
                     Skip tutorial
                   </Button>

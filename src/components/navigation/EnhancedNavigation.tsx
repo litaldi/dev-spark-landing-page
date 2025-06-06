@@ -84,26 +84,37 @@ const NavItem = ({
             : "hover:bg-muted/80 hover:scale-105"
         )}
         onClick={onClick}
+        aria-current={isActive ? "page" : undefined}
+        aria-describedby={showDescription ? `nav-${item.id}-desc` : undefined}
       >
         <motion.div
           className="flex items-center w-full"
           whileHover={{ x: 2 }}
           transition={{ duration: 0.2 }}
         >
-          <item.icon className={cn(
-            "h-4 w-4 flex-shrink-0",
-            showDescription ? "mr-3" : "mr-2"
-          )} />
+          <item.icon 
+            className={cn(
+              "h-4 w-4 flex-shrink-0",
+              showDescription ? "mr-3" : "mr-2"
+            )} 
+            aria-hidden="true"
+          />
           <div className="flex-1 text-left">
             <div className="font-medium">{item.label}</div>
             {showDescription && item.description && (
-              <div className="text-xs opacity-70 mt-1">
+              <div 
+                id={`nav-${item.id}-desc`}
+                className="text-xs opacity-70 mt-1"
+              >
                 {item.description}
               </div>
             )}
           </div>
           {!isActive && (
-            <ChevronRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+            <ChevronRight 
+              className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" 
+              aria-hidden="true"
+            />
           )}
         </motion.div>
         
@@ -130,6 +141,18 @@ export const EnhancedNavigation = () => {
     setIsExpanded(false);
   };
 
+  // Close navigation on escape key
+  React.useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && isExpanded) {
+        setIsExpanded(false);
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isExpanded]);
+
   return (
     <>
       {/* Mobile Menu Toggle */}
@@ -139,6 +162,9 @@ export const EnhancedNavigation = () => {
           size="icon"
           onClick={() => setIsExpanded(!isExpanded)}
           className="bg-background/80 backdrop-blur-sm"
+          aria-label={isExpanded ? "Close navigation menu" : "Open navigation menu"}
+          aria-expanded={isExpanded}
+          aria-controls="mobile-navigation"
         >
           <AnimatePresence mode="wait">
             {isExpanded ? (
@@ -177,15 +203,19 @@ export const EnhancedNavigation = () => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsExpanded(false)}
+              aria-hidden="true"
             />
 
             {/* Navigation Panel */}
-            <motion.div
+            <motion.nav
+              id="mobile-navigation"
               className="lg:hidden fixed left-0 top-0 bottom-0 w-80 bg-background border-r z-50 overflow-y-auto"
               initial={{ x: -320 }}
               animate={{ x: 0 }}
               exit={{ x: -320 }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
+              role="navigation"
+              aria-label="Main navigation"
             >
               <div className="p-6 pt-20">
                 <motion.h2 
@@ -197,43 +227,51 @@ export const EnhancedNavigation = () => {
                   Navigation
                 </motion.h2>
                 
-                <div className="space-y-2">
+                <ul className="space-y-2" role="list">
                   {navigationItems.map((item, index) => (
-                    <NavItem
-                      key={item.id}
-                      item={item}
-                      isActive={location.pathname === item.path}
-                      onClick={() => handleNavigate(item.path)}
-                      showDescription={true}
-                      delay={0.1 * index}
-                    />
+                    <li key={item.id}>
+                      <NavItem
+                        item={item}
+                        isActive={location.pathname === item.path}
+                        onClick={() => handleNavigate(item.path)}
+                        showDescription={true}
+                        delay={0.1 * index}
+                      />
+                    </li>
                   ))}
-                </div>
+                </ul>
               </div>
-            </motion.div>
+            </motion.nav>
           </>
         )}
       </AnimatePresence>
 
-      {/* Desktop Navigation (if needed) */}
-      <div className="hidden lg:block fixed left-6 top-1/2 -translate-y-1/2 z-40">
+      {/* Desktop Navigation */}
+      <nav 
+        className="hidden lg:block fixed left-6 top-1/2 -translate-y-1/2 z-40"
+        role="navigation"
+        aria-label="Quick navigation"
+      >
         <motion.div
           className="bg-background/80 backdrop-blur-sm border rounded-lg p-2 space-y-1"
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.4 }}
         >
-          {navigationItems.map((item, index) => (
-            <NavItem
-              key={item.id}
-              item={item}
-              isActive={location.pathname === item.path}
-              onClick={() => handleNavigate(item.path)}
-              delay={0.1 * index}
-            />
-          ))}
+          <ul className="space-y-1" role="list">
+            {navigationItems.map((item, index) => (
+              <li key={item.id}>
+                <NavItem
+                  item={item}
+                  isActive={location.pathname === item.path}
+                  onClick={() => handleNavigate(item.path)}
+                  delay={0.1 * index}
+                />
+              </li>
+            ))}
+          </ul>
         </motion.div>
-      </div>
+      </nav>
     </>
   );
 };

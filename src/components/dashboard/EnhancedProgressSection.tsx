@@ -66,6 +66,7 @@ const StatCard = ({
                 initial={{ scale: 1.1, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ duration: 0.3 }}
+                aria-live="polite"
               >
                 {value}
               </motion.div>
@@ -82,6 +83,7 @@ const StatCard = ({
                 rotate: [0, -10, 10, 0],
                 transition: { duration: 0.5 }
               }}
+              aria-hidden="true"
             >
               <Icon className="h-5 w-5 text-white" />
             </motion.div>
@@ -93,7 +95,11 @@ const StatCard = ({
               animate={{ width: "100%" }}
               transition={{ delay: delay + 0.3, duration: 0.6 }}
             >
-              <Progress value={progress} className="h-2" />
+              <Progress 
+                value={progress} 
+                className="h-2" 
+                aria-label={`${label} progress: ${Math.round(progress)}%`}
+              />
             </motion.div>
           )}
         </CardContent>
@@ -120,6 +126,7 @@ export const EnhancedProgressSection: React.FC<ProgressSectionProps> = ({
             <motion.div
               animate={{ rotate: 360 }}
               transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+              aria-label="Loading progress data"
             >
               <Target className="h-5 w-5" />
             </motion.div>
@@ -129,7 +136,7 @@ export const EnhancedProgressSection: React.FC<ProgressSectionProps> = ({
         <CardContent>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {[...Array(4)].map((_, i) => (
-              <div key={i} className="animate-pulse">
+              <div key={i} className="animate-pulse" aria-hidden="true">
                 <div className="bg-gray-200 dark:bg-gray-700 rounded-lg h-24"></div>
               </div>
             ))}
@@ -158,6 +165,7 @@ export const EnhancedProgressSection: React.FC<ProgressSectionProps> = ({
                 repeat: Infinity,
                 ease: "easeInOut"
               }}
+              aria-hidden="true"
             >
               <Target className="h-5 w-5 text-brand-600" />
             </motion.div>
@@ -210,9 +218,14 @@ export const EnhancedProgressSection: React.FC<ProgressSectionProps> = ({
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.6, duration: 0.4 }}
+            role="region"
+            aria-labelledby="weekly-progress-title"
           >
             <div className="flex justify-between items-center mb-3">
-              <h4 className="font-medium text-brand-900 dark:text-brand-100">
+              <h4 
+                id="weekly-progress-title"
+                className="font-medium text-brand-900 dark:text-brand-100"
+              >
                 This Week's Progress
               </h4>
               <motion.span 
@@ -221,6 +234,7 @@ export const EnhancedProgressSection: React.FC<ProgressSectionProps> = ({
                 initial={{ scale: 1.2, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ duration: 0.3 }}
+                aria-live="polite"
               >
                 {Math.round(weeklyProgress)}%
               </motion.span>
@@ -233,6 +247,7 @@ export const EnhancedProgressSection: React.FC<ProgressSectionProps> = ({
               <Progress 
                 value={weeklyProgress} 
                 className="h-3 bg-brand-200 dark:bg-brand-800" 
+                aria-label={`Weekly goal progress: ${Math.round(weeklyProgress)}% complete`}
               />
             </motion.div>
           </motion.div>

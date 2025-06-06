@@ -86,6 +86,9 @@ export const EnhancedEmptyState = ({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: "easeOut" }}
+      role="region"
+      aria-labelledby="empty-state-title"
+      aria-describedby="empty-state-description"
     >
       <Card className={cn(
         currentSize.container, 
@@ -94,7 +97,7 @@ export const EnhancedEmptyState = ({
         className
       )}>
         {/* Background decoration */}
-        <div className="absolute inset-0 opacity-5">
+        <div className="absolute inset-0 opacity-5" aria-hidden="true">
           <div className="absolute top-0 left-0 w-32 h-32 bg-gradient-to-br from-current rounded-full -translate-x-16 -translate-y-16" />
           <div className="absolute bottom-0 right-0 w-24 h-24 bg-gradient-to-tl from-current rounded-full translate-x-12 translate-y-12" />
         </div>
@@ -115,6 +118,7 @@ export const EnhancedEmptyState = ({
                 repeat: Infinity,
                 ease: "easeInOut"
               }}
+              aria-hidden="true"
             >
               <Icon className={cn(currentSize.icon, currentVariant.iconColor)} />
               <motion.div
@@ -138,16 +142,22 @@ export const EnhancedEmptyState = ({
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.4 }}
           >
-            <h3 className={cn(
-              "font-semibold text-foreground tracking-tight",
-              currentSize.title
-            )}>
+            <h3 
+              id="empty-state-title"
+              className={cn(
+                "font-semibold text-foreground tracking-tight",
+                currentSize.title
+              )}
+            >
               {title}
             </h3>
-            <p className={cn(
-              "text-muted-foreground leading-relaxed",
-              currentSize.description
-            )}>
+            <p 
+              id="empty-state-description"
+              className={cn(
+                "text-muted-foreground leading-relaxed",
+                currentSize.description
+              )}
+            >
               {description}
             </p>
           </motion.div>
@@ -164,6 +174,7 @@ export const EnhancedEmptyState = ({
                   onClick={action.onClick} 
                   variant={action.variant || "default"}
                   className="w-full sm:w-auto transition-all duration-200 hover:scale-105"
+                  aria-describedby="empty-state-description"
                 >
                   {action.label}
                 </Button>
@@ -173,6 +184,7 @@ export const EnhancedEmptyState = ({
                   onClick={secondaryAction.onClick} 
                   variant="outline"
                   className="w-full sm:w-auto transition-all duration-200 hover:scale-105"
+                  aria-describedby="empty-state-description"
                 >
                   {secondaryAction.label}
                 </Button>
