@@ -1,4 +1,3 @@
-
 import React from "react";
 import { WelcomeSection } from "@/components/dashboard/WelcomeSection";
 import { ProgressSection } from "@/components/dashboard/ProgressSection";
@@ -15,6 +14,8 @@ import { HelpCircle, Download } from "lucide-react";
 import { useViewportSize, useBreakpoint } from "@/hooks/use-mobile";
 import { exportProgressReport, exportProgressCSV } from "@/lib/export-utils";
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
+import { EnhancedProgressSection } from "@/components/dashboard/EnhancedProgressSection";
+import { EnhancedNavigation } from "@/components/navigation/EnhancedNavigation";
 
 interface EnhancedDashboardContentProps {
   userName: string;
@@ -72,7 +73,10 @@ export const EnhancedDashboardContent: React.FC<EnhancedDashboardContentProps> =
 
   return (
     <ErrorBoundary>
-      <div className="space-y-6">
+      <div className="space-y-6 relative">
+        {/* Enhanced Navigation */}
+        <EnhancedNavigation />
+        
         {/* Streak Reminder */}
         <StreakReminder 
           currentStreak={currentStreak}
@@ -90,7 +94,7 @@ export const EnhancedDashboardContent: React.FC<EnhancedDashboardContentProps> =
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 xs:gap-4 sm:gap-6">
           <div className="lg:col-span-2 space-y-3 xs:space-y-4 sm:space-y-6">
             <ErrorBoundary>
-              <ProgressSection 
+              <EnhancedProgressSection 
                 weeklyGoalHours={10}
                 currentHours={totalHours}
                 streakDays={currentStreak}

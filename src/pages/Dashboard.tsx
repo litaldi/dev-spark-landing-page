@@ -81,9 +81,9 @@ const Dashboard = () => {
         </main>
         <Footer />
         
-        {/* Onboarding Overlay */}
+        {/* Enhanced Onboarding Overlay */}
         {showOnboarding && (
-          <OnboardingOverlay onComplete={handleOnboardingComplete} />
+          <EnhancedOnboardingOverlay onComplete={handleOnboardingComplete} />
         )}
       </div>
     </AccessibilityProvider>
