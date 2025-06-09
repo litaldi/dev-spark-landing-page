@@ -1,3 +1,4 @@
+
 import React from "react";
 import { WelcomeSection } from "@/components/dashboard/WelcomeSection";
 import { ProgressSection } from "@/components/dashboard/ProgressSection";
@@ -16,6 +17,9 @@ import { exportProgressReport, exportProgressCSV } from "@/lib/export-utils";
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { EnhancedProgressSection } from "@/components/dashboard/EnhancedProgressSection";
 import { EnhancedNavigation } from "@/components/navigation/EnhancedNavigation";
+import { EnhancedWelcomeSection } from "@/components/dashboard/EnhancedWelcomeSection";
+import { FloatingActionButton } from "@/components/ui/floating-action-button";
+import { motion } from "framer-motion";
 
 interface EnhancedDashboardContentProps {
   userName: string;
@@ -73,7 +77,12 @@ export const EnhancedDashboardContent: React.FC<EnhancedDashboardContentProps> =
 
   return (
     <ErrorBoundary>
-      <div className="space-y-6 relative">
+      <motion.div 
+        className="space-y-6 relative"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.6 }}
+      >
         {/* Enhanced Navigation */}
         <EnhancedNavigation />
         
@@ -83,7 +92,7 @@ export const EnhancedDashboardContent: React.FC<EnhancedDashboardContentProps> =
           lastActivityDate={lastActivityDate || undefined}
         />
 
-        <WelcomeSection
+        <EnhancedWelcomeSection
           userName={userName}
           isFirstTimeUser={isFirstTimeUser}
           isLoading={isLoading}
@@ -91,7 +100,12 @@ export const EnhancedDashboardContent: React.FC<EnhancedDashboardContentProps> =
           onStartTodaysSession={startSession}
         />
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 xs:gap-4 sm:gap-6">
+        <motion.div 
+          className="grid grid-cols-1 lg:grid-cols-3 gap-3 xs:gap-4 sm:gap-6"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+        >
           <div className="lg:col-span-2 space-y-3 xs:space-y-4 sm:space-y-6">
             <ErrorBoundary>
               <EnhancedProgressSection 
@@ -133,12 +147,17 @@ export const EnhancedDashboardContent: React.FC<EnhancedDashboardContentProps> =
             </ErrorBoundary>
             
             {/* Export and Help Actions */}
-            <div className="space-y-2">
+            <motion.div 
+              className="space-y-2"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+            >
               <div className="flex flex-col gap-2">
                 <Button 
                   variant="outline"
                   size="sm"
-                  className="w-full justify-start"
+                  className="w-full justify-start hover:bg-brand-50 dark:hover:bg-brand-900/20 transition-all duration-300"
                   onClick={handleExportProgress}
                   aria-label="Export progress report"
                 >
@@ -148,7 +167,7 @@ export const EnhancedDashboardContent: React.FC<EnhancedDashboardContentProps> =
                 <Button 
                   variant="outline"
                   size="sm"
-                  className="w-full justify-start"
+                  className="w-full justify-start hover:bg-brand-50 dark:hover:bg-brand-900/20 transition-all duration-300"
                   onClick={handleExportCSV}
                   aria-label="Export progress data as CSV"
                 >
@@ -156,22 +175,42 @@ export const EnhancedDashboardContent: React.FC<EnhancedDashboardContentProps> =
                   Export CSV Data
                 </Button>
               </div>
-            </div>
+            </motion.div>
             
-            <div className={`${isSmallScreen || isTabletScreen ? 'fixed bottom-6 right-6 z-10' : 'mt-4 flex justify-end'}`}>
-              <Button 
-                variant="outline"
-                size={isSmallScreen ? "icon" : "sm"}
-                className={`${isSmallScreen ? 'rounded-full h-12 w-12 shadow-lg bg-white dark:bg-gray-800' : 'rounded-md'}`}
-                aria-label="Get help with dashboard features"
-                onClick={() => handleAction('help')}
+            {/* Enhanced Help Button */}
+            {!isSmallScreen && !isTabletScreen && (
+              <motion.div 
+                className="mt-4 flex justify-end"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.6, delay: 0.6 }}
               >
-                <HelpCircle className={`${isSmallScreen ? 'h-6 w-6' : 'h-4 w-4 mr-2'}`} />
-                {!isSmallScreen && <span>Get Help</span>}
-              </Button>
-            </div>
+                <Button 
+                  variant="outline"
+                  size="sm"
+                  className="rounded-md hover:bg-brand-50 dark:hover:bg-brand-900/20 transition-all duration-300 group"
+                  aria-label="Get help with dashboard features"
+                  onClick={() => handleAction('help')}
+                >
+                  <HelpCircle className="h-4 w-4 mr-2 group-hover:scale-110 transition-transform" />
+                  <span>Get Help</span>
+                </Button>
+              </motion.div>
+            )}
           </div>
-        </div>
+        </motion.div>
+
+        {/* Floating Help Button for Mobile */}
+        {(isSmallScreen || isTabletScreen) && (
+          <div className="fixed bottom-6 right-6 z-10">
+            <FloatingActionButton
+              icon={HelpCircle}
+              onClick={() => handleAction('help')}
+              ariaLabel="Get help with dashboard features"
+              color="primary"
+            />
+          </div>
+        )}
 
         {/* AI Study Companion (floating chat widget) */}
         <ErrorBoundary>
@@ -182,7 +221,7 @@ export const EnhancedDashboardContent: React.FC<EnhancedDashboardContentProps> =
         <ErrorBoundary>
           <MotivationalPrompts userName={userName} lastActivity={lastActivityDate} />
         </ErrorBoundary>
-      </div>
+      </motion.div>
     </ErrorBoundary>
   );
 };
