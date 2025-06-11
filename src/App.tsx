@@ -8,6 +8,8 @@ import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { useKeyboardFocusDetection } from "@/lib/keyboard-utils";
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { HelmetProvider } from 'react-helmet-async';
+import { PageTransition } from "@/components/ui/page-transition";
+import { EnhancedToaster } from "@/components/ui/enhanced-toast";
 import Home from "./pages/Home";
 import NotFound from "./pages/NotFound";
 import Terms from "./pages/Terms";
@@ -93,39 +95,41 @@ function App() {
             <TooltipProvider>
               <div className="relative">
                 <ErrorBoundary>
-                  <Routes>
-                    {/* Home page route */}
-                    <Route path="/" element={<Home />} />
-                    
-                    {/* Landing pages */}
-                    <Route path="/about" element={<About />} />
-                    <Route path="/faq" element={<FAQ />} />
-                    <Route path="/help" element={<Help />} />
-                    <Route path="/contact" element={<Contact />} />
-                    <Route path="/newsletter" element={<Newsletter />} />
-                    <Route path="/terms" element={<Terms />} />
-                    <Route path="/privacy" element={<Privacy />} />
-                    <Route path="/accessibility" element={<Accessibility />} />
-                    
-                    {/* User related pages */}
-                    <Route path="/profile" element={<Profile />} />
-                    <Route path="/settings" element={<Settings />} />
-                    <Route path="/dashboard" element={<Dashboard />} />
+                  <PageTransition>
+                    <Routes>
+                      {/* Home page route */}
+                      <Route path="/" element={<Home />} />
+                      
+                      {/* Landing pages */}
+                      <Route path="/about" element={<About />} />
+                      <Route path="/faq" element={<FAQ />} />
+                      <Route path="/help" element={<Help />} />
+                      <Route path="/contact" element={<Contact />} />
+                      <Route path="/newsletter" element={<Newsletter />} />
+                      <Route path="/terms" element={<Terms />} />
+                      <Route path="/privacy" element={<Privacy />} />
+                      <Route path="/accessibility" element={<Accessibility />} />
+                      
+                      {/* User related pages */}
+                      <Route path="/profile" element={<Profile />} />
+                      <Route path="/settings" element={<Settings />} />
+                      <Route path="/dashboard" element={<Dashboard />} />
 
-                    {/* Auth pages */}
-                    <Route path="/auth/login" element={<LoginPage />} />
-                    <Route path="/auth/register" element={<RegisterPage />} />
-                    <Route path="/auth/forgot-password" element={<ForgotPasswordPage />} />
-                    <Route path="/auth/magic-link" element={<MagicLinkPage />} />
-                    <Route path="/auth/onboarding" element={<OnboardingPage />} />
-                    <Route path="/auth/logout" element={<LogoutPage />} />
-                    <Route path="/auth/error" element={<AuthErrorPage />} />
-                    
-                    {/* Catch-all route for 404 pages */}
-                    <Route path="*" element={<NotFound />} />
-                  </Routes>
+                      {/* Auth pages */}
+                      <Route path="/auth/login" element={<LoginPage />} />
+                      <Route path="/auth/register" element={<RegisterPage />} />
+                      <Route path="/auth/forgot-password" element={<ForgotPasswordPage />} />
+                      <Route path="/auth/magic-link" element={<MagicLinkPage />} />
+                      <Route path="/auth/onboarding" element={<OnboardingPage />} />
+                      <Route path="/auth/logout" element={<LogoutPage />} />
+                      <Route path="/auth/error" element={<AuthErrorPage />} />
+                      
+                      {/* Catch-all route for 404 pages */}
+                      <Route path="*" element={<NotFound />} />
+                    </Routes>
+                  </PageTransition>
                 </ErrorBoundary>
-                <Toaster />
+                <EnhancedToaster />
                 <Sonner />
               </div>
             </TooltipProvider>
