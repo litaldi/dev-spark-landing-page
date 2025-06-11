@@ -64,69 +64,7 @@ const Home = () => {
               </motion.div>
               
               <motion.div variants={sectionVariants}>
-                <section className="py-16 bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
-                  <div className="container mx-auto px-4">
-                    <motion.div
-                      className="text-center mb-12"
-                      initial={{ opacity: 0, y: 20 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ duration: 0.6 }}
-                    >
-                      <h2 className="text-3xl md:text-4xl font-bold text-brand-800 dark:text-white mb-4">
-                        What Our Students Say
-                      </h2>
-                      <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-                        Join thousands of developers who've transformed their careers with DevAI
-                      </p>
-                    </motion.div>
-                    
-                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-                      <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.6, delay: 0.1 }}
-                      >
-                        <TestimonialCard 
-                          quote="DevAI helped me land my first developer job in just 3 months!"
-                          author="Sarah Chen"
-                          role="Frontend Developer at Google"
-                          rating={5}
-                        />
-                      </motion.div>
-                      
-                      <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.6, delay: 0.2 }}
-                      >
-                        <TestimonialCard 
-                          quote="The AI-powered feedback is incredible. It's like having a senior developer mentor you 24/7."
-                          author="Marcus Johnson"
-                          role="Full Stack Developer at Microsoft"
-                          rating={5}
-                        />
-                      </motion.div>
-                      
-                      <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.6, delay: 0.3 }}
-                        className="md:col-span-2 lg:col-span-1"
-                      >
-                        <TestimonialCard 
-                          quote="I went from complete beginner to confident developer. The personalized learning path made all the difference."
-                          author="Emily Rodriguez"
-                          role="Software Engineer at Meta"
-                          rating={5}
-                        />
-                      </motion.div>
-                    </div>
-                  </div>
-                </section>
+                <TestimonialCard />
               </motion.div>
             </motion.div>
           </SkipNavContent>

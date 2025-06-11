@@ -45,63 +45,83 @@ export interface EnhancedInteractiveButtonProps
 }
 
 const EnhancedInteractiveButton = React.forwardRef<HTMLButtonElement, EnhancedInteractiveButtonProps>(
-  ({ className, variant, size, asChild = false, loading = false, ripple = true, children, ...props }, ref) => {
+  ({ className, variant, size, asChild = false, loading = false, ripple = true, children, onClick, onMouseDown, onMouseUp, onMouseLeave, ...props }, ref) => {
     const [isPressed, setIsPressed] = React.useState(false);
-    const Comp = asChild ? Slot : motion.button;
+    const Comp = asChild ? Slot : "button";
 
-    const handleMouseDown = () => setIsPressed(true);
-    const handleMouseUp = () => setIsPressed(false);
-    const handleMouseLeave = () => setIsPressed(false);
+    const handleMouseDown = (e: React.MouseEvent<HTMLButtonElement>) => {
+      setIsPressed(true);
+      if (onMouseDown) onMouseDown(e);
+    };
+    
+    const handleMouseUp = (e: React.MouseEvent<HTMLButtonElement>) => {
+      setIsPressed(false);
+      if (onMouseUp) onMouseUp(e);
+    };
+    
+    const handleMouseLeave = (e: React.MouseEvent<HTMLButtonElement>) => {
+      setIsPressed(false);
+      if (onMouseLeave) onMouseLeave(e);
+    };
+
+    const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+      if (onClick) onClick(e);
+    };
 
     return (
-      <Comp
-        className={cn(enhancedButtonVariants({ variant, size, className }))}
-        ref={ref}
-        onMouseDown={handleMouseDown}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseLeave}
+      <motion.div
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
         transition={{ type: "spring", stiffness: 400, damping: 30 }}
-        aria-disabled={props.disabled || loading}
-        aria-busy={loading}
-        data-state={props.disabled || loading ? "disabled" : undefined}
-        {...props}
+        className="inline-block"
       >
-        {/* Ripple effect */}
-        {ripple && isPressed && (
+        <Comp
+          className={cn(enhancedButtonVariants({ variant, size, className }))}
+          ref={ref}
+          onMouseDown={handleMouseDown}
+          onMouseUp={handleMouseUp}
+          onMouseLeave={handleMouseLeave}
+          onClick={handleClick}
+          aria-disabled={props.disabled || loading}
+          aria-busy={loading}
+          data-state={props.disabled || loading ? "disabled" : undefined}
+          {...props}
+        >
+          {/* Ripple effect */}
+          {ripple && isPressed && (
+            <motion.div
+              className="absolute inset-0 bg-white/20 rounded-md"
+              initial={{ scale: 0, opacity: 0.5 }}
+              animate={{ scale: 1, opacity: 0 }}
+              transition={{ duration: 0.6 }}
+            />
+          )}
+          
+          {/* Loading spinner */}
+          {loading && (
+            <motion.div
+              className="absolute inset-0 flex items-center justify-center bg-inherit rounded-md"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.2 }}
+            >
+              <motion.div
+                className="w-4 h-4 border-2 border-current border-t-transparent rounded-full"
+                animate={{ rotate: 360 }}
+                transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+              />
+            </motion.div>
+          )}
+          
           <motion.div
-            className="absolute inset-0 bg-white/20 rounded-md"
-            initial={{ scale: 0, opacity: 0.5 }}
-            animate={{ scale: 1, opacity: 0 }}
-            transition={{ duration: 0.6 }}
-          />
-        )}
-        
-        {/* Loading spinner */}
-        {loading && (
-          <motion.div
-            className="absolute inset-0 flex items-center justify-center bg-inherit rounded-md"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
+            className={cn("flex items-center gap-2", loading && "opacity-0")}
+            animate={{ opacity: loading ? 0 : 1 }}
             transition={{ duration: 0.2 }}
           >
-            <motion.div
-              className="w-4 h-4 border-2 border-current border-t-transparent rounded-full"
-              animate={{ rotate: 360 }}
-              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-            />
+            {children}
           </motion.div>
-        )}
-        
-        <motion.div
-          className={cn("flex items-center gap-2", loading && "opacity-0")}
-          animate={{ opacity: loading ? 0 : 1 }}
-          transition={{ duration: 0.2 }}
-        >
-          {children}
-        </motion.div>
-      </Comp>
+        </Comp>
+      </motion.div>
     );
   }
 );
