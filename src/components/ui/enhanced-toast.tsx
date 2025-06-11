@@ -65,11 +65,12 @@ export function EnhancedToaster() {
               layout
             >
               <Toast
-                variant={variant}
+                variant={variant === "success" || variant === "warning" ? "default" : variant}
                 className={cn(
                   "group shadow-lg border border-border/50 backdrop-blur-sm",
                   variant === "destructive" && "border-red-200 dark:border-red-800",
-                  variant === "success" && "border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-950/30"
+                  variant === "success" && "border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-950/30",
+                  variant === "warning" && "border-orange-200 dark:border-orange-800 bg-orange-50 dark:bg-orange-950/30"
                 )}
                 {...props}
               >

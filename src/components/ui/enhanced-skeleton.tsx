@@ -104,6 +104,23 @@ export const SkeletonCard = () => (
   </div>
 );
 
+export const SkeletonTable = ({ rows = 5, columns = 4 }: { rows?: number; columns?: number }) => (
+  <div className="space-y-3">
+    <div className="grid gap-3" style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }}>
+      {Array.from({ length: columns }).map((_, i) => (
+        <EnhancedSkeleton key={i} variant="text" className="h-8 w-full" />
+      ))}
+    </div>
+    {Array.from({ length: rows }).map((_, rowIndex) => (
+      <div key={rowIndex} className="grid gap-3" style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }}>
+        {Array.from({ length: columns }).map((_, colIndex) => (
+          <EnhancedSkeleton key={colIndex} variant="text" className="h-6 w-full" />
+        ))}
+      </div>
+    ))}
+  </div>
+);
+
 export const SkeletonDashboard = () => (
   <div className="space-y-6">
     <div className="space-y-4 p-6 border rounded-lg">
