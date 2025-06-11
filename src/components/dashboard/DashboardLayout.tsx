@@ -7,7 +7,7 @@ import { EnhancedWelcomeSection } from "@/components/dashboard/EnhancedWelcomeSe
 import { EnhancedNavigation } from "@/components/navigation/EnhancedNavigation";
 import { AIStudyCompanion } from "@/components/dashboard/AIStudyCompanion";
 import { MotivationalPrompts } from "@/components/dashboard/MotivationalPrompts";
-import { DashboardGrid } from "./DashboardGrid";
+import { EnhancedDashboardGrid } from "./EnhancedDashboardGrid";
 
 interface DashboardLayoutProps {
   userName: string;
@@ -40,43 +40,75 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   onStartLesson,
   onHelpClick
 }) => {
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        delayChildren: 0.1,
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        type: "spring",
+        stiffness: 100,
+        damping: 15
+      }
+    }
+  };
+
   return (
     <ErrorBoundary>
       <motion.div 
         className="space-y-6 relative"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.6 }}
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
       >
         {/* Enhanced Navigation */}
-        <EnhancedNavigation />
+        <motion.div variants={itemVariants}>
+          <EnhancedNavigation />
+        </motion.div>
         
         {/* Streak Reminder */}
-        <StreakReminder 
-          currentStreak={currentStreak}
-          lastActivityDate={lastActivityDate}
-        />
+        <motion.div variants={itemVariants}>
+          <StreakReminder 
+            currentStreak={currentStreak}
+            lastActivityDate={lastActivityDate}
+          />
+        </motion.div>
 
-        <EnhancedWelcomeSection
-          userName={userName}
-          isFirstTimeUser={isFirstTimeUser}
-          isLoading={isLoading}
-          onStartFirstLesson={onStartFirstLesson}
-          onStartTodaysSession={onStartSession}
-        />
+        <motion.div variants={itemVariants}>
+          <EnhancedWelcomeSection
+            userName={userName}
+            isFirstTimeUser={isFirstTimeUser}
+            isLoading={isLoading}
+            onStartFirstLesson={onStartFirstLesson}
+            onStartTodaysSession={onStartSession}
+          />
+        </motion.div>
 
-        <DashboardGrid
-          userName={userName}
-          isLoading={isLoading}
-          userTopics={userTopics}
-          totalHours={totalHours}
-          currentStreak={currentStreak}
-          lessonsCompleted={lessonsCompleted}
-          projectsStarted={projectsStarted}
-          lastActivityDate={lastActivityDate}
-          onStartLesson={onStartLesson}
-          onHelpClick={onHelpClick}
-        />
+        <motion.div variants={itemVariants}>
+          <EnhancedDashboardGrid
+            userName={userName}
+            isLoading={isLoading}
+            userTopics={userTopics}
+            totalHours={totalHours}
+            currentStreak={currentStreak}
+            lessonsCompleted={lessonsCompleted}
+            projectsStarted={projectsStarted}
+            lastActivityDate={lastActivityDate}
+            onStartLesson={onStartLesson}
+            onHelpClick={onHelpClick}
+          />
+        </motion.div>
 
         {/* AI Study Companion (floating chat widget) */}
         <ErrorBoundary>
