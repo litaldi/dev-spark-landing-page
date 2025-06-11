@@ -48,6 +48,19 @@ const getToastIcon = (variant?: string) => {
   }
 };
 
+const getToastStyles = (variant?: string) => {
+  switch (variant) {
+    case "destructive":
+      return "border-red-200 dark:border-red-800";
+    case "success":
+      return "border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-950/30";
+    case "warning":
+      return "border-orange-200 dark:border-orange-800 bg-orange-50 dark:bg-orange-950/30";
+    default:
+      return "";
+  }
+};
+
 export function EnhancedToaster() {
   const { toasts } = useToast();
 
@@ -55,6 +68,9 @@ export function EnhancedToaster() {
     <ToastProvider>
       <AnimatePresence mode="popLayout">
         {toasts.map(function ({ id, title, description, action, variant, ...props }) {
+          // Map custom variants to valid Toast component variants
+          const toastVariant = variant === "destructive" ? "destructive" : "default";
+          
           return (
             <motion.div
               key={id}
@@ -65,12 +81,10 @@ export function EnhancedToaster() {
               layout
             >
               <Toast
-                variant={variant === "success" || variant === "warning" ? "default" : variant}
+                variant={toastVariant}
                 className={cn(
                   "group shadow-lg border border-border/50 backdrop-blur-sm",
-                  variant === "destructive" && "border-red-200 dark:border-red-800",
-                  variant === "success" && "border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-950/30",
-                  variant === "warning" && "border-orange-200 dark:border-orange-800 bg-orange-50 dark:bg-orange-950/30"
+                  getToastStyles(variant)
                 )}
                 {...props}
               >
