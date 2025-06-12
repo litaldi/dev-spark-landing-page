@@ -1,14 +1,24 @@
 
 import React, { createContext, useContext, useEffect } from 'react';
 import { useLocalStorage } from '@/hooks/use-local-storage';
-import { AccessibilitySettings } from '@/components/a11y/AccessibilityMenu';
 import { prefersReducedMotion } from '@/lib/keyboard-utils';
 import { createSkipLink } from '@/lib/keyboard-utils/a11y-helpers';
 import { applyReducedMotionStyles } from '@/lib/motion-utils';
 
-// Default settings if none are found in local storage
+// Accessibility settings interface
+export interface AccessibilitySettings {
+  textSize: number; // Percentage (100 = normal)
+  highContrast: boolean;
+  keyboardMode: boolean;
+  reducedMotion: boolean;
+  largePointer: boolean;
+  lineHeight: number;
+  letterSpacing: number;
+}
+
+// Default settings
 const defaultSettings: AccessibilitySettings = {
-  textSize: 100, // 100%
+  textSize: 100,
   highContrast: false,
   keyboardMode: false,
   reducedMotion: false,
@@ -23,7 +33,6 @@ interface AccessibilityContextType {
   resetSettings: () => void;
 }
 
-// Create the context
 const AccessibilityContext = createContext<AccessibilityContextType | undefined>(undefined);
 
 export function AccessibilityProvider({ children }: { children: React.ReactNode }) {
@@ -51,7 +60,7 @@ export function AccessibilityProvider({ children }: { children: React.ReactNode 
       document.body.classList.remove('keyboard-navigation');
     }
     
-    // Apply reduced motion (checks both settings and user preference)
+    // Apply reduced motion
     const shouldReduceMotion = settings.reducedMotion || prefersReducedMotion();
     applyReducedMotionStyles(shouldReduceMotion);
     
@@ -62,17 +71,23 @@ export function AccessibilityProvider({ children }: { children: React.ReactNode 
       document.documentElement.classList.remove('large-pointer');
     }
     
-    // Apply line height
+    // Apply line height and letter spacing
     document.documentElement.style.setProperty('--a11y-line-height', settings.lineHeight.toString());
-    
-    // Apply letter spacing
     document.documentElement.style.setProperty('--a11y-letter-spacing', `${settings.letterSpacing}px`);
     
     // Create skip link for keyboard navigation
     createSkipLink('main-content');
     
-    // Add CSS classes for styling
-    const styleElement = document.createElement('style');
+    // Add accessibility styles
+    const styleId = 'accessibility-styles';
+    let styleElement = document.getElementById(styleId) as HTMLStyleElement;
+    
+    if (!styleElement) {
+      styleElement = document.createElement('style');
+      styleElement.id = styleId;
+      document.head.appendChild(styleElement);
+    }
+    
     styleElement.textContent = `
       body.keyboard-navigation *:focus {
         outline: 3px solid rgb(64, 156, 255) !important;
@@ -88,27 +103,33 @@ export function AccessibilityProvider({ children }: { children: React.ReactNode 
         letter-spacing: var(--a11y-letter-spacing, 0);
       }
       
-      .reduce-motion * {
+      .reduce-motion *,
+      .reduce-motion *::before,
+      .reduce-motion *::after {
         animation-duration: 0.001ms !important;
         transition-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+      }
+      
+      .high-contrast {
+        filter: contrast(150%);
+      }
+      
+      .high-contrast * {
+        border-color: currentColor !important;
       }
     `;
     
-    document.head.appendChild(styleElement);
-    
     return () => {
-      // Clean up
+      // Cleanup function
       document.documentElement.style.fontSize = '';
-      document.documentElement.classList.remove('high-contrast');
+      document.documentElement.classList.remove('high-contrast', 'large-pointer');
       document.body.classList.remove('keyboard-navigation');
-      document.documentElement.classList.remove('large-pointer');
       document.documentElement.style.removeProperty('--a11y-line-height');
       document.documentElement.style.removeProperty('--a11y-letter-spacing');
-      document.head.removeChild(styleElement);
     };
   }, [settings]);
 
-  // Create context value
   const contextValue: AccessibilityContextType = {
     settings,
     updateSettings: (key, value) => {
@@ -126,7 +147,6 @@ export function AccessibilityProvider({ children }: { children: React.ReactNode 
   );
 }
 
-// Hook to use the accessibility context
 export function useAccessibility() {
   const context = useContext(AccessibilityContext);
   if (context === undefined) {
