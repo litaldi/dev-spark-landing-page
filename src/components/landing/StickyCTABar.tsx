@@ -45,12 +45,6 @@ const StickyCTABar: React.FC = () => {
     });
   };
 
-  const handleGetStarted = () => {
-    setModalOpen(false);
-    // In a real app, this would redirect to the registration page
-    window.location.href = "/auth/register";
-  };
-
   const handleDismiss = () => {
     setIsDismissed(true);
     localStorage.setItem("ctaBarDismissed", "true");
@@ -127,7 +121,6 @@ const StickyCTABar: React.FC = () => {
       <GetStartedModal 
         isOpen={modalOpen} 
         onClose={() => setModalOpen(false)}
-        onGetStarted={handleGetStarted}
       />
     </>
   );
