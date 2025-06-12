@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Activity, Zap, Clock, AlertTriangle } from 'lucide-react';
@@ -96,7 +95,7 @@ export const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({
     const measureLoadTime = () => {
       const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
       if (navigation) {
-        const loadTime = navigation.loadEventEnd - navigation.navigationStart;
+        const loadTime = navigation.loadEventEnd - navigation.fetchStart;
         setMetrics(prev => ({
           ...prev,
           loadTime: Math.round(loadTime)
