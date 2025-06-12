@@ -1,105 +1,141 @@
 
 import React from "react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 interface EnhancedSkeletonProps {
   className?: string;
-  variant?: "default" | "text" | "circular" | "rectangular";
+  variant?: "card" | "text" | "avatar" | "button" | "custom";
   lines?: number;
-  width?: string | number;
-  height?: string | number;
+  animated?: boolean;
 }
 
-export function EnhancedSkeleton({
+export const EnhancedSkeleton: React.FC<EnhancedSkeletonProps> = ({
   className,
-  variant = "default",
-  lines = 1,
-  width,
-  height,
-}: EnhancedSkeletonProps) {
-  const baseClass = "animate-pulse bg-muted";
-  
-  const variantClasses = {
-    default: "rounded-md",
-    text: "rounded",
-    circular: "rounded-full",
-    rectangular: "",
+  variant = "custom",
+  lines = 3,
+  animated = true
+}) => {
+  const shimmerVariants = {
+    initial: { x: "-100%" },
+    animate: { 
+      x: "100%",
+      transition: {
+        repeat: Infinity,
+        duration: 1.5,
+        ease: "easeInOut"
+      }
+    }
   };
+
+  const getVariantClasses = () => {
+    switch (variant) {
+      case "card":
+        return "h-48 w-full rounded-lg";
+      case "text":
+        return "h-4 w-3/4 rounded";
+      case "avatar":
+        return "h-12 w-12 rounded-full";
+      case "button":
+        return "h-10 w-24 rounded-md";
+      default:
+        return "";
+    }
+  };
+
+  const SkeletonComponent = animated ? motion.div : "div";
 
   if (variant === "text" && lines > 1) {
     return (
-      <div className={cn("space-y-2", className)}>
+      <div className="space-y-2">
         {Array.from({ length: lines }).map((_, index) => (
-          <div
+          <SkeletonComponent
             key={index}
             className={cn(
-              baseClass,
-              variantClasses.text,
-              "h-4",
-              index === lines - 1 ? "w-3/4" : "w-full"
+              "relative overflow-hidden bg-gray-200 dark:bg-gray-800",
+              getVariantClasses(),
+              index === lines - 1 && "w-1/2", // Last line shorter
+              className
             )}
-            style={{ width, height }}
-          />
+          >
+            {animated && (
+              <motion.div
+                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                variants={shimmerVariants}
+                initial="initial"
+                animate="animate"
+              />
+            )}
+          </SkeletonComponent>
         ))}
       </div>
     );
   }
 
   return (
-    <div
+    <SkeletonComponent
       className={cn(
-        baseClass,
-        variantClasses[variant],
-        variant === "default" && "h-4 w-full",
-        variant === "circular" && "h-12 w-12",
+        "relative overflow-hidden bg-gray-200 dark:bg-gray-800",
+        getVariantClasses(),
         className
       )}
-      style={{ width, height }}
-    />
+    >
+      {animated && (
+        <motion.div
+          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+          variants={shimmerVariants}
+          initial="initial"
+          animate="animate"
+        />
+      )}
+    </SkeletonComponent>
   );
-}
+};
 
-export function SkeletonCard() {
-  return (
-    <div className="space-y-4 p-6 border rounded-lg">
-      <div className="flex items-center space-x-4">
-        <EnhancedSkeleton variant="circular" className="h-12 w-12" />
-        <div className="space-y-2 flex-1">
-          <EnhancedSkeleton className="h-4 w-[200px]" />
-          <EnhancedSkeleton className="h-4 w-[150px]" />
-        </div>
-      </div>
-      <EnhancedSkeleton variant="text" lines={3} />
-      <div className="flex space-x-2">
-        <EnhancedSkeleton className="h-8 w-20" />
-        <EnhancedSkeleton className="h-8 w-24" />
-      </div>
+export const SkeletonCard = () => (
+  <div className="space-y-4 p-6 border rounded-lg">
+    <EnhancedSkeleton variant="text" className="h-6 w-1/3" />
+    <EnhancedSkeleton variant="text" lines={3} />
+    <div className="flex gap-2 pt-2">
+      <EnhancedSkeleton variant="button" />
+      <EnhancedSkeleton variant="button" />
     </div>
-  );
-}
+  </div>
+);
 
-export function SkeletonTable({ rows = 5, columns = 4 }) {
-  return (
-    <div className="space-y-4">
-      {/* Header */}
-      <div className="grid gap-4" style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }}>
-        {Array.from({ length: columns }).map((_, index) => (
-          <EnhancedSkeleton key={index} className="h-6 w-full" />
-        ))}
-      </div>
-      
-      {/* Rows */}
-      {Array.from({ length: rows }).map((_, rowIndex) => (
-        <div
-          key={rowIndex}
-          className="grid gap-4"
-          style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }}
-        >
-          {Array.from({ length: columns }).map((_, colIndex) => (
-            <EnhancedSkeleton key={colIndex} className="h-8 w-full" />
-          ))}
-        </div>
+export const SkeletonTable = ({ rows = 5, columns = 4 }: { rows?: number; columns?: number }) => (
+  <div className="space-y-3">
+    <div className="grid gap-3" style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }}>
+      {Array.from({ length: columns }).map((_, i) => (
+        <EnhancedSkeleton key={i} variant="text" className="h-8 w-full" />
       ))}
     </div>
-  );
-}
+    {Array.from({ length: rows }).map((_, rowIndex) => (
+      <div key={rowIndex} className="grid gap-3" style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }}>
+        {Array.from({ length: columns }).map((_, colIndex) => (
+          <EnhancedSkeleton key={colIndex} variant="text" className="h-6 w-full" />
+        ))}
+      </div>
+    ))}
+  </div>
+);
+
+export const SkeletonDashboard = () => (
+  <div className="space-y-6">
+    <div className="space-y-4 p-6 border rounded-lg">
+      <div className="flex items-center gap-4">
+        <EnhancedSkeleton variant="avatar" />
+        <div className="space-y-2 flex-1">
+          <EnhancedSkeleton variant="text" className="h-6 w-1/4" />
+          <EnhancedSkeleton variant="text" className="h-4 w-1/2" />
+        </div>
+      </div>
+    </div>
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {Array.from({ length: 6 }).map((_, i) => (
+        <SkeletonCard key={i} />
+      ))}
+    </div>
+  </div>
+);

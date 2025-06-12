@@ -46,7 +46,7 @@ export function WebFirstLayout({
   
   return (
     <div className={cn("min-h-screen flex flex-col bg-background", className)}>
-      <SkipNavLink contentId={mainId}>Skip to main content</SkipNavLink>
+      <SkipNavLink contentId={mainId} />
       
       {includeHeader && <WebFirstHeader />}
       

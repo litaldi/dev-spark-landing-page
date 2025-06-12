@@ -1,12 +1,10 @@
 
-import React from 'react';
-
 /**
- * Motion utilities for accessibility and user preferences
+ * Motion and animation utilities for accessibility and performance
  */
 
 /**
- * Check if user prefers reduced motion
+ * Checks if user prefers reduced motion
  */
 export const prefersReducedMotion = (): boolean => {
   if (typeof window === 'undefined') return false;
@@ -14,10 +12,11 @@ export const prefersReducedMotion = (): boolean => {
 };
 
 /**
- * Apply reduced motion styles to the document
- * @param shouldReduce Whether to apply reduced motion styles
+ * Applies reduced motion styles when needed
  */
-export const applyReducedMotionStyles = (shouldReduce: boolean): void => {
+export const applyReducedMotionStyles = (forceReduce: boolean = false): void => {
+  const shouldReduce = forceReduce || prefersReducedMotion();
+  
   if (shouldReduce) {
     document.documentElement.classList.add('reduce-motion');
   } else {
@@ -26,66 +25,21 @@ export const applyReducedMotionStyles = (shouldReduce: boolean): void => {
 };
 
 /**
- * Create a safe animation function that respects user preferences
- * @param animationFn Function that performs the animation
- * @param fallbackFn Optional fallback function if motion is reduced
+ * Creates a motion-safe animation class
  */
-export const createSafeAnimation = (
-  animationFn: () => void,
-  fallbackFn?: () => void
-): (() => void) => {
-  return () => {
-    if (prefersReducedMotion() && fallbackFn) {
-      fallbackFn();
-    } else {
-      animationFn();
-    }
+export const motionSafeClass = (animationClass: string): string => {
+  return prefersReducedMotion() ? '' : animationClass;
+};
+
+/**
+ * Safe animation helper for React components
+ */
+export const useMotionSafe = () => {
+  const isMotionSafe = !prefersReducedMotion();
+  
+  return {
+    isMotionSafe,
+    safeClass: (animationClass: string) => isMotionSafe ? animationClass : '',
+    safeDuration: (duration: number) => isMotionSafe ? duration : 0
   };
-};
-
-/**
- * Get appropriate transition duration based on user preferences
- * @param normalDuration Normal transition duration
- * @param reducedDuration Reduced transition duration
- */
-export const getTransitionDuration = (
-  normalDuration: number,
-  reducedDuration: number = 0
-): number => {
-  return prefersReducedMotion() ? reducedDuration : normalDuration;
-};
-
-/**
- * CSS-in-JS utility for conditional animations
- * @param normalStyles Normal animation styles
- * @param reducedStyles Reduced motion styles
- */
-export const getAnimationStyles = (
-  normalStyles: React.CSSProperties,
-  reducedStyles: React.CSSProperties = {}
-): React.CSSProperties => {
-  return prefersReducedMotion() ? { ...normalStyles, ...reducedStyles } : normalStyles;
-};
-
-/**
- * Hook to watch for changes in motion preferences
- */
-export const useMotionPreference = (): boolean => {
-  const [prefersReduced, setPrefersReduced] = React.useState(prefersReducedMotion);
-  
-  React.useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-    
-    const handleChange = (event: MediaQueryListEvent) => {
-      setPrefersReduced(event.matches);
-    };
-    
-    mediaQuery.addEventListener('change', handleChange);
-    
-    return () => {
-      mediaQuery.removeEventListener('change', handleChange);
-    };
-  }, []);
-  
-  return prefersReduced;
 };

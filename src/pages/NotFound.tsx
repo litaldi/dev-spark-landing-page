@@ -1,107 +1,68 @@
 
-import React from 'react';
-import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
-import { Home, ArrowLeft, Search } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { SEOHead } from '@/components/seo/SEOHead';
-import { SkipNavLink, SkipNavContent } from '@/components/a11y/skip-nav';
+import React, { useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import Navbar from "@/components/landing/Navbar";
+import Footer from "@/components/landing/Footer";
+import { SkipNavLink, SkipNavContent } from "@/components/a11y/skip-nav";
+import { Button } from "@/components/ui/button";
+import { Home, ChevronLeft } from "lucide-react";
+import { announceToScreenReader } from "@/lib/keyboard-utils";
 
-const NotFound: React.FC = () => {
+const NotFound = () => {
+  const navigate = useNavigate();
+  
+  // Announce to screen readers
+  useEffect(() => {
+    announceToScreenReader("Page not found. The page you were looking for doesn't exist.", "assertive");
+  }, []);
+  
+  // Handle keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        navigate("/");
+      }
+    };
+    
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [navigate]);
+  
   return (
-    <>
-      <SEOHead 
-        title="Page Not Found - DevAI"
-        description="The page you're looking for doesn't exist. Return to DevAI homepage."
-      />
-      
-      <div className="min-h-screen bg-gradient-to-br from-primary/10 via-background to-secondary/10 flex items-center justify-center p-4">
-        <SkipNavLink contentId="main-content">Skip to main content</SkipNavLink>
-        
+    <div className="min-h-screen flex flex-col bg-background">
+      <SkipNavLink contentId="main-content">Skip to content</SkipNavLink>
+      <Navbar />
+      <main className="flex-1 flex items-center justify-center" id="main-content">
         <SkipNavContent id="main-content">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5 }}
-            className="w-full max-w-md"
-          >
-            <Card>
-              <CardHeader className="text-center">
-                <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-                  className="mx-auto w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mb-4"
-                >
-                  <Search className="w-10 h-10 text-primary" />
-                </motion.div>
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3 }}
-                >
-                  <CardTitle className="text-3xl font-bold mb-2">404</CardTitle>
-                  <CardDescription className="text-lg">
-                    Oops! This page seems to have wandered off into the digital void.
-                  </CardDescription>
-                </motion.div>
-              </CardHeader>
-              
-              <CardContent className="space-y-4">
-                <motion.p
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.4 }}
-                  className="text-center text-muted-foreground"
-                >
-                  The page you're looking for doesn't exist or has been moved. 
-                  Let's get you back to learning!
-                </motion.p>
-                
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.5 }}
-                  className="flex flex-col gap-3 pt-4"
-                >
-                  <Link to="/" className="block">
-                    <Button className="w-full" size="lg">
-                      <Home className="w-4 h-4 mr-2" />
-                      Go to Homepage
-                    </Button>
-                  </Link>
-                  
-                  <Button 
-                    variant="outline" 
-                    size="lg" 
-                    onClick={() => window.history.back()}
-                    className="w-full"
-                  >
-                    <ArrowLeft className="w-4 h-4 mr-2" />
-                    Go Back
-                  </Button>
-                </motion.div>
-
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.6 }}
-                  className="text-center pt-4"
-                >
-                  <p className="text-sm text-muted-foreground">
-                    Need help?{' '}
-                    <Link to="/help" className="text-primary hover:underline">
-                      Contact support
-                    </Link>
-                  </p>
-                </motion.div>
-              </CardContent>
-            </Card>
-          </motion.div>
+          <div className="container max-w-md text-center py-16 px-4">
+            <div aria-hidden="true" className="mb-6 text-8xl font-bold text-primary/20">404</div>
+            <h1 className="text-3xl font-bold mb-2">Page Not Found</h1>
+            <p className="text-muted-foreground mb-8">
+              The page you were looking for doesn't exist or has been moved.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button 
+                variant="outline" 
+                className="flex items-center gap-2"
+                onClick={() => window.history.back()}
+              >
+                <ChevronLeft className="h-4 w-4" />
+                Go Back
+              </Button>
+              <Button className="flex items-center gap-2" asChild>
+                <Link to="/">
+                  <Home className="h-4 w-4" />
+                  Return Home
+                </Link>
+              </Button>
+            </div>
+          </div>
         </SkipNavContent>
-      </div>
-    </>
+      </main>
+      <Footer />
+    </div>
   );
 };
 

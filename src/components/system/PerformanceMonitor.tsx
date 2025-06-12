@@ -1,5 +1,4 @@
-
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Activity, Zap, Clock, AlertTriangle } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -42,78 +41,8 @@ export const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({
   });
   const [showAlert, setShowAlert] = useState(false);
   const [isMonitoring, setIsMonitoring] = useState(false);
-  
-  // Use refs to prevent infinite loops
-  const metricsInitialized = useRef(false);
-  const observersSetup = useRef(false);
-
-  const measureLoadTime = useCallback(() => {
-    if (metricsInitialized.current) return;
-    
-    try {
-      const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
-      if (navigation && navigation.loadEventEnd > 0) {
-        const loadTime = navigation.loadEventEnd - navigation.fetchStart;
-        setMetrics(prev => ({
-          ...prev,
-          loadTime: Math.round(loadTime)
-        }));
-        metricsInitialized.current = true;
-      }
-    } catch (error) {
-      console.warn('Failed to measure load time:', error);
-    }
-  }, []);
-
-  const measureWebVitals = useCallback(() => {
-    if (observersSetup.current) return;
-    
-    try {
-      // Largest Contentful Paint
-      const lcpObserver = new PerformanceObserver((list) => {
-        const entries = list.getEntries();
-        const lastEntry = entries[entries.length - 1];
-        if (lastEntry) {
-          setMetrics(prev => ({
-            ...prev,
-            vitals: { ...prev.vitals, lcp: Math.round(lastEntry.startTime) }
-          }));
-        }
-      });
-      
-      lcpObserver.observe({ entryTypes: ['largest-contentful-paint'] });
-
-      // Cumulative Layout Shift
-      const clsObserver = new PerformanceObserver((list) => {
-        let clsValue = 0;
-        for (const entry of list.getEntries()) {
-          if (!(entry as any).hadRecentInput) {
-            clsValue += (entry as any).value;
-          }
-        }
-        setMetrics(prev => ({
-          ...prev,
-          vitals: { ...prev.vitals, cls: Math.round(clsValue * 1000) / 1000 }
-        }));
-      });
-      
-      clsObserver.observe({ entryTypes: ['layout-shift'] });
-      
-      observersSetup.current = true;
-      
-      return () => {
-        lcpObserver.disconnect();
-        clsObserver.disconnect();
-      };
-    } catch (error) {
-      console.warn('Web Vitals not supported:', error);
-      return () => {};
-    }
-  }, []);
 
   useEffect(() => {
-    if (!isMonitoring) return;
-
     let frameId: number;
     let lastTime = performance.now();
     let frameCount = 0;
@@ -163,24 +92,78 @@ export const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({
       }
     };
 
-    // Start FPS monitoring
-    measureFPS();
-    
-    // Measure load time once
-    measureLoadTime();
-    
-    // Setup web vitals observers once
-    const vitalsCleanup = measureWebVitals();
-    
-    // Memory monitoring interval
-    const memoryInterval = setInterval(measureMemory, 2000);
-    
+    const measureLoadTime = () => {
+      const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
+      if (navigation) {
+        const loadTime = navigation.loadEventEnd - navigation.fetchStart;
+        setMetrics(prev => ({
+          ...prev,
+          loadTime: Math.round(loadTime)
+        }));
+      }
+    };
+
+    const measureWebVitals = () => {
+      // Largest Contentful Paint
+      const lcpObserver = new PerformanceObserver((list) => {
+        const entries = list.getEntries();
+        const lastEntry = entries[entries.length - 1];
+        setMetrics(prev => ({
+          ...prev,
+          vitals: { ...prev.vitals, lcp: Math.round(lastEntry.startTime) }
+        }));
+      });
+      
+      try {
+        lcpObserver.observe({ entryTypes: ['largest-contentful-paint'] });
+      } catch (e) {
+        // LCP not supported
+      }
+
+      // Cumulative Layout Shift
+      const clsObserver = new PerformanceObserver((list) => {
+        let clsValue = 0;
+        for (const entry of list.getEntries()) {
+          if (!(entry as any).hadRecentInput) {
+            clsValue += (entry as any).value;
+          }
+        }
+        setMetrics(prev => ({
+          ...prev,
+          vitals: { ...prev.vitals, cls: Math.round(clsValue * 1000) / 1000 }
+        }));
+      });
+      
+      try {
+        clsObserver.observe({ entryTypes: ['layout-shift'] });
+      } catch (e) {
+        // CLS not supported
+      }
+
+      return () => {
+        lcpObserver.disconnect();
+        clsObserver.disconnect();
+      };
+    };
+
+    if (isMonitoring) {
+      measureFPS();
+      measureLoadTime();
+      const vitalsCleanup = measureWebVitals();
+      
+      const memoryInterval = setInterval(measureMemory, 2000);
+      
+      return () => {
+        cancelAnimationFrame(frameId);
+        clearInterval(memoryInterval);
+        vitalsCleanup?.();
+      };
+    }
+
     return () => {
       cancelAnimationFrame(frameId);
-      clearInterval(memoryInterval);
-      vitalsCleanup?.();
     };
-  }, [isMonitoring, threshold, measureLoadTime, measureWebVitals]);
+  }, [isMonitoring, threshold]);
 
   useEffect(() => {
     // Auto-start monitoring in development

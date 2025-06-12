@@ -46,7 +46,7 @@ export function EnhancedPageLayout({
   
   return (
     <div className={`min-h-screen flex flex-col ${className}`}>
-      <SkipNavLink contentId={mainId}>Skip to main content</SkipNavLink>
+      <SkipNavLink contentId={mainId} />
       
       {includeNavbar && <Navbar />}
       

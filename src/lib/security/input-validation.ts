@@ -1,88 +1,130 @@
-
 import DOMPurify from 'dompurify';
 
 /**
- * Sanitize HTML input to prevent XSS attacks
+ * Sanitizes a string to prevent XSS attacks
  */
 export function sanitizeInput(input: string): string {
-  if (typeof input !== 'string') {
-    return '';
-  }
-  
-  return DOMPurify.sanitize(input, {
-    ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'p', 'br'],
-    ALLOWED_ATTR: []
-  });
+  if (typeof input !== 'string') return '';
+  return DOMPurify.sanitize(input.trim());
 }
 
 /**
- * Validate email format
+ * Validates an email address format
  */
 export function isValidEmail(email: string): boolean {
-  if (typeof email !== 'string') {
-    return false;
-  }
-  
+  if (!email || typeof email !== 'string') return false;
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailRegex.test(email.trim());
 }
 
 /**
- * Check if password meets strength requirements
+ * Validates a password has sufficient complexity
  */
 export function isStrongPassword(password: string): boolean {
-  if (typeof password !== 'string' || password.length < 8) {
-    return false;
-  }
-  
-  const hasUppercase = /[A-Z]/.test(password);
-  const hasLowercase = /[a-z]/.test(password);
-  const hasNumber = /\d/.test(password);
-  const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
-  
-  return hasUppercase && hasLowercase && hasNumber && hasSpecialChar;
+  // At least 8 chars, 1 uppercase, 1 lowercase, 1 number, 1 special char
+  const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+  return !!password && strongPasswordRegex.test(password);
 }
 
 /**
- * Validate form inputs for security risks
+ * Validates input content length to prevent payload attacks
+ * @param input Input string to validate
+ * @param maxLength Maximum allowed length
  */
-export function validateFormSecurity(inputs: Record<string, any>): Record<string, string> {
-  const errors: Record<string, string> = {};
+export function validateInputLength(input: string, maxLength: number = 1000): boolean {
+  if (typeof input !== 'string') return false;
+  return input.length <= maxLength;
+}
+
+/**
+ * Filters and sanitizes URL parameters to prevent injection attacks
+ * @param url URL to sanitize
+ */
+export function sanitizeUrl(url: string): string {
+  if (typeof url !== 'string') return '';
   
-  Object.entries(inputs).forEach(([key, value]) => {
-    if (typeof value === 'string') {
-      // Check for script tags
-      if (/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi.test(value)) {
-        errors[key] = 'Invalid content detected';
-      }
-      
-      // Check for event handlers
-      if (/on\w+\s*=/gi.test(value)) {
-        errors[key] = 'Invalid content detected';
-      }
-      
-      // Check for excessively long inputs
-      if (value.length > 1000) {
-        errors[key] = 'Input too long';
-      }
+  try {
+    // Remove any script or data URIs
+    if (/^(javascript|data|vbscript|file):/i.test(url)) {
+      return '';
     }
-  });
+    
+    // Ensure it's a proper URL or relative path
+    if (url.startsWith('http') || url.startsWith('https')) {
+      const urlObj = new URL(url);
+      return urlObj.toString();
+    }
+    
+    // For relative URLs, sanitize path
+    return url.replace(/[^\w\s\/\-._~:?#[\]@!$&'()*+,;=]/gi, '');
+  } catch (e) {
+    console.error('URL sanitization error:', e);
+    return '';
+  }
+}
+
+/**
+ * Validates form inputs against common security issues
+ * @param inputs Key-value pairs of form inputs
+ */
+export function validateFormSecurity(inputs: Record<string, string>): Record<string, string | null> {
+  const errors: Record<string, string | null> = {};
+  
+  for (const [key, value] of Object.entries(inputs)) {
+    // Check for potential XSS attempts
+    if (/<script|javascript:|on\w+=/i.test(value)) {
+      errors[key] = 'Invalid input detected';
+      continue;
+    }
+    
+    // Check input length
+    if (value.length > 1000) {
+      errors[key] = 'Input exceeds maximum allowed length';
+      continue;
+    }
+    
+    // Field-specific validation
+    if (key.includes('email') && !isValidEmail(value)) {
+      errors[key] = 'Please enter a valid email address';
+    }
+    
+    if (key.includes('password') && key.includes('new') && !isStrongPassword(value)) {
+      errors[key] = 'Password must be at least 8 characters with uppercase, lowercase, number, and special character';
+    }
+    
+    if (key.includes('url') && value && !sanitizeUrl(value)) {
+      errors[key] = 'Please enter a valid URL';
+    }
+  }
   
   return errors;
 }
 
 /**
- * Check if input contains potentially malicious content
+ * Comprehensive input sanitization for all user inputs
+ * This should be used before storing or displaying any user-generated content
  */
-export function containsMaliciousContent(input: string): boolean {
-  const maliciousPatterns = [
-    /<script\b/i,
-    /javascript:/i,
-    /on\w+\s*=/i,
-    /<iframe\b/i,
-    /<object\b/i,
-    /<embed\b/i
-  ];
+export function sanitizeUserInput(input: string, options: {
+  allowHtml?: boolean;
+  maxLength?: number;
+} = {}): string {
+  const { allowHtml = false, maxLength = 1000 } = options;
   
-  return maliciousPatterns.some(pattern => pattern.test(input));
+  if (typeof input !== 'string') return '';
+  
+  // Check length first
+  if (input.length > maxLength) {
+    throw new Error(`Input exceeds maximum length of ${maxLength} characters`);
+  }
+  
+  // If HTML is not allowed, strip all tags
+  if (!allowHtml) {
+    return DOMPurify.sanitize(input, { ALLOWED_TAGS: [] });
+  }
+  
+  // Otherwise, sanitize but allow safe HTML
+  return DOMPurify.sanitize(input, {
+    ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'p', 'br'],
+    ALLOWED_ATTR: []
+  });
 }

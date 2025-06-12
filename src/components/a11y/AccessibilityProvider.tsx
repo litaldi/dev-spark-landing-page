@@ -1,20 +1,10 @@
 
 import React, { createContext, useContext, useEffect } from 'react';
 import { useLocalStorage } from '@/hooks/use-local-storage';
+import { AccessibilitySettings } from '@/components/a11y/AccessibilityMenu';
 import { prefersReducedMotion } from '@/lib/keyboard-utils';
 import { createSkipLink } from '@/lib/keyboard-utils/a11y-helpers';
 import { applyReducedMotionStyles } from '@/lib/motion-utils';
-
-// Define AccessibilitySettings interface locally
-export interface AccessibilitySettings {
-  textSize: number;
-  highContrast: boolean;
-  keyboardMode: boolean;
-  reducedMotion: boolean;
-  largePointer: boolean;
-  lineHeight: number;
-  letterSpacing: number;
-}
 
 // Default settings if none are found in local storage
 const defaultSettings: AccessibilitySettings = {
@@ -83,14 +73,6 @@ export function AccessibilityProvider({ children }: { children: React.ReactNode 
     
     // Add CSS classes for styling
     const styleElement = document.createElement('style');
-    styleElement.id = 'accessibility-styles';
-    
-    // Remove existing styles to prevent duplicates
-    const existingStyles = document.getElementById('accessibility-styles');
-    if (existingStyles) {
-      existingStyles.remove();
-    }
-    
     styleElement.textContent = `
       body.keyboard-navigation *:focus {
         outline: 3px solid rgb(64, 156, 255) !important;
@@ -110,14 +92,6 @@ export function AccessibilityProvider({ children }: { children: React.ReactNode 
         animation-duration: 0.001ms !important;
         transition-duration: 0.001ms !important;
       }
-
-      .high-contrast {
-        filter: contrast(150%) brightness(110%);
-      }
-      
-      .high-contrast * {
-        border-color: currentColor !important;
-      }
     `;
     
     document.head.appendChild(styleElement);
@@ -130,12 +104,7 @@ export function AccessibilityProvider({ children }: { children: React.ReactNode 
       document.documentElement.classList.remove('large-pointer');
       document.documentElement.style.removeProperty('--a11y-line-height');
       document.documentElement.style.removeProperty('--a11y-letter-spacing');
-      
-      // Remove styles
-      const styles = document.getElementById('accessibility-styles');
-      if (styles) {
-        styles.remove();
-      }
+      document.head.removeChild(styleElement);
     };
   }, [settings]);
 
