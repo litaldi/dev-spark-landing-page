@@ -9,10 +9,9 @@ interface VisuallyHiddenProps {
 
 export function VisuallyHidden({ children, className }: VisuallyHiddenProps) {
   return (
-    <span
+    <span 
       className={cn(
-        "absolute w-px h-px p-0 -m-px overflow-hidden whitespace-nowrap border-0",
-        "clip-[rect(0,0,0,0)]",
+        'sr-only absolute w-px h-px p-0 m-[-1px] overflow-hidden whitespace-nowrap border-0',
         className
       )}
     >

@@ -33,13 +33,13 @@ export type AccessibilitySettings = {
 };
 
 const defaultSettings: AccessibilitySettings = {
-  textSize: 100, // 100%
+  textSize: 100,
   highContrast: false,
   keyboardMode: false,
   reducedMotion: false,
   largePointer: false,
-  lineHeight: 1.5, // Default line height
-  letterSpacing: 0, // Default letter spacing
+  lineHeight: 1.5,
+  letterSpacing: 0,
 };
 
 export function AccessibilityMenu() {
@@ -49,47 +49,57 @@ export function AccessibilityMenu() {
   );
   const [isOpen, setIsOpen] = useState(false);
 
-  // Apply settings on component mount and when they change
+  // Ensure settings have safe defaults
+  const safeSettings = {
+    ...defaultSettings,
+    ...settings,
+    textSize: settings.textSize ?? 100,
+    lineHeight: settings.lineHeight ?? 1.5,
+    letterSpacing: settings.letterSpacing ?? 0,
+  };
+
   useEffect(() => {
-    // Apply text size
-    document.documentElement.style.fontSize = `${settings.textSize}%`;
+    // Apply text size safely
+    if (typeof safeSettings.textSize === 'number') {
+      document.documentElement.style.fontSize = `${safeSettings.textSize}%`;
+    }
     
     // Apply high contrast mode
-    if (settings.highContrast) {
+    if (safeSettings.highContrast) {
       document.documentElement.classList.add('high-contrast');
     } else {
       document.documentElement.classList.remove('high-contrast');
     }
     
     // Apply keyboard navigation mode
-    if (settings.keyboardMode) {
+    if (safeSettings.keyboardMode) {
       document.body.classList.add('keyboard-navigation');
     } else {
       document.body.classList.remove('keyboard-navigation');
     }
     
     // Apply reduced motion
-    applyReducedMotionStyles(settings.reducedMotion);
+    applyReducedMotionStyles(safeSettings.reducedMotion);
     
     // Apply large pointer
-    if (settings.largePointer) {
+    if (safeSettings.largePointer) {
       document.documentElement.classList.add('large-pointer');
     } else {
       document.documentElement.classList.remove('large-pointer');
     }
     
-    // Apply line height - Fix: Safely handle line height with null check
-    if (settings.lineHeight !== undefined && settings.lineHeight !== null) {
-      document.documentElement.style.setProperty('--a11y-line-height', settings.lineHeight.toString());
+    // Apply line height safely
+    if (typeof safeSettings.lineHeight === 'number') {
+      document.documentElement.style.setProperty('--a11y-line-height', safeSettings.lineHeight.toString());
     }
     
-    // Apply letter spacing - Fix: Safely handle letter spacing with null check
-    if (settings.letterSpacing !== undefined && settings.letterSpacing !== null) {
-      document.documentElement.style.setProperty('--a11y-letter-spacing', `${settings.letterSpacing}px`);
+    // Apply letter spacing safely
+    if (typeof safeSettings.letterSpacing === 'number') {
+      document.documentElement.style.setProperty('--a11y-letter-spacing', `${safeSettings.letterSpacing}px`);
     }
     
     return () => {
-      // Clean up if component unmounts
+      // Clean up styles
       document.documentElement.style.fontSize = '';
       document.documentElement.classList.remove('high-contrast');
       document.body.classList.remove('keyboard-navigation');
@@ -97,15 +107,16 @@ export function AccessibilityMenu() {
       document.documentElement.style.removeProperty('--a11y-line-height');
       document.documentElement.style.removeProperty('--a11y-letter-spacing');
     };
-  }, [settings]);
+  }, [safeSettings]);
 
   const updateSetting = <K extends keyof AccessibilitySettings>(
     key: K,
     value: AccessibilitySettings[K]
   ) => {
-    setSettings({ ...settings, [key]: value });
+    const newSettings = { ...safeSettings, [key]: value };
+    setSettings(newSettings);
     
-    // Announce the change to screen readers
+    // Announce changes to screen readers
     let message = '';
     
     switch (key) {
@@ -152,18 +163,26 @@ export function AccessibilityMenu() {
         <Button 
           variant="outline" 
           size="icon" 
-          className="rounded-full" 
-          aria-label="Accessibility options"
+          className="rounded-full hover:bg-accent/80 focus:ring-2 focus:ring-primary focus:ring-offset-2" 
+          aria-label="Open accessibility options"
         >
           <Accessibility className="h-[1.2rem] w-[1.2rem]" aria-hidden="true" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-80" align="end">
+      <PopoverContent 
+        className="w-80 bg-popover/95 backdrop-blur-sm border shadow-lg z-50" 
+        align="end"
+        side="bottom"
+        sideOffset={8}
+      >
         <div className="grid gap-4">
           <div className="space-y-2">
-            <h4 className="font-medium text-sm">Accessibility Settings</h4>
+            <h4 className="font-medium text-sm flex items-center gap-2">
+              <Accessibility className="h-4 w-4" />
+              Accessibility Settings
+            </h4>
             <p className="text-xs text-muted-foreground">
-              Customize your experience to improve accessibility.
+              Customize your experience to improve accessibility and usability.
             </p>
           </div>
           
@@ -172,7 +191,7 @@ export function AccessibilityMenu() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                   <Type className="h-4 w-4" aria-hidden="true" />
-                  <Label htmlFor="text-size">Text Size: {settings.textSize}%</Label>
+                  <Label htmlFor="text-size">Text Size: {safeSettings.textSize}%</Label>
                 </div>
               </div>
               <Slider 
@@ -180,8 +199,9 @@ export function AccessibilityMenu() {
                 min={75}
                 max={200}
                 step={5}
-                value={[settings.textSize]}
+                value={[safeSettings.textSize]}
                 onValueChange={(values) => updateSetting("textSize", values[0])}
+                className="cursor-pointer"
                 aria-label="Adjust text size"
               />
             </div>
@@ -190,7 +210,7 @@ export function AccessibilityMenu() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                   <MoveHorizontal className="h-4 w-4" aria-hidden="true" />
-                  <Label htmlFor="letter-spacing">Letter Spacing: {settings.letterSpacing}</Label>
+                  <Label htmlFor="letter-spacing">Letter Spacing: {safeSettings.letterSpacing}px</Label>
                 </div>
               </div>
               <Slider 
@@ -198,8 +218,9 @@ export function AccessibilityMenu() {
                 min={0}
                 max={5}
                 step={0.5}
-                value={[settings.letterSpacing]}
+                value={[safeSettings.letterSpacing]}
                 onValueChange={(values) => updateSetting("letterSpacing", values[0])}
+                className="cursor-pointer"
                 aria-label="Adjust letter spacing"
               />
             </div>
@@ -207,12 +228,12 @@ export function AccessibilityMenu() {
             <div className="flex items-center space-x-2">
               <Switch
                 id="high-contrast"
-                checked={settings.highContrast}
+                checked={safeSettings.highContrast}
                 onCheckedChange={(checked) => updateSetting("highContrast", checked)}
                 aria-label="Toggle high contrast mode"
               />
-              <div className="grid gap-1">
-                <Label htmlFor="high-contrast" className="flex items-center gap-2">
+              <div className="grid gap-1 flex-1">
+                <Label htmlFor="high-contrast" className="flex items-center gap-2 cursor-pointer">
                   <Contrast className="h-4 w-4" aria-hidden="true" />
                   High Contrast
                 </Label>
@@ -225,12 +246,12 @@ export function AccessibilityMenu() {
             <div className="flex items-center space-x-2">
               <Switch
                 id="keyboard-mode"
-                checked={settings.keyboardMode}
+                checked={safeSettings.keyboardMode}
                 onCheckedChange={(checked) => updateSetting("keyboardMode", checked)}
                 aria-label="Toggle keyboard navigation mode"
               />
-              <div className="grid gap-1">
-                <Label htmlFor="keyboard-mode" className="flex items-center gap-2">
+              <div className="grid gap-1 flex-1">
+                <Label htmlFor="keyboard-mode" className="flex items-center gap-2 cursor-pointer">
                   <Keyboard className="h-4 w-4" aria-hidden="true" />
                   Keyboard Navigation
                 </Label>
@@ -243,12 +264,12 @@ export function AccessibilityMenu() {
             <div className="flex items-center space-x-2">
               <Switch
                 id="reduced-motion"
-                checked={settings.reducedMotion}
+                checked={safeSettings.reducedMotion}
                 onCheckedChange={(checked) => updateSetting("reducedMotion", checked)}
                 aria-label="Toggle reduced motion"
               />
-              <div className="grid gap-1">
-                <Label htmlFor="reduced-motion" className="flex items-center gap-2">
+              <div className="grid gap-1 flex-1">
+                <Label htmlFor="reduced-motion" className="flex items-center gap-2 cursor-pointer">
                   <Sparkles className="h-4 w-4" aria-hidden="true" />
                   Reduced Motion
                 </Label>
@@ -261,12 +282,12 @@ export function AccessibilityMenu() {
             <div className="flex items-center space-x-2">
               <Switch
                 id="large-pointer"
-                checked={settings.largePointer}
+                checked={safeSettings.largePointer}
                 onCheckedChange={(checked) => updateSetting("largePointer", checked)}
                 aria-label="Toggle large pointer"
               />
-              <div className="grid gap-1">
-                <Label htmlFor="large-pointer" className="flex items-center gap-2">
+              <div className="grid gap-1 flex-1">
+                <Label htmlFor="large-pointer" className="flex items-center gap-2 cursor-pointer">
                   <MousePointer className="h-4 w-4" aria-hidden="true" />
                   Large Pointer
                 </Label>
@@ -277,8 +298,13 @@ export function AccessibilityMenu() {
             </div>
           </div>
           
-          <div className="text-xs text-muted-foreground mt-2">
-            <p>Press <kbd className="px-1 py-0.5 bg-muted border rounded text-xs">Tab</kbd> to navigate and <kbd className="px-1 py-0.5 bg-muted border rounded text-xs">Space</kbd> or <kbd className="px-1 py-0.5 bg-muted border rounded text-xs">Enter</kbd> to toggle options.</p>
+          <div className="border-t pt-3 text-xs text-muted-foreground">
+            <p className="mb-2">Keyboard shortcuts:</p>
+            <div className="space-y-1">
+              <p><kbd className="px-1 py-0.5 bg-muted border rounded text-xs">Tab</kbd> - Navigate options</p>
+              <p><kbd className="px-1 py-0.5 bg-muted border rounded text-xs">Space</kbd> - Toggle switches</p>
+              <p><kbd className="px-1 py-0.5 bg-muted border rounded text-xs">Esc</kbd> - Close menu</p>
+            </div>
           </div>
         </div>
       </PopoverContent>

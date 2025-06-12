@@ -21,10 +21,22 @@ export const createSkipLink = (contentId: string): void => {
   if (!skipLink) {
     skipLink = document.createElement('a');
     skipLink.id = 'skip-nav-link';
-    skipLink.className = 'sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 z-50 bg-primary text-primary-foreground px-4 py-2 rounded-md';
+    skipLink.className = 'sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 z-50 bg-primary text-primary-foreground px-4 py-2 rounded-md transition-all duration-200';
     skipLink.innerText = 'Skip to content';
-    // Fix: Use setAttribute for href instead of direct property access
     skipLink.setAttribute('href', `#${contentId}`);
+    
+    // Add keyboard event listener
+    skipLink.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        const targetElement = document.getElementById(contentId);
+        if (targetElement) {
+          targetElement.focus();
+          targetElement.scrollIntoView({ behavior: 'smooth' });
+        }
+      }
+    });
+    
     document.body.insertBefore(skipLink, document.body.firstChild);
   }
 };
@@ -48,14 +60,15 @@ export const announceToScreenReader = (message: string, priority: 'polite' | 'as
     announcer.setAttribute('aria-live', priority);
   }
   
-  // Clear the announcer and then set the new content
+  // Clear the announcer first
   announcer.textContent = '';
   
-  // Use setTimeout to ensure the announcement happens after the screen reader 
-  // has a chance to detect that the content has been cleared
+  // Use setTimeout to ensure the announcement happens
   setTimeout(() => {
-    announcer.textContent = message;
-  }, 50);
+    if (announcer) {
+      announcer.textContent = message;
+    }
+  }, 100);
 };
 
 /**
@@ -74,13 +87,11 @@ export const trapFocus = (container: HTMLElement): (() => void) => {
     if (e.key !== 'Tab') return;
     
     if (e.shiftKey) {
-      // If shift + tab and on first element, move to last element
       if (document.activeElement === firstElement) {
         e.preventDefault();
         lastElement.focus();
       }
     } else {
-      // If tab and on last element, move to first element
       if (document.activeElement === lastElement) {
         e.preventDefault();
         firstElement.focus();
@@ -90,7 +101,9 @@ export const trapFocus = (container: HTMLElement): (() => void) => {
   
   document.addEventListener('keydown', handleKeyDown);
   
-  // Return cleanup function
+  // Focus the first element initially
+  firstElement.focus();
+  
   return () => {
     document.removeEventListener('keydown', handleKeyDown);
   };
@@ -104,6 +117,7 @@ export const trapFocus = (container: HTMLElement): (() => void) => {
 export const handleEscapeKey = (callback: () => void): (() => void) => {
   const handleKeyDown = (e: KeyboardEvent) => {
     if (e.key === 'Escape') {
+      e.preventDefault();
       callback();
     }
   };
@@ -114,3 +128,31 @@ export const handleEscapeKey = (callback: () => void): (() => void) => {
     document.removeEventListener('keydown', handleKeyDown);
   };
 };
+
+/**
+ * Manages focus restoration after modal/dialog closes
+ */
+export class FocusManager {
+  private previousActiveElement: HTMLElement | null = null;
+  
+  saveFocus() {
+    this.previousActiveElement = document.activeElement as HTMLElement;
+  }
+  
+  restoreFocus() {
+    if (this.previousActiveElement && typeof this.previousActiveElement.focus === 'function') {
+      setTimeout(() => {
+        this.previousActiveElement?.focus();
+      }, 0);
+    }
+  }
+  
+  clear() {
+    this.previousActiveElement = null;
+  }
+}
+
+/**
+ * Creates a global focus manager instance
+ */
+export const globalFocusManager = new FocusManager();

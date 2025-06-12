@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface LoadingSpinnerProps {
@@ -16,20 +17,17 @@ export function LoadingSpinner({ size = 'md', className, text }: LoadingSpinnerP
   };
 
   return (
-    <div className={cn('flex flex-col items-center justify-center space-y-2', className)}>
-      <div 
-        className={cn(
-          'animate-spin rounded-full border-2 border-gray-300 border-t-brand-500',
-          sizeClasses[size]
-        )}
-        role="status"
-        aria-label="Loading"
-      />
-      {text && (
-        <p className="text-sm text-muted-foreground" aria-live="polite">
-          {text}
-        </p>
-      )}
+    <div className={cn('flex items-center justify-center space-x-2', className)}>
+      <Loader2 className={cn('animate-spin', sizeClasses[size])} />
+      {text && <span className="text-sm text-muted-foreground">{text}</span>}
+    </div>
+  );
+}
+
+export function FullPageLoader({ text = 'Loading...' }: { text?: string }) {
+  return (
+    <div className="flex min-h-screen items-center justify-center">
+      <LoadingSpinner size="lg" text={text} />
     </div>
   );
 }
