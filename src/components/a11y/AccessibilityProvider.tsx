@@ -1,20 +1,10 @@
 
 import React, { createContext, useContext, useEffect } from 'react';
 import { useLocalStorage } from '@/hooks/use-local-storage';
+import { AccessibilitySettings } from '@/components/a11y/AccessibilityMenu';
 import { prefersReducedMotion } from '@/lib/keyboard-utils';
 import { createSkipLink } from '@/lib/keyboard-utils/a11y-helpers';
 import { applyReducedMotionStyles } from '@/lib/motion-utils';
-
-// Define AccessibilitySettings type here
-export interface AccessibilitySettings {
-  textSize: number;
-  highContrast: boolean;
-  keyboardMode: boolean;
-  reducedMotion: boolean;
-  largePointer: boolean;
-  lineHeight: number;
-  letterSpacing: number;
-}
 
 // Default settings if none are found in local storage
 const defaultSettings: AccessibilitySettings = {
