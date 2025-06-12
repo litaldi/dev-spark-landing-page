@@ -1,117 +1,81 @@
 
 /**
- * Keyboard event handlers and utilities
+ * Handle Enter and Space key press events for accessibility
+ * @param event Keyboard event
+ * @param callback Function to execute on Enter or Space key press
  */
-
-/**
- * Handles Enter and Space key events for custom interactive elements
- * @param callback Function to execute when Enter or Space is pressed
- * @returns Keyboard event handler
- */
-export const handleEnterAndSpace = (callback: () => void) => {
-  return (event: React.KeyboardEvent) => {
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault();
-      callback();
-    }
-  };
+export const handleEnterAndSpace = (
+  event: React.KeyboardEvent,
+  callback: () => void
+): void => {
+  if (event.key === 'Enter' || event.key === ' ') {
+    event.preventDefault();
+    callback();
+  }
 };
 
 /**
- * Handles arrow key navigation for lists and menus
- * @param items Array of focusable elements
- * @param currentIndex Current focused item index
- * @param onIndexChange Callback when index changes
- * @param options Configuration options
+ * Handle arrow key navigation
+ * @param event Keyboard event
+ * @param options Configuration for arrow key handling
  */
 export const handleArrowKeys = (
-  items: HTMLElement[],
-  currentIndex: number,
-  onIndexChange: (index: number) => void,
+  event: React.KeyboardEvent,
   options: {
-    loop?: boolean;
-    horizontal?: boolean;
+    onArrowUp?: () => void;
+    onArrowDown?: () => void;
+    onArrowLeft?: () => void;
+    onArrowRight?: () => void;
     preventDefault?: boolean;
-  } = {}
-) => {
-  const { loop = true, horizontal = false, preventDefault = true } = options;
+  }
+): void => {
+  const { onArrowUp, onArrowDown, onArrowLeft, onArrowRight, preventDefault = true } = options;
   
-  return (event: React.KeyboardEvent) => {
-    const { key } = event;
-    let newIndex = currentIndex;
-    
-    const upKey = horizontal ? 'ArrowLeft' : 'ArrowUp';
-    const downKey = horizontal ? 'ArrowRight' : 'ArrowDown';
-    
-    if (key === upKey) {
+  switch (event.key) {
+    case 'ArrowUp':
       if (preventDefault) event.preventDefault();
-      newIndex = currentIndex > 0 ? currentIndex - 1 : (loop ? items.length - 1 : currentIndex);
-    } else if (key === downKey) {
+      onArrowUp?.();
+      break;
+    case 'ArrowDown':
       if (preventDefault) event.preventDefault();
-      newIndex = currentIndex < items.length - 1 ? currentIndex + 1 : (loop ? 0 : currentIndex);
-    } else if (key === 'Home') {
+      onArrowDown?.();
+      break;
+    case 'ArrowLeft':
       if (preventDefault) event.preventDefault();
-      newIndex = 0;
-    } else if (key === 'End') {
+      onArrowLeft?.();
+      break;
+    case 'ArrowRight':
       if (preventDefault) event.preventDefault();
-      newIndex = items.length - 1;
-    }
-    
-    if (newIndex !== currentIndex) {
-      onIndexChange(newIndex);
-      items[newIndex]?.focus();
-    }
-  };
+      onArrowRight?.();
+      break;
+  }
 };
 
 /**
- * Creates a keyboard navigation handler for dropdown menus
+ * Handle Tab key navigation with custom logic
+ * @param event Keyboard event
+ * @param callback Function to execute on Tab key press
  */
-export const createDropdownKeyHandler = (
-  items: HTMLElement[],
-  onClose: () => void,
-  onSelect?: (index: number) => void
-) => {
-  let currentIndex = -1;
-  
-  return (event: React.KeyboardEvent) => {
-    switch (event.key) {
-      case 'Escape':
-        event.preventDefault();
-        onClose();
-        break;
-        
-      case 'ArrowDown':
-        event.preventDefault();
-        currentIndex = currentIndex < items.length - 1 ? currentIndex + 1 : 0;
-        items[currentIndex]?.focus();
-        break;
-        
-      case 'ArrowUp':
-        event.preventDefault();
-        currentIndex = currentIndex > 0 ? currentIndex - 1 : items.length - 1;
-        items[currentIndex]?.focus();
-        break;
-        
-      case 'Enter':
-      case ' ':
-        event.preventDefault();
-        if (currentIndex >= 0 && onSelect) {
-          onSelect(currentIndex);
-        }
-        break;
-        
-      case 'Home':
-        event.preventDefault();
-        currentIndex = 0;
-        items[currentIndex]?.focus();
-        break;
-        
-      case 'End':
-        event.preventDefault();
-        currentIndex = items.length - 1;
-        items[currentIndex]?.focus();
-        break;
-    }
-  };
+export const handleTabKey = (
+  event: React.KeyboardEvent,
+  callback: (shiftKey: boolean) => void
+): void => {
+  if (event.key === 'Tab') {
+    callback(event.shiftKey);
+  }
+};
+
+/**
+ * Handle Escape key press
+ * @param event Keyboard event
+ * @param callback Function to execute on Escape key press
+ */
+export const handleEscapeKey = (
+  event: React.KeyboardEvent,
+  callback: () => void
+): void => {
+  if (event.key === 'Escape') {
+    event.preventDefault();
+    callback();
+  }
 };
