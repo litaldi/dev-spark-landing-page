@@ -3,28 +3,17 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import { 
-  BookOpen, 
-  HelpCircle, 
   User, 
   Settings, 
   LogOut,
-  Home,
-  MessageSquare,
-  FileQuestion,
-  Users,
-  X,
-  BarChart3,
-  Target,
-  Zap,
-  Award,
-  Code,
-  Play
+  X
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { AccessibilityMenu } from "@/components/a11y/AccessibilityMenu";
+import { mobileNavigationSections } from "./navigation-data";
 
 interface MobileNavigationProps {
   isLoggedIn: boolean;
@@ -32,46 +21,6 @@ interface MobileNavigationProps {
   onLogout: () => void;
   onClose: () => void;
 }
-
-const navigationSections = [
-  {
-    title: "Main Navigation",
-    items: [
-      { title: "Home", href: "/", icon: Home, description: "Return to homepage" },
-      { title: "About", href: "/about", icon: Users, description: "Learn about our mission" }
-    ]
-  },
-  {
-    title: "Dashboard",
-    items: [
-      { title: "Overview", href: "/dashboard", icon: BarChart3, description: "Your learning hub" },
-      { title: "My Courses", href: "/dashboard/courses", icon: BookOpen, description: "Browse enrolled courses" },
-      { title: "Practice Labs", href: "/dashboard/practice", icon: Code, description: "Interactive coding challenges" },
-      { title: "Projects", href: "/dashboard/projects", icon: Zap, description: "Build real applications" },
-      { title: "Achievements", href: "/dashboard/achievements", icon: Award, description: "View badges & milestones" },
-      { title: "Study Sessions", href: "/dashboard/sessions", icon: Play, description: "Track learning time" }
-    ]
-  },
-  {
-    title: "Learning Resources",
-    items: [
-      { title: "Interactive Tutorials", href: "/learn/tutorials", icon: BookOpen, description: "Step-by-step guides" },
-      { title: "Code Examples", href: "/learn/examples", icon: Code, description: "Real-world samples" },
-      { title: "Best Practices", href: "/learn/practices", icon: Target, description: "Industry standards" },
-      { title: "Video Lessons", href: "/learn/videos", icon: Play, description: "Comprehensive courses" },
-      { title: "Practice Exercises", href: "/learn/exercises", icon: Zap, description: "Hands-on challenges" }
-    ]
-  },
-  {
-    title: "Support & Help",
-    items: [
-      { title: "Help Center", href: "/help", icon: HelpCircle, description: "Documentation & guides" },
-      { title: "FAQ", href: "/faq", icon: FileQuestion, description: "Common questions" },
-      { title: "Contact Support", href: "/contact", icon: MessageSquare, description: "Get personalized help" },
-      { title: "Community Forum", href: "/community", icon: Users, description: "Connect with learners" }
-    ]
-  }
-];
 
 export function MobileNavigation({ isLoggedIn, userName, onLogout, onClose }: MobileNavigationProps) {
   const location = useLocation();
@@ -116,7 +65,7 @@ export function MobileNavigation({ isLoggedIn, userName, onLogout, onClose }: Mo
       {/* Enhanced Navigation Content */}
       <div className="flex-1 overflow-auto p-6">
         <nav className="space-y-8">
-          {navigationSections.map((section) => (
+          {mobileNavigationSections.map((section) => (
             <div key={section.title}>
               <h3 className="text-sm font-bold text-foreground uppercase tracking-wider mb-4 px-1 flex items-center gap-2">
                 <span className="w-6 h-0.5 bg-primary rounded-full"></span>
@@ -125,38 +74,38 @@ export function MobileNavigation({ isLoggedIn, userName, onLogout, onClose }: Mo
               <div className="space-y-2">
                 {section.items.map((item) => (
                   <Link
-                    key={item.href}
-                    to={item.href}
+                    key={item.id}
+                    to={item.path}
                     onClick={handleLinkClick}
                     className={cn(
                       "flex items-center gap-4 px-4 py-4 rounded-xl text-sm font-medium transition-all duration-200",
                       "focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2",
                       "hover:bg-accent/80 active:bg-accent group border border-transparent",
                       "hover:border-border/50 hover:shadow-sm hover:scale-[1.02]",
-                      location.pathname === item.href
+                      location.pathname === item.path
                         ? "bg-primary text-primary-foreground shadow-md border-primary/20 scale-[1.02]"
                         : "text-foreground hover:text-primary"
                     )}
-                    aria-current={location.pathname === item.href ? "page" : undefined}
+                    aria-current={location.pathname === item.path ? "page" : undefined}
                   >
                     <div className={cn(
                       "p-2 rounded-lg transition-colors",
-                      location.pathname === item.href 
+                      location.pathname === item.path 
                         ? "bg-primary-foreground/10" 
                         : "bg-primary/10 group-hover:bg-primary/20"
                     )}>
                       <item.icon className={cn(
                         "h-5 w-5",
-                        location.pathname === item.href 
+                        location.pathname === item.path 
                           ? "text-primary-foreground" 
                           : "text-primary"
                       )} />
                     </div>
                     <div className="flex flex-col flex-1">
-                      <span className="font-semibold">{item.title}</span>
+                      <span className="font-semibold">{item.label}</span>
                       <span className={cn(
                         "text-xs mt-0.5 leading-relaxed",
-                        location.pathname === item.href 
+                        location.pathname === item.path 
                           ? "text-primary-foreground/80" 
                           : "text-muted-foreground group-hover:text-foreground/80"
                       )}>

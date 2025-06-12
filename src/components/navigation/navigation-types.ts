@@ -7,5 +7,12 @@ export interface NavigationItem {
   icon: LucideIcon;
   path: string;
   description?: string;
+  children?: NavigationItem[];
   badge?: string;
+  isNew?: boolean;
+}
+
+export interface NavigationSection {
+  title: string;
+  items: NavigationItem[];
 }
