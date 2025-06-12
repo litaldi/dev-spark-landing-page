@@ -15,7 +15,10 @@ import {
   X,
   BarChart3,
   Target,
-  Zap
+  Zap,
+  Award,
+  Code,
+  Play
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -32,27 +35,40 @@ interface MobileNavigationProps {
 
 const navigationSections = [
   {
-    title: "Main",
+    title: "Main Navigation",
     items: [
       { title: "Home", href: "/", icon: Home, description: "Return to homepage" },
-      { title: "Dashboard", href: "/dashboard", icon: BarChart3, description: "Your learning hub" },
       { title: "About", href: "/about", icon: Users, description: "Learn about our mission" }
     ]
   },
   {
-    title: "Learning",
+    title: "Dashboard",
     items: [
-      { title: "Courses", href: "/dashboard/courses", icon: BookOpen, description: "Browse all courses" },
-      { title: "Practice", href: "/dashboard/practice", icon: Target, description: "Code challenges" },
-      { title: "Projects", href: "/dashboard/projects", icon: Zap, description: "Build real apps" }
+      { title: "Overview", href: "/dashboard", icon: BarChart3, description: "Your learning hub" },
+      { title: "My Courses", href: "/dashboard/courses", icon: BookOpen, description: "Browse enrolled courses" },
+      { title: "Practice Labs", href: "/dashboard/practice", icon: Code, description: "Interactive coding challenges" },
+      { title: "Projects", href: "/dashboard/projects", icon: Zap, description: "Build real applications" },
+      { title: "Achievements", href: "/dashboard/achievements", icon: Award, description: "View badges & milestones" },
+      { title: "Study Sessions", href: "/dashboard/sessions", icon: Play, description: "Track learning time" }
     ]
   },
   {
-    title: "Support",
+    title: "Learning Resources",
     items: [
-      { title: "Help Center", href: "/help", icon: HelpCircle, description: "Documentation and guides" },
+      { title: "Interactive Tutorials", href: "/learn/tutorials", icon: BookOpen, description: "Step-by-step guides" },
+      { title: "Code Examples", href: "/learn/examples", icon: Code, description: "Real-world samples" },
+      { title: "Best Practices", href: "/learn/practices", icon: Target, description: "Industry standards" },
+      { title: "Video Lessons", href: "/learn/videos", icon: Play, description: "Comprehensive courses" },
+      { title: "Practice Exercises", href: "/learn/exercises", icon: Zap, description: "Hands-on challenges" }
+    ]
+  },
+  {
+    title: "Support & Help",
+    items: [
+      { title: "Help Center", href: "/help", icon: HelpCircle, description: "Documentation & guides" },
       { title: "FAQ", href: "/faq", icon: FileQuestion, description: "Common questions" },
-      { title: "Contact", href: "/contact", icon: MessageSquare, description: "Get in touch" }
+      { title: "Contact Support", href: "/contact", icon: MessageSquare, description: "Get personalized help" },
+      { title: "Community Forum", href: "/community", icon: Users, description: "Connect with learners" }
     ]
   }
 ];
@@ -66,18 +82,18 @@ export function MobileNavigation({ isLoggedIn, userName, onLogout, onClose }: Mo
 
   return (
     <div className="flex flex-col h-full bg-background">
-      {/* Header */}
-      <div className="p-6 border-b bg-gradient-to-r from-primary/5 to-primary/10">
+      {/* Enhanced Header */}
+      <div className="p-6 border-b bg-gradient-to-r from-primary/10 via-primary/5 to-transparent">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div 
-              className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center text-primary-foreground font-bold text-lg shadow-sm" 
+              className="w-11 h-11 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center text-primary-foreground font-bold text-lg shadow-lg ring-2 ring-primary/20" 
               aria-hidden="true"
             >
               D
             </div>
             <div className="flex flex-col">
-              <h2 className="text-lg font-bold text-foreground">DevAI</h2>
+              <h2 className="text-xl font-bold text-foreground">DevAI</h2>
               <p className="text-xs text-muted-foreground">Learning Platform</p>
             </div>
           </div>
@@ -88,7 +104,7 @@ export function MobileNavigation({ isLoggedIn, userName, onLogout, onClose }: Mo
               variant="ghost" 
               size="icon" 
               onClick={onClose}
-              className="h-8 w-8 hover:bg-accent/80"
+              className="h-9 w-9 hover:bg-accent/80 transition-colors rounded-lg"
               aria-label="Close menu"
             >
               <X className="h-4 w-4" />
@@ -97,43 +113,52 @@ export function MobileNavigation({ isLoggedIn, userName, onLogout, onClose }: Mo
         </div>
       </div>
 
-      {/* Navigation Content */}
+      {/* Enhanced Navigation Content */}
       <div className="flex-1 overflow-auto p-6">
-        <nav className="space-y-6">
+        <nav className="space-y-8">
           {navigationSections.map((section) => (
             <div key={section.title}>
-              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3 px-1">
+              <h3 className="text-sm font-bold text-foreground uppercase tracking-wider mb-4 px-1 flex items-center gap-2">
+                <span className="w-6 h-0.5 bg-primary rounded-full"></span>
                 {section.title}
               </h3>
-              <div className="space-y-1">
+              <div className="space-y-2">
                 {section.items.map((item) => (
                   <Link
                     key={item.href}
                     to={item.href}
                     onClick={handleLinkClick}
                     className={cn(
-                      "flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium transition-all duration-200",
+                      "flex items-center gap-4 px-4 py-4 rounded-xl text-sm font-medium transition-all duration-200",
                       "focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2",
-                      "hover:bg-accent/80 active:bg-accent group",
+                      "hover:bg-accent/80 active:bg-accent group border border-transparent",
+                      "hover:border-border/50 hover:shadow-sm hover:scale-[1.02]",
                       location.pathname === item.href
-                        ? "bg-primary text-primary-foreground shadow-sm"
+                        ? "bg-primary text-primary-foreground shadow-md border-primary/20 scale-[1.02]"
                         : "text-foreground hover:text-primary"
                     )}
                     aria-current={location.pathname === item.href ? "page" : undefined}
                   >
-                    <item.icon className={cn(
-                      "h-5 w-5 flex-shrink-0",
+                    <div className={cn(
+                      "p-2 rounded-lg transition-colors",
                       location.pathname === item.href 
-                        ? "text-primary-foreground" 
-                        : "text-muted-foreground group-hover:text-primary"
-                    )} />
-                    <div className="flex flex-col">
-                      <span className="font-medium">{item.title}</span>
+                        ? "bg-primary-foreground/10" 
+                        : "bg-primary/10 group-hover:bg-primary/20"
+                    )}>
+                      <item.icon className={cn(
+                        "h-5 w-5",
+                        location.pathname === item.href 
+                          ? "text-primary-foreground" 
+                          : "text-primary"
+                      )} />
+                    </div>
+                    <div className="flex flex-col flex-1">
+                      <span className="font-semibold">{item.title}</span>
                       <span className={cn(
-                        "text-xs mt-0.5",
+                        "text-xs mt-0.5 leading-relaxed",
                         location.pathname === item.href 
                           ? "text-primary-foreground/80" 
-                          : "text-muted-foreground"
+                          : "text-muted-foreground group-hover:text-foreground/80"
                       )}>
                         {item.description}
                       </span>
@@ -146,24 +171,25 @@ export function MobileNavigation({ isLoggedIn, userName, onLogout, onClose }: Mo
         </nav>
       </div>
 
-      {/* User Section */}
-      <div className="border-t bg-muted/20 p-6">
+      {/* Enhanced User Section */}
+      <div className="border-t bg-muted/30 p-6">
         {isLoggedIn ? (
-          <div className="space-y-4">
-            <div className="flex items-center gap-3 px-3 py-3 bg-gradient-to-r from-primary/10 to-primary/5 rounded-lg border border-primary/20">
-              <div className="h-10 w-10 rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-sm">
-                <User className="h-5 w-5 text-primary-foreground" />
+          <div className="space-y-6">
+            <div className="flex items-center gap-4 px-4 py-4 bg-gradient-to-r from-primary/15 to-primary/5 rounded-xl border border-primary/20 shadow-sm">
+              <div className="h-12 w-12 rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-md ring-2 ring-primary/20">
+                <User className="h-6 w-6 text-primary-foreground" />
               </div>
               <div className="flex flex-col">
-                <span className="text-sm font-semibold text-foreground">{userName}</span>
-                <span className="text-xs text-muted-foreground">Logged in</span>
+                <span className="text-sm font-bold text-foreground">{userName}</span>
+                <span className="text-xs text-muted-foreground">Logged in • Premium Member</span>
               </div>
             </div>
-            <div className="space-y-1">
+            
+            <div className="space-y-2">
               <Link
                 to="/profile"
                 onClick={handleLinkClick}
-                className="flex items-center gap-3 px-3 py-2.5 text-sm text-muted-foreground hover:text-foreground hover:bg-accent rounded-md transition-colors"
+                className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent/80 rounded-lg transition-colors"
               >
                 <User className="h-4 w-4" />
                 My Profile
@@ -171,18 +197,18 @@ export function MobileNavigation({ isLoggedIn, userName, onLogout, onClose }: Mo
               <Link
                 to="/settings"
                 onClick={handleLinkClick}
-                className="flex items-center gap-3 px-3 py-2.5 text-sm text-muted-foreground hover:text-foreground hover:bg-accent rounded-md transition-colors"
+                className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent/80 rounded-lg transition-colors"
               >
                 <Settings className="h-4 w-4" />
                 Settings
               </Link>
-              <Separator className="my-2" />
+              <Separator className="my-3" />
               <button
                 onClick={() => {
                   onLogout();
                   onClose();
                 }}
-                className="flex items-center gap-3 px-3 py-2.5 text-sm text-destructive hover:bg-destructive/10 rounded-md transition-colors w-full text-left"
+                className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-destructive hover:bg-destructive/10 rounded-lg transition-colors w-full text-left"
               >
                 <LogOut className="h-4 w-4" />
                 Sign Out
@@ -190,19 +216,19 @@ export function MobileNavigation({ isLoggedIn, userName, onLogout, onClose }: Mo
             </div>
           </div>
         ) : (
-          <div className="space-y-3">
-            <Button asChild className="w-full bg-primary hover:bg-primary/90 shadow-sm">
+          <div className="space-y-4">
+            <Button asChild className="w-full bg-primary hover:bg-primary/90 shadow-md hover:shadow-lg transition-all duration-200 font-semibold h-12">
               <Link to="/auth/register" onClick={handleLinkClick}>
                 Get Started Free
               </Link>
             </Button>
-            <Button variant="outline" asChild className="w-full">
+            <Button variant="outline" asChild className="w-full font-medium h-11 border-2 hover:bg-accent/80">
               <Link to="/auth/login" onClick={handleLinkClick}>
                 Sign In
               </Link>
             </Button>
-            <p className="text-xs text-muted-foreground text-center mt-3">
-              Join thousands of developers learning with AI
+            <p className="text-xs text-muted-foreground text-center mt-4 leading-relaxed">
+              Join thousands of developers learning with AI-powered education
             </p>
           </div>
         )}

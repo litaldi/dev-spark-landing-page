@@ -1,112 +1,132 @@
 
-import React from "react";
-import { cn } from "@/lib/utils";
-import { Loader2 } from "lucide-react";
-import { EnhancedSkeleton, SkeletonCard, SkeletonTable } from "./enhanced-skeleton";
+import React from 'react';
+import { Loader2, Zap } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface LoadingSpinnerProps {
-  size?: "sm" | "md" | "lg";
+  size?: 'sm' | 'md' | 'lg';
   className?: string;
-  text?: string;
 }
 
-export function LoadingSpinner({ size = "md", className, text }: LoadingSpinnerProps) {
+export function LoadingSpinner({ size = 'md', className }: LoadingSpinnerProps) {
   const sizeClasses = {
-    sm: "h-4 w-4",
-    md: "h-6 w-6", 
-    lg: "h-8 w-8"
+    sm: 'h-4 w-4',
+    md: 'h-6 w-6', 
+    lg: 'h-8 w-8'
   };
 
   return (
-    <div className={cn("flex items-center justify-center gap-2", className)}>
-      <Loader2 className={cn("animate-spin", sizeClasses[size])} />
-      {text && <span className="text-sm text-muted-foreground">{text}</span>}
-    </div>
+    <Loader2 
+      className={cn(
+        'animate-spin text-primary',
+        s.className
+      )} 
+    />
   );
 }
 
-interface PageLoadingProps {
+interface LoadingPageProps {
   message?: string;
-  showSkeleton?: boolean;
-  skeletonType?: "cards" | "table" | "text";
+  submessage?: string;
+  showProgress?: boolean;
+  progress?: number;
 }
 
-export function PageLoading({ 
+export function LoadingPage({ 
   message = "Loading...", 
-  showSkeleton = true,
-  skeletonType = "cards" 
-}: PageLoadingProps) {
-  if (!showSkeleton) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
-        <LoadingSpinner size="lg" />
-        <p className="text-lg text-muted-foreground">{message}</p>
-      </div>
-    );
-  }
-
-  const renderSkeleton = () => {
-    switch (skeletonType) {
-      case "table":
-        return <SkeletonTable rows={8} columns={4} />;
-      case "text":
-        return (
-          <div className="space-y-4 max-w-3xl">
-            <EnhancedSkeleton variant="text" lines={3} />
-            <EnhancedSkeleton variant="text" lines={4} />
-            <EnhancedSkeleton variant="text" lines={2} />
-          </div>
-        );
-      case "cards":
-      default:
-        return (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {Array.from({ length: 6 }).map((_, index) => (
-              <SkeletonCard key={index} />
-            ))}
-          </div>
-        );
-    }
-  };
-
+  submessage = "Please wait while we prepare everything for you",
+  showProgress = false,
+  progress = 0
+}: LoadingPageProps) {
   return (
-    <div className="space-y-6 p-6">
-      <div className="flex items-center gap-2 mb-6">
-        <LoadingSpinner size="sm" />
-        <span className="text-sm text-muted-foreground">{message}</span>
+    <div className="min-h-screen flex items-center justify-center p-6 bg-background">
+      <div className="text-center space-y-6 max-w-md">
+        <div className="flex justify-center">
+          <div className="relative">
+            <div className="p-4 bg-primary/10 rounded-full">
+              <div className="relative">
+                <Zap className="h-12 w-12 text-primary animate-pulse" />
+                <LoadingSpinner 
+                  size="lg" 
+                  className="absolute -top-1 -right-1 h-6 w-6 text-primary/60" 
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-3">
+          <h2 className="text-xl font-semibold text-foreground">
+            {message}
+          </h2>
+          <p className="text-muted-foreground text-sm leading-relaxed">
+            {submessage}
+          </p>
+        </div>
+
+        {showProgress && (
+          <div className="space-y-2">
+            <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
+              <div 
+                className="h-full bg-gradient-to-r from-primary to-primary/80 transition-all duration-500 ease-out rounded-full"
+                style={{ width: `${Math.min(100, Math.max(0, progress))}%` }}
+              />
+            </div>
+            <p className="text-xs text-muted-foreground">
+              {Math.round(progress)}% complete
+            </p>
+          </div>
+        )}
+
+        <div className="flex justify-center space-x-1">
+          {[0, 1, 2].map((i) => (
+            <div
+              key={i}
+              className="w-2 h-2 bg-primary/60 rounded-full animate-pulse"
+              style={{
+                animationDelay: `${i * 0.2}s`,
+                animationDuration: '1.4s'
+              }}
+            />
+          ))}
+        </div>
       </div>
-      {renderSkeleton()}
     </div>
   );
 }
 
-interface InlineLoadingProps {
-  text?: string;
+interface LoadingCardProps {
+  title?: string;
+  description?: string;
   className?: string;
 }
 
-export function InlineLoading({ text = "Loading...", className }: InlineLoadingProps) {
+export function LoadingCard({ 
+  title = "Loading content...", 
+  description,
+  className 
+}: LoadingCardProps) {
   return (
-    <div className={cn("flex items-center gap-2", className)}>
-      <LoadingSpinner size="sm" />
-      <span className="text-sm">{text}</span>
-    </div>
-  );
-}
-
-interface ButtonLoadingProps {
-  isLoading: boolean;
-  children: React.ReactNode;
-  loadingText?: string;
-}
-
-export function ButtonLoading({ isLoading, children, loadingText = "Loading..." }: ButtonLoadingProps) {
-  if (!isLoading) return <>{children}</>;
-  
-  return (
-    <div className="flex items-center gap-2">
-      <LoadingSpinner size="sm" />
-      <span>{loadingText}</span>
+    <div className={cn(
+      "p-6 border rounded-lg bg-background/50 backdrop-blur-sm",
+      "animate-pulse space-y-4",
+      className
+    )}>
+      <div className="flex items-center gap-3">
+        <LoadingSpinner size="sm" />
+        <div className="space-y-2 flex-1">
+          <div className="font-medium text-sm text-foreground">{title}</div>
+          {description && (
+            <div className="text-xs text-muted-foreground">{description}</div>
+          )}
+        </div>
+      </div>
+      
+      <div className="space-y-2">
+        <div className="h-3 bg-muted rounded w-3/4"></div>
+        <div className="h-3 bg-muted rounded w-1/2"></div>
+        <div className="h-3 bg-muted rounded w-5/6"></div>
+      </div>
     </div>
   );
 }
