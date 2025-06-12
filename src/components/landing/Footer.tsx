@@ -1,161 +1,229 @@
 
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { Code, Github, Twitter, Linkedin, Mail } from 'lucide-react';
+import React from "react";
+import { Link } from "react-router-dom";
+import { Github, Linkedin, Twitter, Mail, MapPin, Phone, ArrowRight, Facebook, Instagram, Youtube } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
-const footerLinks = {
-  product: [
-    { name: 'Features', href: '/features' },
-    { name: 'Pricing', href: '/pricing' },
-    { name: 'Documentation', href: '/docs' },
-    { name: 'API', href: '/api' },
-  ],
-  company: [
-    { name: 'About', href: '/about' },
-    { name: 'Blog', href: '/blog' },
-    { name: 'Careers', href: '/careers' },
-    { name: 'Contact', href: '/contact' },
-  ],
-  support: [
-    { name: 'Help Center', href: '/help' },
-    { name: 'Community', href: '/community' },
-    { name: 'Status', href: '/status' },
-    { name: 'Accessibility', href: '/accessibility' },
-  ],
-  legal: [
-    { name: 'Privacy', href: '/privacy' },
-    { name: 'Terms', href: '/terms' },
-    { name: 'Security', href: '/security' },
-    { name: 'Cookies', href: '/cookies' },
-  ],
-};
+const Footer: React.FC = () => {
+  const currentYear = new Date().getFullYear();
 
-const socialLinks = [
-  { name: 'GitHub', href: 'https://github.com', icon: Github },
-  { name: 'Twitter', href: 'https://twitter.com', icon: Twitter },
-  { name: 'LinkedIn', href: 'https://linkedin.com', icon: Linkedin },
-  { name: 'Email', href: 'mailto:hello@devai.com', icon: Mail },
-];
-
-export default function Footer() {
   return (
-    <footer className="bg-background border-t border-border">
-      <div className="container mx-auto px-4 py-12 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-8">
-          {/* Brand */}
-          <div className="lg:col-span-2">
-            <Link to="/" className="flex items-center space-x-2 text-xl font-bold text-primary">
-              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-primary-foreground">
-                <Code className="w-5 h-5" />
+    <footer 
+      className="bg-background border-t border-border"
+      role="contentinfo"
+      aria-labelledby="footer-heading"
+    >
+      <h2 id="footer-heading" className="sr-only">Footer</h2>
+      
+      {/* Main Footer Content */}
+      <div className="container mx-auto px-4 lg:px-6 py-12 lg:py-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
+          
+          {/* Company Info Column */}
+          <div className="space-y-4">
+            <Link 
+              to="/" 
+              className="flex items-center gap-2 hover:opacity-80 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-md"
+              aria-label="Go to homepage"
+            >
+              <div 
+                className="w-8 h-8 rounded-md bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center text-primary-foreground font-bold text-base" 
+                aria-hidden="true"
+              >
+                D
               </div>
-              <span>DevAI</span>
+              <span className="font-bold text-lg text-foreground">DevAI</span>
             </Link>
-            <p className="mt-4 text-sm text-muted-foreground max-w-md">
-              Empowering developers with AI-powered learning experiences. 
-              Build your programming skills faster and more effectively.
+            <p className="text-muted-foreground text-sm leading-relaxed max-w-xs">
+              AI-powered programming education platform designed to help developers learn, grow, and excel in their coding journey.
             </p>
-            <div className="mt-6 flex space-x-4">
-              {socialLinks.map((social) => {
-                const Icon = social.icon;
-                return (
-                  <a
-                    key={social.name}
-                    href={social.href}
-                    className="text-muted-foreground hover:text-foreground transition-colors"
-                    aria-label={social.name}
-                  >
-                    <Icon className="w-5 h-5" />
-                  </a>
-                );
-              })}
+            <div className="flex items-center gap-3">
+              <a 
+                href="https://github.com" 
+                className="text-muted-foreground hover:text-primary transition-colors p-2 hover:bg-accent rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                aria-label="Visit our GitHub"
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                <Github className="h-5 w-5" aria-hidden="true" />
+              </a>
+              <a 
+                href="https://linkedin.com" 
+                className="text-muted-foreground hover:text-primary transition-colors p-2 hover:bg-accent rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                aria-label="Visit our LinkedIn"
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                <Linkedin className="h-5 w-5" aria-hidden="true" />
+              </a>
+              <a 
+                href="https://twitter.com" 
+                className="text-muted-foreground hover:text-primary transition-colors p-2 hover:bg-accent rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                aria-label="Visit our Twitter"
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                <Twitter className="h-5 w-5" aria-hidden="true" />
+              </a>
             </div>
           </div>
-
-          {/* Links */}
-          <div>
-            <h3 className="text-sm font-semibold text-foreground uppercase tracking-wider">
-              Product
-            </h3>
-            <ul className="mt-4 space-y-3">
-              {footerLinks.product.map((link) => (
-                <li key={link.name}>
-                  <Link
-                    to={link.href}
-                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    {link.name}
-                  </Link>
-                </li>
-              ))}
+          
+          {/* Quick Links Column */}
+          <div className="space-y-4">
+            <h3 className="font-semibold text-foreground">Quick Links</h3>
+            <ul className="space-y-3">
+              <li>
+                <Link 
+                  to="/" 
+                  className="text-muted-foreground hover:text-primary text-sm transition-colors focus:outline-none focus-visible:text-primary focus-visible:underline"
+                >
+                  Home
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/dashboard" 
+                  className="text-muted-foreground hover:text-primary text-sm transition-colors focus:outline-none focus-visible:text-primary focus-visible:underline"
+                >
+                  Dashboard
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/about" 
+                  className="text-muted-foreground hover:text-primary text-sm transition-colors focus:outline-none focus-visible:text-primary focus-visible:underline"
+                >
+                  About Us
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/contact" 
+                  className="text-muted-foreground hover:text-primary text-sm transition-colors focus:outline-none focus-visible:text-primary focus-visible:underline"
+                >
+                  Contact
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/faq" 
+                  className="text-muted-foreground hover:text-primary text-sm transition-colors focus:outline-none focus-visible:text-primary focus-visible:underline"
+                >
+                  FAQ
+                </Link>
+              </li>
             </ul>
           </div>
-
-          <div>
-            <h3 className="text-sm font-semibold text-foreground uppercase tracking-wider">
-              Company
-            </h3>
-            <ul className="mt-4 space-y-3">
-              {footerLinks.company.map((link) => (
-                <li key={link.name}>
-                  <Link
-                    to={link.href}
-                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    {link.name}
-                  </Link>
-                </li>
-              ))}
+          
+          {/* Contact Info Column */}
+          <div className="space-y-4">
+            <h3 className="font-semibold text-foreground">Contact Info</h3>
+            <ul className="space-y-3">
+              <li className="flex items-start gap-2 text-sm">
+                <Mail className="h-4 w-4 text-muted-foreground mt-0.5" aria-hidden="true" />
+                <a 
+                  href="mailto:hello@devai.com" 
+                  className="text-muted-foreground hover:text-primary transition-colors focus:outline-none focus-visible:text-primary focus-visible:underline"
+                >
+                  hello@devai.com
+                </a>
+              </li>
+              <li className="flex items-start gap-2 text-sm">
+                <Phone className="h-4 w-4 text-muted-foreground mt-0.5" aria-hidden="true" />
+                <a 
+                  href="tel:+1234567890" 
+                  className="text-muted-foreground hover:text-primary transition-colors focus:outline-none focus-visible:text-primary focus-visible:underline"
+                >
+                  +1 (234) 567-890
+                </a>
+              </li>
+              <li className="flex items-start gap-2 text-sm">
+                <MapPin className="h-4 w-4 text-muted-foreground mt-0.5" aria-hidden="true" />
+                <span className="text-muted-foreground">
+                  San Francisco, CA
+                </span>
+              </li>
             </ul>
           </div>
-
-          <div>
-            <h3 className="text-sm font-semibold text-foreground uppercase tracking-wider">
-              Support
-            </h3>
-            <ul className="mt-4 space-y-3">
-              {footerLinks.support.map((link) => (
-                <li key={link.name}>
-                  <Link
-                    to={link.href}
-                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+          
+          {/* Newsletter Column */}
+          <div className="space-y-4">
+            <h3 className="font-semibold text-foreground">Stay Updated</h3>
+            <p className="text-muted-foreground text-sm">
+              Get the latest updates on new features and learning resources.
+            </p>
+            <form className="space-y-3" onSubmit={(e) => e.preventDefault()}>
+              <div className="flex gap-2">
+                <Input 
+                  type="email" 
+                  placeholder="Enter your email"
+                  className="flex-1 text-sm"
+                  aria-label="Email address for newsletter"
+                />
+                <Button type="submit" size="sm" className="px-3">
+                  <ArrowRight className="h-4 w-4" />
+                  <span className="sr-only">Subscribe to newsletter</span>
+                </Button>
+              </div>
+            </form>
+            <div className="space-y-2">
+              <h4 className="font-medium text-foreground text-sm">Resources</h4>
+              <ul className="space-y-1">
+                <li>
+                  <Link 
+                    to="/help" 
+                    className="text-muted-foreground hover:text-primary text-sm transition-colors focus:outline-none focus-visible:text-primary focus-visible:underline"
                   >
-                    {link.name}
+                    Help Center
                   </Link>
                 </li>
-              ))}
-            </ul>
-          </div>
-
-          <div>
-            <h3 className="text-sm font-semibold text-foreground uppercase tracking-wider">
-              Legal
-            </h3>
-            <ul className="mt-4 space-y-3">
-              {footerLinks.legal.map((link) => (
-                <li key={link.name}>
-                  <Link
-                    to={link.href}
-                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                <li>
+                  <Link 
+                    to="/accessibility" 
+                    className="text-muted-foreground hover:text-primary text-sm transition-colors focus:outline-none focus-visible:text-primary focus-visible:underline"
                   >
-                    {link.name}
+                    Accessibility
                   </Link>
                 </li>
-              ))}
-            </ul>
+              </ul>
+            </div>
           </div>
         </div>
-
-        <div className="mt-8 pt-8 border-t border-border">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <p className="text-sm text-muted-foreground">
-              © 2024 DevAI. All rights reserved.
-            </p>
-            <p className="text-sm text-muted-foreground mt-2 md:mt-0">
-              Built with ❤️ for developers everywhere
-            </p>
+      </div>
+      
+      {/* Footer Bottom */}
+      <div className="border-t border-border bg-muted/30">
+        <div className="container mx-auto px-4 lg:px-6 py-6">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="text-xs text-muted-foreground">
+              © {currentYear} DevAI Learning Platform. All rights reserved.
+            </div>
+            <div className="flex items-center gap-6 text-xs">
+              <Link 
+                to="/terms" 
+                className="text-muted-foreground hover:text-primary transition-colors focus:outline-none focus-visible:text-primary focus-visible:underline"
+              >
+                Terms of Service
+              </Link>
+              <Link 
+                to="/privacy" 
+                className="text-muted-foreground hover:text-primary transition-colors focus:outline-none focus-visible:text-primary focus-visible:underline"
+              >
+                Privacy Policy
+              </Link>
+              <Link 
+                to="/cookies" 
+                className="text-muted-foreground hover:text-primary transition-colors focus:outline-none focus-visible:text-primary focus-visible:underline"
+              >
+                Cookie Policy
+              </Link>
+            </div>
           </div>
         </div>
       </div>
     </footer>
   );
-}
+};
+
+export default Footer;
