@@ -1,9 +1,9 @@
 
 import React from 'react';
-import { AlertTriangle, RefreshCw, Home, Bug, Lightbulb } from 'lucide-react';
+import { AlertTriangle, RefreshCw, Home, MessageCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { cn } from '@/lib/utils';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
 
 interface EnhancedErrorFallbackProps {
   error: Error;
@@ -16,112 +16,107 @@ export function EnhancedErrorFallback({
   resetErrorBoundary, 
   className 
 }: EnhancedErrorFallbackProps) {
-  const handleReportBug = () => {
-    const errorDetails = {
-      message: error.message,
-      stack: error.stack,
-      timestamp: new Date().toISOString(),
-      userAgent: navigator.userAgent,
-      url: window.location.href
-    };
+  const isDevelopment = process.env.NODE_ENV === 'development';
+  
+  const handleReportError = () => {
+    // In a real app, this would send error reports to your error tracking service
+    console.error('Error reported:', error);
     
-    console.log('Bug report data:', errorDetails);
-    // In production, send to error tracking service
+    // Create a mailto link for error reporting
+    const subject = encodeURIComponent('DevAI Error Report');
+    const body = encodeURIComponent(`
+Error: ${error.message}
+Stack: ${error.stack}
+URL: ${window.location.href}
+User Agent: ${navigator.userAgent}
+Timestamp: ${new Date().toISOString()}
+    `);
+    
+    window.location.href = `mailto:support@devai.com?subject=${subject}&body=${body}`;
   };
 
-  const suggestions = [
-    "Try refreshing the page",
-    "Check your internet connection", 
-    "Clear your browser cache",
-    "Try again in a few minutes"
-  ];
+  const handleGoHome = () => {
+    window.location.href = '/';
+  };
 
   return (
-    <div className={cn("min-h-screen flex items-center justify-center p-6 bg-background", className)}>
-      <Card className="w-full max-w-2xl p-8 text-center space-y-6 shadow-lg border-destructive/20">
-        <div className="flex justify-center">
-          <div className="p-4 bg-destructive/10 rounded-full animate-pulse">
-            <AlertTriangle className="h-12 w-12 text-destructive" />
-          </div>
-        </div>
-
-        <div className="space-y-4">
-          <h1 className="text-2xl font-bold text-foreground">
-            Oops! Something went wrong
-          </h1>
-          <p className="text-muted-foreground leading-relaxed max-w-md mx-auto">
-            We're sorry for the inconvenience. An unexpected error occurred while loading this content.
-          </p>
-
-          {process.env.NODE_ENV === 'development' && (
-            <details className="mt-6 p-4 bg-muted rounded-lg text-left text-sm">
-              <summary className="font-medium cursor-pointer mb-2 flex items-center gap-2">
-                <Bug className="h-4 w-4" />
-                Error Details (Development Mode)
-              </summary>
-              <pre className="whitespace-pre-wrap text-xs text-destructive overflow-auto max-h-32 mt-2">
-                {error.message}
-                {error.stack && (
-                  <>
-                    {'\n\nStack Trace:'}
-                    {error.stack}
-                  </>
-                )}
-              </pre>
-            </details>
-          )}
-
-          <div className="bg-muted/50 rounded-lg p-4 text-left">
-            <div className="flex items-center gap-2 mb-3">
-              <Lightbulb className="h-4 w-4 text-primary" />
-              <span className="font-medium text-sm">Try these solutions:</span>
+    <div className={`min-h-screen flex items-center justify-center p-6 bg-background ${className}`}>
+      <Card className="w-full max-w-lg animate-fade-in">
+        <CardHeader className="text-center">
+          <div className="flex justify-center mb-4">
+            <div className="p-3 bg-destructive/10 rounded-full">
+              <AlertTriangle className="h-8 w-8 text-destructive" />
             </div>
-            <ul className="text-sm text-muted-foreground space-y-1">
-              {suggestions.map((suggestion, index) => (
-                <li key={index} className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 bg-primary rounded-full"></span>
-                  {suggestion}
-                </li>
-              ))}
+          </div>
+          <CardTitle className="text-xl font-semibold text-foreground">
+            Oops! Something went wrong
+          </CardTitle>
+          <CardDescription className="text-muted-foreground">
+            We encountered an unexpected error. Don't worry, this has been logged and we're looking into it.
+          </CardDescription>
+        </CardHeader>
+        
+        <CardContent className="space-y-4">
+          {isDevelopment && (
+            <div className="bg-muted p-4 rounded-lg">
+              <h4 className="text-sm font-medium text-foreground mb-2">Error Details (Dev Mode)</h4>
+              <p className="text-xs text-muted-foreground font-mono break-all">
+                {error.message}
+              </p>
+              {error.stack && (
+                <details className="mt-2">
+                  <summary className="text-xs text-muted-foreground cursor-pointer hover:text-foreground">
+                    Stack Trace
+                  </summary>
+                  <pre className="text-xs text-muted-foreground mt-2 whitespace-pre-wrap break-all">
+                    {error.stack}
+                  </pre>
+                </details>
+              )}
+            </div>
+          )}
+          
+          <div className="text-sm text-muted-foreground space-y-2">
+            <p>Here are some things you can try:</p>
+            <ul className="list-disc list-inside space-y-1 ml-2">
+              <li>Refresh the page to try again</li>
+              <li>Go back to the homepage</li>
+              <li>Clear your browser cache</li>
+              <li>Contact support if the problem persists</li>
             </ul>
           </div>
-        </div>
-
-        <div className="flex flex-col sm:flex-row gap-3 justify-center pt-4">
+        </CardContent>
+        
+        <Separator />
+        
+        <CardFooter className="flex flex-col sm:flex-row gap-3 pt-6">
           <Button 
             onClick={resetErrorBoundary}
-            className="flex items-center gap-2 bg-primary hover:bg-primary/90"
+            className="w-full sm:w-auto"
+            variant="default"
           >
-            <RefreshCw className="h-4 w-4" />
+            <RefreshCw className="h-4 w-4 mr-2" />
             Try Again
           </Button>
           
           <Button 
-            onClick={() => window.location.href = '/'}
+            onClick={handleGoHome}
+            className="w-full sm:w-auto"
             variant="outline"
-            className="flex items-center gap-2"
           >
-            <Home className="h-4 w-4" />
+            <Home className="h-4 w-4 mr-2" />
             Go Home
           </Button>
-
+          
           <Button 
-            onClick={handleReportBug}
+            onClick={handleReportError}
+            className="w-full sm:w-auto"
             variant="ghost"
-            size="sm"
-            className="flex items-center gap-2 text-muted-foreground"
           >
-            <Bug className="h-4 w-4" />
+            <MessageCircle className="h-4 w-4 mr-2" />
             Report Issue
           </Button>
-        </div>
-
-        <p className="text-xs text-muted-foreground pt-4 border-t border-border/50">
-          If this problem persists, please contact our support team at{' '}
-          <a href="mailto:support@devai.com" className="text-primary hover:underline">
-            support@devai.com
-          </a>
-        </p>
+        </CardFooter>
       </Card>
     </div>
   );

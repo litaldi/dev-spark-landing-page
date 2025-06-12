@@ -1,3 +1,4 @@
+
 import { 
   Home, 
   BookOpen, 
@@ -112,37 +113,5 @@ export const mobileNavigationSections: NavigationSection[] = [
       { id: 'contact', label: 'Contact Support', icon: MessageSquare, path: '/contact', description: 'Get personalized help' },
       { id: 'community', label: 'Community Forum', icon: Users, path: '/community', description: 'Connect with learners' }
     ]
-  }
-];
-
-// Legacy support - keeping existing simple structure for compatibility
-export const navigationItems: NavigationItem[] = [
-  {
-    id: 'dashboard',
-    label: 'Dashboard',
-    icon: Home,
-    path: '/dashboard',
-    description: 'Your learning overview'
-  },
-  {
-    id: 'profile',
-    label: 'Profile',
-    icon: User,
-    path: '/profile',
-    description: 'Manage your account'
-  },
-  {
-    id: 'settings',
-    label: 'Settings',
-    icon: Settings,
-    path: '/settings',
-    description: 'App preferences'
-  },
-  {
-    id: 'help',
-    label: 'Help',
-    icon: HelpCircle,
-    path: '/help',
-    description: 'Get support'
   }
 ];

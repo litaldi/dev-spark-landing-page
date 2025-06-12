@@ -9,7 +9,6 @@ import { AlertError } from "./AlertError";
 import { LoginFormInputs } from "./LoginFormInputs";
 import { LoginAlternatives } from "./LoginAlternatives";
 import { RateLimitWarning } from "./RateLimitWarning";
-import { DemoUserCredentials } from "./DemoUserCredentials";
 import { useLoginForm, loginSchema, LoginFormValues } from "@/hooks/auth/use-login-form";
 import { Loader2 } from "lucide-react";
 import { useBreakpoint } from "@/hooks/use-mobile";
@@ -44,12 +43,10 @@ export function LoginForm({ onGoogleLogin, onGithubLogin, onMagicLink }: LoginFo
     },
   });
 
-  // Form submission handler
   const onSubmit = (data: LoginFormValues) => {
     handleSubmit(data);
   };
   
-  // Magic link handler
   const handleMagicLink = () => {
     const email = form.getValues("email");
     
@@ -113,8 +110,6 @@ export function LoginForm({ onGoogleLogin, onGithubLogin, onMagicLink }: LoginFo
         onMagicLink={handleMagicLink}
         isLoading={isLoading || isBlocked}
       />
-      
-      {/* DemoUserCredentials component is imported but not rendered */}
     </div>
   );
 }
