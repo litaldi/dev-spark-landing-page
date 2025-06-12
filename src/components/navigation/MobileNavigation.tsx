@@ -12,7 +12,10 @@ import {
   MessageSquare,
   FileQuestion,
   Users,
-  X
+  X,
+  BarChart3,
+  Target,
+  Zap
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -31,17 +34,25 @@ const navigationSections = [
   {
     title: "Main",
     items: [
-      { title: "Home", href: "/", icon: Home },
-      { title: "Dashboard", href: "/dashboard", icon: BookOpen },
-      { title: "About", href: "/about", icon: Users }
+      { title: "Home", href: "/", icon: Home, description: "Return to homepage" },
+      { title: "Dashboard", href: "/dashboard", icon: BarChart3, description: "Your learning hub" },
+      { title: "About", href: "/about", icon: Users, description: "Learn about our mission" }
+    ]
+  },
+  {
+    title: "Learning",
+    items: [
+      { title: "Courses", href: "/dashboard/courses", icon: BookOpen, description: "Browse all courses" },
+      { title: "Practice", href: "/dashboard/practice", icon: Target, description: "Code challenges" },
+      { title: "Projects", href: "/dashboard/projects", icon: Zap, description: "Build real apps" }
     ]
   },
   {
     title: "Support",
     items: [
-      { title: "Help Center", href: "/help", icon: HelpCircle },
-      { title: "FAQ", href: "/faq", icon: FileQuestion },
-      { title: "Contact", href: "/contact", icon: MessageSquare }
+      { title: "Help Center", href: "/help", icon: HelpCircle, description: "Documentation and guides" },
+      { title: "FAQ", href: "/faq", icon: FileQuestion, description: "Common questions" },
+      { title: "Contact", href: "/contact", icon: MessageSquare, description: "Get in touch" }
     ]
   }
 ];
@@ -56,16 +67,19 @@ export function MobileNavigation({ isLoggedIn, userName, onLogout, onClose }: Mo
   return (
     <div className="flex flex-col h-full bg-background">
       {/* Header */}
-      <div className="p-6 border-b bg-muted/30">
+      <div className="p-6 border-b bg-gradient-to-r from-primary/5 to-primary/10">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div 
-              className="w-8 h-8 rounded-md bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center text-primary-foreground font-bold text-base" 
+              className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center text-primary-foreground font-bold text-lg shadow-sm" 
               aria-hidden="true"
             >
               D
             </div>
-            <h2 className="text-lg font-semibold">DevAI</h2>
+            <div className="flex flex-col">
+              <h2 className="text-lg font-bold text-foreground">DevAI</h2>
+              <p className="text-xs text-muted-foreground">Learning Platform</p>
+            </div>
           </div>
           <div className="flex items-center gap-2">
             <AccessibilityMenu />
@@ -74,7 +88,7 @@ export function MobileNavigation({ isLoggedIn, userName, onLogout, onClose }: Mo
               variant="ghost" 
               size="icon" 
               onClick={onClose}
-              className="h-8 w-8"
+              className="h-8 w-8 hover:bg-accent/80"
               aria-label="Close menu"
             >
               <X className="h-4 w-4" />
@@ -88,7 +102,7 @@ export function MobileNavigation({ isLoggedIn, userName, onLogout, onClose }: Mo
         <nav className="space-y-6">
           {navigationSections.map((section) => (
             <div key={section.title}>
-              <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide mb-3">
+              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3 px-1">
                 {section.title}
               </h3>
               <div className="space-y-1">
@@ -98,17 +112,32 @@ export function MobileNavigation({ isLoggedIn, userName, onLogout, onClose }: Mo
                     to={item.href}
                     onClick={handleLinkClick}
                     className={cn(
-                      "flex items-center gap-3 px-3 py-3 rounded-md text-sm font-medium transition-all duration-200",
+                      "flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium transition-all duration-200",
                       "focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2",
-                      "hover:bg-accent/80 active:bg-accent",
+                      "hover:bg-accent/80 active:bg-accent group",
                       location.pathname === item.href
                         ? "bg-primary text-primary-foreground shadow-sm"
-                        : "text-foreground"
+                        : "text-foreground hover:text-primary"
                     )}
                     aria-current={location.pathname === item.href ? "page" : undefined}
                   >
-                    <item.icon className="h-4 w-4" />
-                    {item.title}
+                    <item.icon className={cn(
+                      "h-5 w-5 flex-shrink-0",
+                      location.pathname === item.href 
+                        ? "text-primary-foreground" 
+                        : "text-muted-foreground group-hover:text-primary"
+                    )} />
+                    <div className="flex flex-col">
+                      <span className="font-medium">{item.title}</span>
+                      <span className={cn(
+                        "text-xs mt-0.5",
+                        location.pathname === item.href 
+                          ? "text-primary-foreground/80" 
+                          : "text-muted-foreground"
+                      )}>
+                        {item.description}
+                      </span>
+                    </div>
                   </Link>
                 ))}
               </div>
@@ -118,28 +147,31 @@ export function MobileNavigation({ isLoggedIn, userName, onLogout, onClose }: Mo
       </div>
 
       {/* User Section */}
-      <div className="border-t p-6 bg-muted/20">
+      <div className="border-t bg-muted/20 p-6">
         {isLoggedIn ? (
           <div className="space-y-4">
-            <div className="flex items-center gap-3 px-3 py-2 bg-accent/50 rounded-md">
-              <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center">
-                <User className="h-4 w-4 text-primary-foreground" />
+            <div className="flex items-center gap-3 px-3 py-3 bg-gradient-to-r from-primary/10 to-primary/5 rounded-lg border border-primary/20">
+              <div className="h-10 w-10 rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-sm">
+                <User className="h-5 w-5 text-primary-foreground" />
               </div>
-              <span className="text-sm font-medium">{userName}</span>
+              <div className="flex flex-col">
+                <span className="text-sm font-semibold text-foreground">{userName}</span>
+                <span className="text-xs text-muted-foreground">Logged in</span>
+              </div>
             </div>
             <div className="space-y-1">
               <Link
                 to="/profile"
                 onClick={handleLinkClick}
-                className="flex items-center gap-3 px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-accent rounded-md transition-colors"
+                className="flex items-center gap-3 px-3 py-2.5 text-sm text-muted-foreground hover:text-foreground hover:bg-accent rounded-md transition-colors"
               >
                 <User className="h-4 w-4" />
-                Profile
+                My Profile
               </Link>
               <Link
                 to="/settings"
                 onClick={handleLinkClick}
-                className="flex items-center gap-3 px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-accent rounded-md transition-colors"
+                className="flex items-center gap-3 px-3 py-2.5 text-sm text-muted-foreground hover:text-foreground hover:bg-accent rounded-md transition-colors"
               >
                 <Settings className="h-4 w-4" />
                 Settings
@@ -150,7 +182,7 @@ export function MobileNavigation({ isLoggedIn, userName, onLogout, onClose }: Mo
                   onLogout();
                   onClose();
                 }}
-                className="flex items-center gap-3 px-3 py-2 text-sm text-destructive hover:bg-destructive/10 rounded-md transition-colors w-full text-left"
+                className="flex items-center gap-3 px-3 py-2.5 text-sm text-destructive hover:bg-destructive/10 rounded-md transition-colors w-full text-left"
               >
                 <LogOut className="h-4 w-4" />
                 Sign Out
@@ -159,9 +191,9 @@ export function MobileNavigation({ isLoggedIn, userName, onLogout, onClose }: Mo
           </div>
         ) : (
           <div className="space-y-3">
-            <Button asChild className="w-full">
+            <Button asChild className="w-full bg-primary hover:bg-primary/90 shadow-sm">
               <Link to="/auth/register" onClick={handleLinkClick}>
-                Get Started
+                Get Started Free
               </Link>
             </Button>
             <Button variant="outline" asChild className="w-full">
@@ -169,6 +201,9 @@ export function MobileNavigation({ isLoggedIn, userName, onLogout, onClose }: Mo
                 Sign In
               </Link>
             </Button>
+            <p className="text-xs text-muted-foreground text-center mt-3">
+              Join thousands of developers learning with AI
+            </p>
           </div>
         )}
       </div>
