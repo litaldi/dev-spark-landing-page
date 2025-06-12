@@ -19,7 +19,7 @@ import {
   Sparkles
 } from "lucide-react";
 import { useLocalStorage } from "@/hooks/use-local-storage";
-import { announceToScreenReader } from "@/lib/keyboard-utils/a11y-helpers";
+import { announceToScreenReader } from "@/lib/keyboard-utils";
 import { applyReducedMotionStyles } from "@/lib/motion-utils";
 
 export type AccessibilitySettings = {
@@ -33,13 +33,13 @@ export type AccessibilitySettings = {
 };
 
 const defaultSettings: AccessibilitySettings = {
-  textSize: 100,
+  textSize: 100, // 100%
   highContrast: false,
   keyboardMode: false,
   reducedMotion: false,
   largePointer: false,
-  lineHeight: 1.5,
-  letterSpacing: 0,
+  lineHeight: 1.5, // Default line height
+  letterSpacing: 0, // Default letter spacing
 };
 
 export function AccessibilityMenu() {
@@ -51,108 +51,51 @@ export function AccessibilityMenu() {
 
   // Apply settings on component mount and when they change
   useEffect(() => {
-    // Ensure settings have proper defaults to prevent undefined errors
-    const safeSettings = {
-      ...defaultSettings,
-      ...settings,
-      textSize: typeof settings?.textSize === 'number' ? settings.textSize : defaultSettings.textSize,
-      lineHeight: typeof settings?.lineHeight === 'number' ? settings.lineHeight : defaultSettings.lineHeight,
-      letterSpacing: typeof settings?.letterSpacing === 'number' ? settings.letterSpacing : defaultSettings.letterSpacing,
-    };
+    // Apply text size
+    document.documentElement.style.fontSize = `${settings.textSize}%`;
     
-    try {
-      // Apply text size
-      document.documentElement.style.fontSize = `${safeSettings.textSize}%`;
-      
-      // Apply high contrast mode
-      if (safeSettings.highContrast) {
-        document.documentElement.classList.add('high-contrast');
-      } else {
-        document.documentElement.classList.remove('high-contrast');
-      }
-      
-      // Apply keyboard navigation mode
-      if (safeSettings.keyboardMode) {
-        document.body.classList.add('keyboard-navigation');
-      } else {
-        document.body.classList.remove('keyboard-navigation');
-      }
-      
-      // Apply reduced motion
-      applyReducedMotionStyles(safeSettings.reducedMotion);
-      
-      // Apply large pointer
-      if (safeSettings.largePointer) {
-        document.documentElement.classList.add('large-pointer');
-      } else {
-        document.documentElement.classList.remove('large-pointer');
-      }
-      
-      // Apply line height with safe defaults
-      const lineHeightValue = safeSettings.lineHeight;
-      document.documentElement.style.setProperty('--a11y-line-height', lineHeightValue.toString());
-      
-      // Apply letter spacing with safe defaults
-      const letterSpacingValue = safeSettings.letterSpacing;
-      document.documentElement.style.setProperty('--a11y-letter-spacing', `${letterSpacingValue}px`);
-      
-      // Add accessibility styles
-      const styleId = 'accessibility-styles';
-      let styleElement = document.getElementById(styleId) as HTMLStyleElement;
-      
-      if (!styleElement) {
-        styleElement = document.createElement('style');
-        styleElement.id = styleId;
-        document.head.appendChild(styleElement);
-      }
-      
-      styleElement.textContent = `
-        body.keyboard-navigation *:focus {
-          outline: 3px solid rgb(64, 156, 255) !important;
-          outline-offset: 2px !important;
-        }
-        
-        .large-pointer * {
-          cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 16 16"><circle cx="8" cy="8" r="8" fill="black"/><circle cx="8" cy="8" r="6" fill="white"/></svg>') 16 16, auto !important;
-        }
-        
-        html {
-          line-height: var(--a11y-line-height, 1.5);
-          letter-spacing: var(--a11y-letter-spacing, 0);
-        }
-        
-        .reduce-motion *,
-        .reduce-motion *::before,
-        .reduce-motion *::after {
-          animation-duration: 0.001ms !important;
-          transition-duration: 0.001ms !important;
-          animation-iteration-count: 1 !important;
-        }
-        
-        .high-contrast {
-          filter: contrast(150%);
-        }
-        
-        .high-contrast * {
-          border-color: currentColor !important;
-        }
-      `;
-    } catch (error) {
-      console.error('Error applying accessibility settings:', error);
+    // Apply high contrast mode
+    if (settings.highContrast) {
+      document.documentElement.classList.add('high-contrast');
+    } else {
+      document.documentElement.classList.remove('high-contrast');
+    }
+    
+    // Apply keyboard navigation mode
+    if (settings.keyboardMode) {
+      document.body.classList.add('keyboard-navigation');
+    } else {
+      document.body.classList.remove('keyboard-navigation');
+    }
+    
+    // Apply reduced motion
+    applyReducedMotionStyles(settings.reducedMotion);
+    
+    // Apply large pointer
+    if (settings.largePointer) {
+      document.documentElement.classList.add('large-pointer');
+    } else {
+      document.documentElement.classList.remove('large-pointer');
+    }
+    
+    // Apply line height - Fix: Safely handle line height with null check
+    if (settings.lineHeight !== undefined && settings.lineHeight !== null) {
+      document.documentElement.style.setProperty('--a11y-line-height', settings.lineHeight.toString());
+    }
+    
+    // Apply letter spacing - Fix: Safely handle letter spacing with null check
+    if (settings.letterSpacing !== undefined && settings.letterSpacing !== null) {
+      document.documentElement.style.setProperty('--a11y-letter-spacing', `${settings.letterSpacing}px`);
     }
     
     return () => {
       // Clean up if component unmounts
-      try {
-        document.documentElement.style.fontSize = '';
-        document.documentElement.classList.remove('high-contrast');
-        document.body.classList.remove('keyboard-navigation');
-        document.documentElement.classList.remove('large-pointer');
-        document.documentElement.style.removeProperty('--a11y-line-height');
-        document.documentElement.style.removeProperty('--a11y-letter-spacing');
-      } catch (error) {
-        console.error('Error cleaning up accessibility settings:', error);
-      }
+      document.documentElement.style.fontSize = '';
+      document.documentElement.classList.remove('high-contrast');
+      document.body.classList.remove('keyboard-navigation');
+      document.documentElement.classList.remove('large-pointer');
+      document.documentElement.style.removeProperty('--a11y-line-height');
+      document.documentElement.style.removeProperty('--a11y-letter-spacing');
     };
   }, [settings]);
 
@@ -160,65 +103,47 @@ export function AccessibilityMenu() {
     key: K,
     value: AccessibilitySettings[K]
   ) => {
-    try {
-      const newSettings = { ...settings, [key]: value };
-      setSettings(newSettings);
-      
-      // Announce the change to screen readers
-      let message = '';
-      
-      switch (key) {
-        case 'textSize':
-          message = `Text size set to ${value}%`;
-          break;
-        case 'highContrast':
-          message = value ? 'High contrast mode enabled' : 'High contrast mode disabled';
-          break;
-        case 'keyboardMode':
-          message = value ? 'Keyboard navigation mode enabled' : 'Keyboard navigation mode disabled';
-          break;
-        case 'reducedMotion':
-          message = value ? 'Reduced motion mode enabled' : 'Reduced motion mode disabled';
-          break;
-        case 'largePointer':
-          message = value ? 'Large pointer enabled' : 'Large pointer disabled';
-          break;
-        case 'lineHeight':
-          message = `Line height set to ${value}`;
-          break;
-        case 'letterSpacing':
-          message = `Letter spacing set to ${value}`;
-          break;
-        default:
-          message = 'Accessibility setting updated';
-      }
-      
-      announceToScreenReader(message, 'polite');
-    } catch (error) {
-      console.error('Error updating accessibility setting:', error);
+    setSettings({ ...settings, [key]: value });
+    
+    // Announce the change to screen readers
+    let message = '';
+    
+    switch (key) {
+      case 'textSize':
+        message = `Text size set to ${value}%`;
+        break;
+      case 'highContrast':
+        message = value ? 'High contrast mode enabled' : 'High contrast mode disabled';
+        break;
+      case 'keyboardMode':
+        message = value ? 'Keyboard navigation mode enabled' : 'Keyboard navigation mode disabled';
+        break;
+      case 'reducedMotion':
+        message = value ? 'Reduced motion mode enabled' : 'Reduced motion mode disabled';
+        break;
+      case 'largePointer':
+        message = value ? 'Large pointer enabled' : 'Large pointer disabled';
+        break;
+      case 'lineHeight':
+        message = `Line height set to ${value}`;
+        break;
+      case 'letterSpacing':
+        message = `Letter spacing set to ${value}`;
+        break;
+      default:
+        message = 'Accessibility setting updated';
     }
+    
+    announceToScreenReader(message, 'polite');
   };
 
   const handleOpenChange = (open: boolean) => {
     setIsOpen(open);
-    try {
-      if (open) {
-        announceToScreenReader('Accessibility menu opened', 'polite');
-      } else {
-        announceToScreenReader('Accessibility menu closed', 'polite');
-      }
-    } catch (error) {
-      console.error('Error announcing menu state change:', error);
+    if (open) {
+      announceToScreenReader('Accessibility menu opened', 'polite');
+    } else {
+      announceToScreenReader('Accessibility menu closed', 'polite');
     }
-  };
-
-  // Ensure settings have safe values for the UI
-  const safeSettings = {
-    ...defaultSettings,
-    ...settings,
-    textSize: typeof settings?.textSize === 'number' ? settings.textSize : defaultSettings.textSize,
-    lineHeight: typeof settings?.lineHeight === 'number' ? settings.lineHeight : defaultSettings.lineHeight,
-    letterSpacing: typeof settings?.letterSpacing === 'number' ? settings.letterSpacing : defaultSettings.letterSpacing,
   };
 
   return (
@@ -233,7 +158,7 @@ export function AccessibilityMenu() {
           <Accessibility className="h-[1.2rem] w-[1.2rem]" aria-hidden="true" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-80 bg-background border shadow-lg z-50 backdrop-blur-sm" align="end" sideOffset={8}>
+      <PopoverContent className="w-80" align="end">
         <div className="grid gap-4">
           <div className="space-y-2">
             <h4 className="font-medium text-sm">Accessibility Settings</h4>
@@ -247,7 +172,7 @@ export function AccessibilityMenu() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                   <Type className="h-4 w-4" aria-hidden="true" />
-                  <Label htmlFor="text-size">Text Size: {safeSettings.textSize}%</Label>
+                  <Label htmlFor="text-size">Text Size: {settings.textSize}%</Label>
                 </div>
               </div>
               <Slider 
@@ -255,10 +180,9 @@ export function AccessibilityMenu() {
                 min={75}
                 max={200}
                 step={5}
-                value={[safeSettings.textSize]}
+                value={[settings.textSize]}
                 onValueChange={(values) => updateSetting("textSize", values[0])}
                 aria-label="Adjust text size"
-                className="w-full"
               />
             </div>
             
@@ -266,7 +190,7 @@ export function AccessibilityMenu() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                   <MoveHorizontal className="h-4 w-4" aria-hidden="true" />
-                  <Label htmlFor="letter-spacing">Letter Spacing: {safeSettings.letterSpacing}px</Label>
+                  <Label htmlFor="letter-spacing">Letter Spacing: {settings.letterSpacing}</Label>
                 </div>
               </div>
               <Slider 
@@ -274,17 +198,16 @@ export function AccessibilityMenu() {
                 min={0}
                 max={5}
                 step={0.5}
-                value={[safeSettings.letterSpacing]}
+                value={[settings.letterSpacing]}
                 onValueChange={(values) => updateSetting("letterSpacing", values[0])}
                 aria-label="Adjust letter spacing"
-                className="w-full"
               />
             </div>
             
             <div className="flex items-center space-x-2">
               <Switch
                 id="high-contrast"
-                checked={safeSettings.highContrast}
+                checked={settings.highContrast}
                 onCheckedChange={(checked) => updateSetting("highContrast", checked)}
                 aria-label="Toggle high contrast mode"
               />
@@ -302,7 +225,7 @@ export function AccessibilityMenu() {
             <div className="flex items-center space-x-2">
               <Switch
                 id="keyboard-mode"
-                checked={safeSettings.keyboardMode}
+                checked={settings.keyboardMode}
                 onCheckedChange={(checked) => updateSetting("keyboardMode", checked)}
                 aria-label="Toggle keyboard navigation mode"
               />
@@ -320,7 +243,7 @@ export function AccessibilityMenu() {
             <div className="flex items-center space-x-2">
               <Switch
                 id="reduced-motion"
-                checked={safeSettings.reducedMotion}
+                checked={settings.reducedMotion}
                 onCheckedChange={(checked) => updateSetting("reducedMotion", checked)}
                 aria-label="Toggle reduced motion"
               />
@@ -338,7 +261,7 @@ export function AccessibilityMenu() {
             <div className="flex items-center space-x-2">
               <Switch
                 id="large-pointer"
-                checked={safeSettings.largePointer}
+                checked={settings.largePointer}
                 onCheckedChange={(checked) => updateSetting("largePointer", checked)}
                 aria-label="Toggle large pointer"
               />
@@ -354,7 +277,7 @@ export function AccessibilityMenu() {
             </div>
           </div>
           
-          <div className="text-xs text-muted-foreground mt-2 border-t pt-2">
+          <div className="text-xs text-muted-foreground mt-2">
             <p>Press <kbd className="px-1 py-0.5 bg-muted border rounded text-xs">Tab</kbd> to navigate and <kbd className="px-1 py-0.5 bg-muted border rounded text-xs">Space</kbd> or <kbd className="px-1 py-0.5 bg-muted border rounded text-xs">Enter</kbd> to toggle options.</p>
           </div>
         </div>

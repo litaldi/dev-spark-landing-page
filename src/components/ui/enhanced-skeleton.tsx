@@ -1,141 +1,105 @@
 
 import React from "react";
-import { Skeleton } from "@/components/ui/skeleton";
-import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 interface EnhancedSkeletonProps {
   className?: string;
-  variant?: "card" | "text" | "avatar" | "button" | "custom";
+  variant?: "default" | "text" | "avatar" | "card" | "button";
   lines?: number;
-  animated?: boolean;
+  width?: string | number;
+  height?: string | number;
 }
 
-export const EnhancedSkeleton: React.FC<EnhancedSkeletonProps> = ({
+export function EnhancedSkeleton({
   className,
-  variant = "custom",
-  lines = 3,
-  animated = true
-}) => {
-  const shimmerVariants = {
-    initial: { x: "-100%" },
-    animate: { 
-      x: "100%",
-      transition: {
-        repeat: Infinity,
-        duration: 1.5,
-        ease: "easeInOut"
-      }
-    }
-  };
+  variant = "default",
+  lines = 1,
+  width,
+  height,
+  ...props
+}: EnhancedSkeletonProps & React.HTMLAttributes<HTMLDivElement>) {
+  const baseClasses = "animate-pulse bg-muted rounded-md";
 
   const getVariantClasses = () => {
     switch (variant) {
-      case "card":
-        return "h-48 w-full rounded-lg";
       case "text":
-        return "h-4 w-3/4 rounded";
+        return "h-4 w-3/4";
       case "avatar":
-        return "h-12 w-12 rounded-full";
+        return "h-10 w-10 rounded-full";
+      case "card":
+        return "h-32 w-full";
       case "button":
-        return "h-10 w-24 rounded-md";
+        return "h-10 w-20";
       default:
-        return "";
+        return "h-4 w-full";
     }
   };
 
-  const SkeletonComponent = animated ? motion.div : "div";
+  const style = {
+    ...(width && { width: typeof width === "number" ? `${width}px` : width }),
+    ...(height && { height: typeof height === "number" ? `${height}px` : height }),
+  };
 
   if (variant === "text" && lines > 1) {
     return (
       <div className="space-y-2">
         {Array.from({ length: lines }).map((_, index) => (
-          <SkeletonComponent
+          <div
             key={index}
             className={cn(
-              "relative overflow-hidden bg-gray-200 dark:bg-gray-800",
+              baseClasses,
               getVariantClasses(),
-              index === lines - 1 && "w-1/2", // Last line shorter
+              index === lines - 1 && "w-1/2", // Last line is shorter
               className
             )}
-          >
-            {animated && (
-              <motion.div
-                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                variants={shimmerVariants}
-                initial="initial"
-                animate="animate"
-              />
-            )}
-          </SkeletonComponent>
+            style={style}
+            {...props}
+          />
         ))}
       </div>
     );
   }
 
   return (
-    <SkeletonComponent
-      className={cn(
-        "relative overflow-hidden bg-gray-200 dark:bg-gray-800",
-        getVariantClasses(),
-        className
-      )}
-    >
-      {animated && (
-        <motion.div
-          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-          variants={shimmerVariants}
-          initial="initial"
-          animate="animate"
-        />
-      )}
-    </SkeletonComponent>
+    <div
+      className={cn(baseClasses, getVariantClasses(), className)}
+      style={style}
+      {...props}
+    />
   );
-};
+}
 
-export const SkeletonCard = () => (
-  <div className="space-y-4 p-6 border rounded-lg">
-    <EnhancedSkeleton variant="text" className="h-6 w-1/3" />
-    <EnhancedSkeleton variant="text" lines={3} />
-    <div className="flex gap-2 pt-2">
-      <EnhancedSkeleton variant="button" />
+// Preset skeleton components for common use cases
+export function SkeletonCard({ className }: { className?: string }) {
+  return (
+    <div className={cn("space-y-3 p-6 border rounded-lg", className)}>
+      <EnhancedSkeleton variant="avatar" />
+      <div className="space-y-2">
+        <EnhancedSkeleton variant="text" width="60%" />
+        <EnhancedSkeleton variant="text" lines={2} />
+      </div>
       <EnhancedSkeleton variant="button" />
     </div>
-  </div>
-);
+  );
+}
 
-export const SkeletonTable = ({ rows = 5, columns = 4 }: { rows?: number; columns?: number }) => (
-  <div className="space-y-3">
-    <div className="grid gap-3" style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }}>
-      {Array.from({ length: columns }).map((_, i) => (
-        <EnhancedSkeleton key={i} variant="text" className="h-8 w-full" />
-      ))}
-    </div>
-    {Array.from({ length: rows }).map((_, rowIndex) => (
-      <div key={rowIndex} className="grid gap-3" style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }}>
-        {Array.from({ length: columns }).map((_, colIndex) => (
-          <EnhancedSkeleton key={colIndex} variant="text" className="h-6 w-full" />
+export function SkeletonTable({ rows = 5, columns = 4 }: { rows?: number; columns?: number }) {
+  return (
+    <div className="space-y-3">
+      {/* Header */}
+      <div className="grid gap-4" style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }}>
+        {Array.from({ length: columns }).map((_, index) => (
+          <EnhancedSkeleton key={index} variant="text" width="80%" />
         ))}
       </div>
-    ))}
-  </div>
-);
-
-export const SkeletonDashboard = () => (
-  <div className="space-y-6">
-    <div className="space-y-4 p-6 border rounded-lg">
-      <div className="flex items-center gap-4">
-        <EnhancedSkeleton variant="avatar" />
-        <div className="space-y-2 flex-1">
-          <EnhancedSkeleton variant="text" className="h-6 w-1/4" />
-          <EnhancedSkeleton variant="text" className="h-4 w-1/2" />
+      {/* Rows */}
+      {Array.from({ length: rows }).map((_, rowIndex) => (
+        <div key={rowIndex} className="grid gap-4" style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }}>
+          {Array.from({ length: columns }).map((_, colIndex) => (
+            <EnhancedSkeleton key={colIndex} variant="text" />
+          ))}
         </div>
-      </div>
-    </div>
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      {Array.from({ length: 6 }).map((_, i) => (
-        <SkeletonCard key={i} />
       ))}
     </div>
-  </div>
-);
+  );
+}

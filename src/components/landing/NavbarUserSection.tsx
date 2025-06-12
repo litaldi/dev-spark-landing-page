@@ -5,7 +5,7 @@ import { AccessibilityMenu } from "@/components/a11y/AccessibilityMenu";
 import { Menu, X } from "lucide-react";
 import GetStartedButton from "./GetStartedButton";
 import AuthButtons from "./AuthButtons";
-import { announceToScreenReader } from "@/lib/keyboard-utils/a11y-helpers";
+import { announceToScreenReader } from "@/lib/keyboard-utils";
 
 interface NavbarUserSectionProps {
   isLoggedIn: boolean;
@@ -28,12 +28,8 @@ const NavbarUserSection: React.FC<NavbarUserSectionProps> = ({
     
     // Use a slight delay to ensure the state has changed
     setTimeout(() => {
-      try {
-        const state = !mobileMenuOpen ? "open" : "closed";
-        announceToScreenReader(`Mobile menu is now ${state}`, "polite");
-      } catch (error) {
-        console.error('Error announcing menu state:', error);
-      }
+      const state = !mobileMenuOpen ? "open" : "closed";
+      announceToScreenReader(`Mobile menu is now ${state}`, "polite");
     }, 50);
   };
 
@@ -63,7 +59,7 @@ const NavbarUserSection: React.FC<NavbarUserSectionProps> = ({
       )}
       
       <button 
-        className="md:hidden text-gray-600 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded p-1" 
+        className="md:hidden text-gray-600 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2" 
         onClick={handleToggleMobileMenu}
         aria-expanded={mobileMenuOpen}
         aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}

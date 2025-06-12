@@ -1,78 +1,58 @@
 
 import React from "react";
-import { motion } from "framer-motion";
-import Navbar from "@/components/landing/Navbar";
-import EnhancedHeroSection from "@/components/landing/EnhancedHeroSection";
-import FeatureGrid from "@/components/landing/FeatureGrid";
-import HowItWorksSection from "@/components/landing/HowItWorksSection";
+import { WebFirstLayout } from "@/components/layout/WebFirstLayout";
+import { ResponsiveContainer, ResponsiveText } from "@/components/ui/enhanced-responsive";
+import HeroSection from "@/components/landing/HeroSection";
+import FeatureGrid from "@/components/landing/FeatureGrid"; 
 import TestimonialCard from "@/components/landing/TestimonialCard";
+import JoinNowSection from "@/components/landing/JoinNowSection";
+import StickyCTABar from "@/components/landing/StickyCTABar";
 import Footer from "@/components/landing/Footer";
-import { SEOHead } from "@/components/seo/SEOHead";
-import { SkipNavLink, SkipNavContent } from "@/components/a11y/skip-nav";
 
 const Home = () => {
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        delayChildren: 0.1,
-        staggerChildren: 0.1
-      }
-    }
-  };
-
-  const sectionVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.6,
-        ease: "easeOut"
-      }
-    }
-  };
-
   return (
-    <>
-      <SEOHead 
-        title="DevAI - AI-Powered Programming Education Platform"
-        description="Learn programming with AI-powered education. Get personalized learning paths, real-time code reviews, and land your first developer job."
-        keywords="programming education, AI learning, code review, developer jobs, web development"
-      />
+    <WebFirstLayout
+      title="DevAI Learning Platform - AI-Powered Programming Education"
+      description="Master programming with personalized AI assistance, interactive challenges, and real-time code reviews"
+      includeBreadcrumbs={false}
+      fullWidth={true}
+      className="bg-background"
+    >
+      <HeroSection />
       
-      <div className="min-h-screen flex flex-col bg-background">
-        <SkipNavLink contentId="main-content">Skip to content</SkipNavLink>
-        <Navbar />
-        
-        <main id="main-content" className="flex-1">
-          <SkipNavContent id="main-content">
-            <motion.div
-              variants={containerVariants}
-              initial="hidden"
-              animate="visible"
-            >
-              <EnhancedHeroSection />
-              
-              <motion.div variants={sectionVariants}>
-                <FeatureGrid />
-              </motion.div>
-              
-              <motion.div variants={sectionVariants}>
-                <HowItWorksSection />
-              </motion.div>
-              
-              <motion.div variants={sectionVariants}>
-                <TestimonialCard />
-              </motion.div>
-            </motion.div>
-          </SkipNavContent>
-        </main>
-        
-        <Footer />
-      </div>
-    </>
+      <section className="py-16 lg:py-24 bg-white dark:bg-gray-800">
+        <ResponsiveContainer maxWidth="xl">
+          <div className="text-center mb-12">
+            <ResponsiveText variant="h2" className="text-gray-800 dark:text-white mb-4">
+              Elevate Your Coding Journey
+            </ResponsiveText>
+            <ResponsiveText variant="p" className="text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+              Master programming with AI-powered learning, personalized feedback, and hands-on projects
+            </ResponsiveText>
+          </div>
+          <FeatureGrid />
+        </ResponsiveContainer>
+      </section>
+      
+      <section className="py-16 lg:py-20 bg-gray-50 dark:bg-gray-900">
+        <ResponsiveContainer maxWidth="xl">
+          <div className="text-center mb-12">
+            <ResponsiveText variant="h2" className="text-gray-800 dark:text-white mb-4">
+              Success Stories from Our Community
+            </ResponsiveText>
+            <ResponsiveText variant="p" className="text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+              See how developers are transforming their careers with DevAI
+            </ResponsiveText>
+          </div>
+          <TestimonialCard />
+        </ResponsiveContainer>
+      </section>
+      
+      <JoinNowSection />
+      
+      <Footer />
+      <StickyCTABar />
+    </WebFirstLayout>
   );
 };
 

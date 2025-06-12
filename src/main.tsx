@@ -2,9 +2,9 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
-import { HelmetProvider } from 'react-helmet-async'
 import App from './App'
 import './index.css'
+import { ThemeProvider } from '@/components/theme/ThemeProvider'
 import { initializeCSRF } from '@/lib/security/csrf-protection'
 import { applySecurityDefenses } from '@/lib/security/http-security'
 
@@ -14,10 +14,10 @@ applySecurityDefenses();
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <HelmetProvider>
-      <BrowserRouter>
+    <BrowserRouter>
+      <ThemeProvider>
         <App />
-      </BrowserRouter>
-    </HelmetProvider>
+      </ThemeProvider>
+    </BrowserRouter>
   </React.StrictMode>,
 )

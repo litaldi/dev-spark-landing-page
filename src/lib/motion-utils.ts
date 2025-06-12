@@ -40,26 +40,6 @@ export const useMotionSafe = () => {
   return {
     isMotionSafe,
     safeClass: (animationClass: string) => isMotionSafe ? animationClass : '',
-    safeDuration: (duration: number) => isMotionSafe ? duration : 0,
-    safeDelay: (delay: number) => isMotionSafe ? delay : 0
+    safeDuration: (duration: number) => isMotionSafe ? duration : 0
   };
-};
-
-/**
- * Respects user motion preferences for transitions
- */
-export const getTransitionDuration = (defaultMs: number): number => {
-  return prefersReducedMotion() ? 1 : defaultMs;
-};
-
-/**
- * Safe requestAnimationFrame that respects motion preferences
- */
-export const safeRequestAnimationFrame = (callback: FrameRequestCallback): void => {
-  if (prefersReducedMotion()) {
-    // Execute immediately for reduced motion
-    setTimeout(() => callback(performance.now()), 0);
-  } else {
-    requestAnimationFrame(callback);
-  }
 };
