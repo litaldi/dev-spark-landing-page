@@ -19,7 +19,7 @@ import {
   Sparkles
 } from "lucide-react";
 import { useLocalStorage } from "@/hooks/use-local-storage";
-import { announceToScreenReader } from "@/lib/keyboard-utils";
+import { announceToScreenReader } from "@/lib/keyboard-utils/a11y-helpers";
 import { applyReducedMotionStyles } from "@/lib/motion-utils";
 
 export type AccessibilitySettings = {
@@ -33,13 +33,13 @@ export type AccessibilitySettings = {
 };
 
 const defaultSettings: AccessibilitySettings = {
-  textSize: 100, // 100%
+  textSize: 100,
   highContrast: false,
   keyboardMode: false,
   reducedMotion: false,
   largePointer: false,
-  lineHeight: 1.5, // Default line height
-  letterSpacing: 0, // Default letter spacing
+  lineHeight: 1.5,
+  letterSpacing: 0,
 };
 
 export function AccessibilityMenu() {
@@ -55,96 +55,104 @@ export function AccessibilityMenu() {
     const safeSettings = {
       ...defaultSettings,
       ...settings,
-      textSize: settings?.textSize ?? defaultSettings.textSize,
-      lineHeight: settings?.lineHeight ?? defaultSettings.lineHeight,
-      letterSpacing: settings?.letterSpacing ?? defaultSettings.letterSpacing,
+      textSize: typeof settings?.textSize === 'number' ? settings.textSize : defaultSettings.textSize,
+      lineHeight: typeof settings?.lineHeight === 'number' ? settings.lineHeight : defaultSettings.lineHeight,
+      letterSpacing: typeof settings?.letterSpacing === 'number' ? settings.letterSpacing : defaultSettings.letterSpacing,
     };
     
-    // Apply text size
-    document.documentElement.style.fontSize = `${safeSettings.textSize}%`;
-    
-    // Apply high contrast mode
-    if (safeSettings.highContrast) {
-      document.documentElement.classList.add('high-contrast');
-    } else {
-      document.documentElement.classList.remove('high-contrast');
+    try {
+      // Apply text size
+      document.documentElement.style.fontSize = `${safeSettings.textSize}%`;
+      
+      // Apply high contrast mode
+      if (safeSettings.highContrast) {
+        document.documentElement.classList.add('high-contrast');
+      } else {
+        document.documentElement.classList.remove('high-contrast');
+      }
+      
+      // Apply keyboard navigation mode
+      if (safeSettings.keyboardMode) {
+        document.body.classList.add('keyboard-navigation');
+      } else {
+        document.body.classList.remove('keyboard-navigation');
+      }
+      
+      // Apply reduced motion
+      applyReducedMotionStyles(safeSettings.reducedMotion);
+      
+      // Apply large pointer
+      if (safeSettings.largePointer) {
+        document.documentElement.classList.add('large-pointer');
+      } else {
+        document.documentElement.classList.remove('large-pointer');
+      }
+      
+      // Apply line height with safe defaults
+      const lineHeightValue = safeSettings.lineHeight;
+      document.documentElement.style.setProperty('--a11y-line-height', lineHeightValue.toString());
+      
+      // Apply letter spacing with safe defaults
+      const letterSpacingValue = safeSettings.letterSpacing;
+      document.documentElement.style.setProperty('--a11y-letter-spacing', `${letterSpacingValue}px`);
+      
+      // Add accessibility styles
+      const styleId = 'accessibility-styles';
+      let styleElement = document.getElementById(styleId) as HTMLStyleElement;
+      
+      if (!styleElement) {
+        styleElement = document.createElement('style');
+        styleElement.id = styleId;
+        document.head.appendChild(styleElement);
+      }
+      
+      styleElement.textContent = `
+        body.keyboard-navigation *:focus {
+          outline: 3px solid rgb(64, 156, 255) !important;
+          outline-offset: 2px !important;
+        }
+        
+        .large-pointer * {
+          cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 16 16"><circle cx="8" cy="8" r="8" fill="black"/><circle cx="8" cy="8" r="6" fill="white"/></svg>') 16 16, auto !important;
+        }
+        
+        html {
+          line-height: var(--a11y-line-height, 1.5);
+          letter-spacing: var(--a11y-letter-spacing, 0);
+        }
+        
+        .reduce-motion *,
+        .reduce-motion *::before,
+        .reduce-motion *::after {
+          animation-duration: 0.001ms !important;
+          transition-duration: 0.001ms !important;
+          animation-iteration-count: 1 !important;
+        }
+        
+        .high-contrast {
+          filter: contrast(150%);
+        }
+        
+        .high-contrast * {
+          border-color: currentColor !important;
+        }
+      `;
+    } catch (error) {
+      console.error('Error applying accessibility settings:', error);
     }
-    
-    // Apply keyboard navigation mode
-    if (safeSettings.keyboardMode) {
-      document.body.classList.add('keyboard-navigation');
-    } else {
-      document.body.classList.remove('keyboard-navigation');
-    }
-    
-    // Apply reduced motion
-    applyReducedMotionStyles(safeSettings.reducedMotion);
-    
-    // Apply large pointer
-    if (safeSettings.largePointer) {
-      document.documentElement.classList.add('large-pointer');
-    } else {
-      document.documentElement.classList.remove('large-pointer');
-    }
-    
-    // Apply line height with safe defaults
-    const lineHeightValue = typeof safeSettings.lineHeight === 'number' ? safeSettings.lineHeight : 1.5;
-    document.documentElement.style.setProperty('--a11y-line-height', lineHeightValue.toString());
-    
-    // Apply letter spacing with safe defaults
-    const letterSpacingValue = typeof safeSettings.letterSpacing === 'number' ? safeSettings.letterSpacing : 0;
-    document.documentElement.style.setProperty('--a11y-letter-spacing', `${letterSpacingValue}px`);
-    
-    // Add accessibility styles
-    const styleId = 'accessibility-styles';
-    let styleElement = document.getElementById(styleId) as HTMLStyleElement;
-    
-    if (!styleElement) {
-      styleElement = document.createElement('style');
-      styleElement.id = styleId;
-      document.head.appendChild(styleElement);
-    }
-    
-    styleElement.textContent = `
-      body.keyboard-navigation *:focus {
-        outline: 3px solid rgb(64, 156, 255) !important;
-        outline-offset: 2px !important;
-      }
-      
-      .large-pointer * {
-        cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 16 16"><circle cx="8" cy="8" r="8" fill="black"/><circle cx="8" cy="8" r="6" fill="white"/></svg>') 16 16, auto !important;
-      }
-      
-      html {
-        line-height: var(--a11y-line-height, 1.5);
-        letter-spacing: var(--a11y-letter-spacing, 0);
-      }
-      
-      .reduce-motion *,
-      .reduce-motion *::before,
-      .reduce-motion *::after {
-        animation-duration: 0.001ms !important;
-        transition-duration: 0.001ms !important;
-        animation-iteration-count: 1 !important;
-      }
-      
-      .high-contrast {
-        filter: contrast(150%);
-      }
-      
-      .high-contrast * {
-        border-color: currentColor !important;
-      }
-    `;
     
     return () => {
       // Clean up if component unmounts
-      document.documentElement.style.fontSize = '';
-      document.documentElement.classList.remove('high-contrast');
-      document.body.classList.remove('keyboard-navigation');
-      document.documentElement.classList.remove('large-pointer');
-      document.documentElement.style.removeProperty('--a11y-line-height');
-      document.documentElement.style.removeProperty('--a11y-letter-spacing');
+      try {
+        document.documentElement.style.fontSize = '';
+        document.documentElement.classList.remove('high-contrast');
+        document.body.classList.remove('keyboard-navigation');
+        document.documentElement.classList.remove('large-pointer');
+        document.documentElement.style.removeProperty('--a11y-line-height');
+        document.documentElement.style.removeProperty('--a11y-letter-spacing');
+      } catch (error) {
+        console.error('Error cleaning up accessibility settings:', error);
+      }
     };
   }, [settings]);
 
@@ -152,47 +160,55 @@ export function AccessibilityMenu() {
     key: K,
     value: AccessibilitySettings[K]
   ) => {
-    const newSettings = { ...settings, [key]: value };
-    setSettings(newSettings);
-    
-    // Announce the change to screen readers
-    let message = '';
-    
-    switch (key) {
-      case 'textSize':
-        message = `Text size set to ${value}%`;
-        break;
-      case 'highContrast':
-        message = value ? 'High contrast mode enabled' : 'High contrast mode disabled';
-        break;
-      case 'keyboardMode':
-        message = value ? 'Keyboard navigation mode enabled' : 'Keyboard navigation mode disabled';
-        break;
-      case 'reducedMotion':
-        message = value ? 'Reduced motion mode enabled' : 'Reduced motion mode disabled';
-        break;
-      case 'largePointer':
-        message = value ? 'Large pointer enabled' : 'Large pointer disabled';
-        break;
-      case 'lineHeight':
-        message = `Line height set to ${value}`;
-        break;
-      case 'letterSpacing':
-        message = `Letter spacing set to ${value}`;
-        break;
-      default:
-        message = 'Accessibility setting updated';
+    try {
+      const newSettings = { ...settings, [key]: value };
+      setSettings(newSettings);
+      
+      // Announce the change to screen readers
+      let message = '';
+      
+      switch (key) {
+        case 'textSize':
+          message = `Text size set to ${value}%`;
+          break;
+        case 'highContrast':
+          message = value ? 'High contrast mode enabled' : 'High contrast mode disabled';
+          break;
+        case 'keyboardMode':
+          message = value ? 'Keyboard navigation mode enabled' : 'Keyboard navigation mode disabled';
+          break;
+        case 'reducedMotion':
+          message = value ? 'Reduced motion mode enabled' : 'Reduced motion mode disabled';
+          break;
+        case 'largePointer':
+          message = value ? 'Large pointer enabled' : 'Large pointer disabled';
+          break;
+        case 'lineHeight':
+          message = `Line height set to ${value}`;
+          break;
+        case 'letterSpacing':
+          message = `Letter spacing set to ${value}`;
+          break;
+        default:
+          message = 'Accessibility setting updated';
+      }
+      
+      announceToScreenReader(message, 'polite');
+    } catch (error) {
+      console.error('Error updating accessibility setting:', error);
     }
-    
-    announceToScreenReader(message, 'polite');
   };
 
   const handleOpenChange = (open: boolean) => {
     setIsOpen(open);
-    if (open) {
-      announceToScreenReader('Accessibility menu opened', 'polite');
-    } else {
-      announceToScreenReader('Accessibility menu closed', 'polite');
+    try {
+      if (open) {
+        announceToScreenReader('Accessibility menu opened', 'polite');
+      } else {
+        announceToScreenReader('Accessibility menu closed', 'polite');
+      }
+    } catch (error) {
+      console.error('Error announcing menu state change:', error);
     }
   };
 
@@ -200,6 +216,9 @@ export function AccessibilityMenu() {
   const safeSettings = {
     ...defaultSettings,
     ...settings,
+    textSize: typeof settings?.textSize === 'number' ? settings.textSize : defaultSettings.textSize,
+    lineHeight: typeof settings?.lineHeight === 'number' ? settings.lineHeight : defaultSettings.lineHeight,
+    letterSpacing: typeof settings?.letterSpacing === 'number' ? settings.letterSpacing : defaultSettings.letterSpacing,
   };
 
   return (
@@ -214,7 +233,7 @@ export function AccessibilityMenu() {
           <Accessibility className="h-[1.2rem] w-[1.2rem]" aria-hidden="true" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-80 bg-background border shadow-lg z-50" align="end">
+      <PopoverContent className="w-80 bg-background border shadow-lg z-50 backdrop-blur-sm" align="end" sideOffset={8}>
         <div className="grid gap-4">
           <div className="space-y-2">
             <h4 className="font-medium text-sm">Accessibility Settings</h4>
@@ -239,6 +258,7 @@ export function AccessibilityMenu() {
                 value={[safeSettings.textSize]}
                 onValueChange={(values) => updateSetting("textSize", values[0])}
                 aria-label="Adjust text size"
+                className="w-full"
               />
             </div>
             
@@ -246,7 +266,7 @@ export function AccessibilityMenu() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                   <MoveHorizontal className="h-4 w-4" aria-hidden="true" />
-                  <Label htmlFor="letter-spacing">Letter Spacing: {safeSettings.letterSpacing}</Label>
+                  <Label htmlFor="letter-spacing">Letter Spacing: {safeSettings.letterSpacing}px</Label>
                 </div>
               </div>
               <Slider 
@@ -257,6 +277,7 @@ export function AccessibilityMenu() {
                 value={[safeSettings.letterSpacing]}
                 onValueChange={(values) => updateSetting("letterSpacing", values[0])}
                 aria-label="Adjust letter spacing"
+                className="w-full"
               />
             </div>
             
@@ -333,7 +354,7 @@ export function AccessibilityMenu() {
             </div>
           </div>
           
-          <div className="text-xs text-muted-foreground mt-2">
+          <div className="text-xs text-muted-foreground mt-2 border-t pt-2">
             <p>Press <kbd className="px-1 py-0.5 bg-muted border rounded text-xs">Tab</kbd> to navigate and <kbd className="px-1 py-0.5 bg-muted border rounded text-xs">Space</kbd> or <kbd className="px-1 py-0.5 bg-muted border rounded text-xs">Enter</kbd> to toggle options.</p>
           </div>
         </div>

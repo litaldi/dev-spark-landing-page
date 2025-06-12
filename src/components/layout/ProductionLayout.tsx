@@ -4,7 +4,7 @@ import { Outlet } from 'react-router-dom';
 import { Toaster } from '@/components/ui/toaster';
 import { ResponsiveNavigation } from '@/components/navigation/ResponsiveNavigation';
 import { NetworkStatus } from '@/components/system/NetworkStatus';
-import { AccessibilityControls } from '@/components/accessibility/AccessibilityControls';
+import { AccessibilityMenu } from '@/components/a11y/AccessibilityMenu';
 import { PerformanceMonitor } from '@/components/system/PerformanceMonitor';
 import { ErrorBoundary } from '@/components/error/ErrorBoundary';
 import { SEOHead } from '@/components/seo/SEOHead';
@@ -37,9 +37,13 @@ export const ProductionLayout: React.FC<ProductionLayoutProps> = ({ children }) 
           </main>
         </SkipNavContent>
         
+        {/* Accessibility Controls - Fixed positioning */}
+        <div className="fixed bottom-4 right-4 z-50">
+          <AccessibilityMenu />
+        </div>
+        
         {/* System Components */}
         <NetworkStatus />
-        <AccessibilityControls />
         <PerformanceMonitor />
         
         {/* Toast Notifications */}

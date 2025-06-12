@@ -22,7 +22,7 @@ const HeroSection: React.FC = () => {
 
   return (
     <section 
-      className="py-12 sm:py-16 md:py-20 lg:py-28 bg-gradient-to-br from-brand-100 via-brand-50 to-white dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 relative overflow-hidden" 
+      className="py-12 sm:py-16 md:py-20 lg:py-28 bg-gradient-to-br from-brand-100 via-brand-50 to-background dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 relative overflow-hidden" 
       aria-labelledby="hero-heading"
     >
       <div className="absolute inset-0 opacity-10" aria-hidden="true">
@@ -33,8 +33,8 @@ const HeroSection: React.FC = () => {
         </div>
       </div>
       
-      <div className="container px-4 sm:px-6 max-w-6xl mx-auto relative">
-        <div className="text-center max-w-3xl mx-auto animate-fade-up z-10">
+      <div className="container px-4 sm:px-6 max-w-6xl mx-auto relative z-10">
+        <div className="text-center max-w-3xl mx-auto animate-fade-in">
           <h1 
             id="hero-heading" 
             className="text-2xl sm:text-3xl md:text-4xl lg:text-6xl font-bold text-brand-800 dark:text-white mb-3 sm:mb-4 md:mb-5 leading-tight tracking-tight"
@@ -49,7 +49,7 @@ const HeroSection: React.FC = () => {
             {isLoggedIn ? (
               <Button 
                 size="lg" 
-                className="rounded-full bg-brand-500 hover:bg-brand-600 text-white px-4 sm:px-6 md:px-8 py-3 sm:py-4 md:py-5 text-sm sm:text-base transform transition-all duration-300 hover:scale-105 shadow-md hover:shadow-lg"
+                className="rounded-full bg-brand-500 hover:bg-brand-600 text-white px-4 sm:px-6 md:px-8 py-3 sm:py-4 md:py-5 text-sm sm:text-base transform transition-all duration-300 hover:scale-105 shadow-md hover:shadow-lg focus:ring-2 focus:ring-brand-400 focus:ring-offset-2"
                 onClick={handleDashboard}
                 aria-label="Navigate to your dashboard"
               >
@@ -59,7 +59,7 @@ const HeroSection: React.FC = () => {
             ) : (
               <Button 
                 size="lg" 
-                className={`rounded-full bg-brand-500 hover:bg-brand-600 text-white px-4 sm:px-6 md:px-8 py-3 sm:py-4 md:py-5 text-sm sm:text-base transform transition-all duration-300 hover:scale-105 shadow-md hover:shadow-lg ${isMobile ? 'w-full' : ''}`}
+                className={`rounded-full bg-brand-500 hover:bg-brand-600 text-white px-4 sm:px-6 md:px-8 py-3 sm:py-4 md:py-5 text-sm sm:text-base transform transition-all duration-300 hover:scale-105 shadow-md hover:shadow-lg focus:ring-2 focus:ring-brand-400 focus:ring-offset-2 ${isMobile ? 'w-full' : ''}`}
                 onClick={handleGetStarted}
                 aria-label="Sign up for an account"
               >
