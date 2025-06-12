@@ -10,7 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 
 const RegisterPage: React.FC = () => {
   return (
-    <>
+    <React.Fragment>
       <SEOHead 
         title="Register - DevAI"
         description="Join DevAI and start your AI-powered programming education journey"
@@ -97,12 +97,12 @@ const RegisterPage: React.FC = () => {
                     Sign in here
                   </Link>
                 </p>
-              </div>
+              </motion.div>
             </motion.div>
           </main>
         </SkipNavContent>
       </div>
-    </>
+    </React.Fragment>
   );
 };
 
