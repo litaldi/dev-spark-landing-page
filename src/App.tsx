@@ -6,7 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { useKeyboardFocusDetection } from "@/lib/keyboard-utils";
-import { ErrorBoundary } from "@/components/error/ErrorBoundary";
+import { EnhancedErrorBoundary } from "@/components/error/EnhancedErrorBoundary";
 import { HelmetProvider } from 'react-helmet-async';
 import Home from "./pages/Home";
 import NotFound from "./pages/NotFound";
@@ -47,52 +47,56 @@ function App() {
   
   // Set html lang attribute and meta tags
   useEffect(() => {
-    document.documentElement.lang = "en";
-    
-    // Add meta description if it doesn't exist
-    if (!document.querySelector('meta[name="description"]')) {
-      const meta = document.createElement('meta');
-      meta.name = 'description';
-      meta.content = 'DevAI Learning Platform - AI-powered programming education with personalized learning paths, real-time code reviews, and interactive challenges';
-      document.head.appendChild(meta);
-    }
-    
-    // Add viewport meta if it doesn't exist
-    if (!document.querySelector('meta[name="viewport"]')) {
-      const viewport = document.createElement('meta');
-      viewport.name = 'viewport';
-      viewport.content = 'width=device-width, initial-scale=1.0, viewport-fit=cover';
-      document.head.appendChild(viewport);
-    }
-    
-    // Announce application loaded for screen readers
-    const announcer = document.createElement('div');
-    announcer.setAttribute('id', 'app-loaded-announcer');
-    announcer.setAttribute('aria-live', 'polite');
-    announcer.setAttribute('aria-atomic', 'true');
-    announcer.className = 'sr-only';
-    document.body.appendChild(announcer);
-    
-    setTimeout(() => {
-      announcer.textContent = 'DevAI Learning Platform loaded successfully';
-    }, 100);
-    
-    // Cleanup function
-    return () => {
-      if (announcer.parentNode) {
-        document.body.removeChild(announcer);
+    try {
+      document.documentElement.lang = "en";
+      
+      // Add meta description if it doesn't exist
+      if (!document.querySelector('meta[name="description"]')) {
+        const meta = document.createElement('meta');
+        meta.name = 'description';
+        meta.content = 'DevAI Learning Platform - AI-powered programming education with personalized learning paths, real-time code reviews, and interactive challenges';
+        document.head.appendChild(meta);
       }
-    };
+      
+      // Add viewport meta if it doesn't exist
+      if (!document.querySelector('meta[name="viewport"]')) {
+        const viewport = document.createElement('meta');
+        viewport.name = 'viewport';
+        viewport.content = 'width=device-width, initial-scale=1.0, viewport-fit=cover';
+        document.head.appendChild(viewport);
+      }
+      
+      // Announce application loaded for screen readers
+      const announcer = document.createElement('div');
+      announcer.setAttribute('id', 'app-loaded-announcer');
+      announcer.setAttribute('aria-live', 'polite');
+      announcer.setAttribute('aria-atomic', 'true');
+      announcer.className = 'sr-only';
+      document.body.appendChild(announcer);
+      
+      setTimeout(() => {
+        announcer.textContent = 'DevAI Learning Platform loaded successfully';
+      }, 100);
+      
+      // Cleanup function
+      return () => {
+        if (announcer.parentNode) {
+          document.body.removeChild(announcer);
+        }
+      };
+    } catch (error) {
+      console.error('Error setting up app metadata:', error);
+    }
   }, []);
   
   return (
-    <ErrorBoundary>
+    <EnhancedErrorBoundary>
       <HelmetProvider>
         <QueryClientProvider client={queryClient}>
           <ThemeProvider defaultTheme="light">
             <TooltipProvider>
               <div className="relative">
-                <ErrorBoundary>
+                <EnhancedErrorBoundary>
                   <Routes>
                     {/* Home page route */}
                     <Route path="/" element={<Home />} />
@@ -124,7 +128,7 @@ function App() {
                     {/* Catch-all route for 404 pages */}
                     <Route path="*" element={<NotFound />} />
                   </Routes>
-                </ErrorBoundary>
+                </EnhancedErrorBoundary>
                 <Toaster />
                 <Sonner />
               </div>
@@ -132,7 +136,7 @@ function App() {
           </ThemeProvider>
         </QueryClientProvider>
       </HelmetProvider>
-    </ErrorBoundary>
+    </EnhancedErrorBoundary>
   );
 };
 

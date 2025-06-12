@@ -49,63 +49,81 @@ export function AccessibilityMenu() {
   );
   const [isOpen, setIsOpen] = useState(false);
 
-  // Ensure settings have safe defaults
-  const safeSettings = {
-    ...defaultSettings,
-    ...settings,
-    textSize: settings.textSize ?? 100,
-    lineHeight: settings.lineHeight ?? 1.5,
-    letterSpacing: settings.letterSpacing ?? 0,
-  };
+  // Ensure settings have safe defaults and proper types
+  const safeSettings = React.useMemo(() => {
+    if (!settings || typeof settings !== 'object') {
+      return defaultSettings;
+    }
+    
+    return {
+      textSize: typeof settings.textSize === 'number' && !isNaN(settings.textSize) ? settings.textSize : 100,
+      highContrast: Boolean(settings.highContrast),
+      keyboardMode: Boolean(settings.keyboardMode),
+      reducedMotion: Boolean(settings.reducedMotion),
+      largePointer: Boolean(settings.largePointer),
+      lineHeight: typeof settings.lineHeight === 'number' && !isNaN(settings.lineHeight) ? settings.lineHeight : 1.5,
+      letterSpacing: typeof settings.letterSpacing === 'number' && !isNaN(settings.letterSpacing) ? settings.letterSpacing : 0,
+    };
+  }, [settings]);
 
   useEffect(() => {
-    // Apply text size safely
-    if (typeof safeSettings.textSize === 'number') {
-      document.documentElement.style.fontSize = `${safeSettings.textSize}%`;
-    }
-    
-    // Apply high contrast mode
-    if (safeSettings.highContrast) {
-      document.documentElement.classList.add('high-contrast');
-    } else {
-      document.documentElement.classList.remove('high-contrast');
-    }
-    
-    // Apply keyboard navigation mode
-    if (safeSettings.keyboardMode) {
-      document.body.classList.add('keyboard-navigation');
-    } else {
-      document.body.classList.remove('keyboard-navigation');
-    }
-    
-    // Apply reduced motion
-    applyReducedMotionStyles(safeSettings.reducedMotion);
-    
-    // Apply large pointer
-    if (safeSettings.largePointer) {
-      document.documentElement.classList.add('large-pointer');
-    } else {
-      document.documentElement.classList.remove('large-pointer');
-    }
-    
-    // Apply line height safely
-    if (typeof safeSettings.lineHeight === 'number') {
-      document.documentElement.style.setProperty('--a11y-line-height', safeSettings.lineHeight.toString());
-    }
-    
-    // Apply letter spacing safely
-    if (typeof safeSettings.letterSpacing === 'number') {
-      document.documentElement.style.setProperty('--a11y-letter-spacing', `${safeSettings.letterSpacing}px`);
+    try {
+      // Apply text size safely
+      if (typeof safeSettings.textSize === 'number' && safeSettings.textSize > 0) {
+        document.documentElement.style.fontSize = `${safeSettings.textSize}%`;
+      }
+      
+      // Apply high contrast mode
+      if (safeSettings.highContrast) {
+        document.documentElement.classList.add('high-contrast');
+      } else {
+        document.documentElement.classList.remove('high-contrast');
+      }
+      
+      // Apply keyboard navigation mode
+      if (safeSettings.keyboardMode) {
+        document.body.classList.add('keyboard-navigation');
+      } else {
+        document.body.classList.remove('keyboard-navigation');
+      }
+      
+      // Apply reduced motion
+      if (typeof applyReducedMotionStyles === 'function') {
+        applyReducedMotionStyles(safeSettings.reducedMotion);
+      }
+      
+      // Apply large pointer
+      if (safeSettings.largePointer) {
+        document.documentElement.classList.add('large-pointer');
+      } else {
+        document.documentElement.classList.remove('large-pointer');
+      }
+      
+      // Apply line height safely
+      if (typeof safeSettings.lineHeight === 'number' && safeSettings.lineHeight > 0) {
+        document.documentElement.style.setProperty('--a11y-line-height', safeSettings.lineHeight.toString());
+      }
+      
+      // Apply letter spacing safely
+      if (typeof safeSettings.letterSpacing === 'number') {
+        document.documentElement.style.setProperty('--a11y-letter-spacing', `${safeSettings.letterSpacing}px`);
+      }
+    } catch (error) {
+      console.error('Error applying accessibility settings:', error);
     }
     
     return () => {
-      // Clean up styles
-      document.documentElement.style.fontSize = '';
-      document.documentElement.classList.remove('high-contrast');
-      document.body.classList.remove('keyboard-navigation');
-      document.documentElement.classList.remove('large-pointer');
-      document.documentElement.style.removeProperty('--a11y-line-height');
-      document.documentElement.style.removeProperty('--a11y-letter-spacing');
+      try {
+        // Clean up styles
+        document.documentElement.style.fontSize = '';
+        document.documentElement.classList.remove('high-contrast');
+        document.body.classList.remove('keyboard-navigation');
+        document.documentElement.classList.remove('large-pointer');
+        document.documentElement.style.removeProperty('--a11y-line-height');
+        document.documentElement.style.removeProperty('--a11y-letter-spacing');
+      } catch (error) {
+        console.error('Error cleaning up accessibility settings:', error);
+      }
     };
   }, [safeSettings]);
 
@@ -113,47 +131,61 @@ export function AccessibilityMenu() {
     key: K,
     value: AccessibilitySettings[K]
   ) => {
-    const newSettings = { ...safeSettings, [key]: value };
-    setSettings(newSettings);
-    
-    // Announce changes to screen readers
-    let message = '';
-    
-    switch (key) {
-      case 'textSize':
-        message = `Text size set to ${value}%`;
-        break;
-      case 'highContrast':
-        message = value ? 'High contrast mode enabled' : 'High contrast mode disabled';
-        break;
-      case 'keyboardMode':
-        message = value ? 'Keyboard navigation mode enabled' : 'Keyboard navigation mode disabled';
-        break;
-      case 'reducedMotion':
-        message = value ? 'Reduced motion mode enabled' : 'Reduced motion mode disabled';
-        break;
-      case 'largePointer':
-        message = value ? 'Large pointer enabled' : 'Large pointer disabled';
-        break;
-      case 'lineHeight':
-        message = `Line height set to ${value}`;
-        break;
-      case 'letterSpacing':
-        message = `Letter spacing set to ${value}`;
-        break;
-      default:
-        message = 'Accessibility setting updated';
+    try {
+      const newSettings = { ...safeSettings, [key]: value };
+      setSettings(newSettings);
+      
+      // Announce changes to screen readers
+      let message = '';
+      
+      switch (key) {
+        case 'textSize':
+          message = `Text size set to ${value}%`;
+          break;
+        case 'highContrast':
+          message = value ? 'High contrast mode enabled' : 'High contrast mode disabled';
+          break;
+        case 'keyboardMode':
+          message = value ? 'Keyboard navigation mode enabled' : 'Keyboard navigation mode disabled';
+          break;
+        case 'reducedMotion':
+          message = value ? 'Reduced motion mode enabled' : 'Reduced motion mode disabled';
+          break;
+        case 'largePointer':
+          message = value ? 'Large pointer enabled' : 'Large pointer disabled';
+          break;
+        case 'lineHeight':
+          message = `Line height set to ${value}`;
+          break;
+        case 'letterSpacing':
+          message = `Letter spacing set to ${value}`;
+          break;
+        default:
+          message = 'Accessibility setting updated';
+      }
+      
+      if (typeof announceToScreenReader === 'function') {
+        announceToScreenReader(message, 'polite');
+      }
+    } catch (error) {
+      console.error('Error updating accessibility setting:', error);
     }
-    
-    announceToScreenReader(message, 'polite');
   };
 
   const handleOpenChange = (open: boolean) => {
     setIsOpen(open);
-    if (open) {
-      announceToScreenReader('Accessibility menu opened', 'polite');
-    } else {
-      announceToScreenReader('Accessibility menu closed', 'polite');
+    try {
+      if (open) {
+        if (typeof announceToScreenReader === 'function') {
+          announceToScreenReader('Accessibility menu opened', 'polite');
+        }
+      } else {
+        if (typeof announceToScreenReader === 'function') {
+          announceToScreenReader('Accessibility menu closed', 'polite');
+        }
+      }
+    } catch (error) {
+      console.error('Error announcing menu state:', error);
     }
   };
 
@@ -170,7 +202,7 @@ export function AccessibilityMenu() {
         </Button>
       </PopoverTrigger>
       <PopoverContent 
-        className="w-80 bg-popover/95 backdrop-blur-sm border shadow-lg z-50" 
+        className="w-80 bg-popover border shadow-lg z-50" 
         align="end"
         side="bottom"
         sideOffset={8}
@@ -200,7 +232,7 @@ export function AccessibilityMenu() {
                 max={200}
                 step={5}
                 value={[safeSettings.textSize]}
-                onValueChange={(values) => updateSetting("textSize", values[0])}
+                onValueChange={(values) => updateSetting("textSize", values[0] || 100)}
                 className="cursor-pointer"
                 aria-label="Adjust text size"
               />
@@ -219,7 +251,7 @@ export function AccessibilityMenu() {
                 max={5}
                 step={0.5}
                 value={[safeSettings.letterSpacing]}
-                onValueChange={(values) => updateSetting("letterSpacing", values[0])}
+                onValueChange={(values) => updateSetting("letterSpacing", values[0] || 0)}
                 className="cursor-pointer"
                 aria-label="Adjust letter spacing"
               />

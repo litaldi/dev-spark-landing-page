@@ -3,95 +3,97 @@ import { useEffect } from 'react';
 
 /**
  * Detects if user is navigating with keyboard
- * @returns Cleanup function to remove event listeners
  */
-export const detectKeyboardNavigation = () => {
-  const handleTabKey = (e: KeyboardEvent) => {
+export function detectKeyboardNavigation(): void {
+  let isKeyboardUser = false;
+
+  // Listen for keyboard events
+  function handleKeydown(e: KeyboardEvent) {
     if (e.key === 'Tab') {
+      isKeyboardUser = true;
       document.body.classList.add('keyboard-navigation');
     }
-  };
-
-  const handleMouseDown = () => {
-    document.body.classList.remove('keyboard-navigation');
-  };
-
-  // Add event listeners
-  document.addEventListener('keydown', handleTabKey);
-  document.addEventListener('mousedown', handleMouseDown);
-
-  // Clean up
-  return () => {
-    document.removeEventListener('keydown', handleTabKey);
-    document.removeEventListener('mousedown', handleMouseDown);
-  };
-};
-
-/**
- * Hook to apply enhanced focus state detection
- */
-export const useKeyboardFocusDetection = () => {
-  useEffect(() => {
-    return detectKeyboardNavigation();
-  }, []);
-};
-
-/**
- * Returns true if user prefers reduced motion
- * @returns Boolean indicating if reduced motion is preferred
- */
-export const prefersReducedMotion = (): boolean => {
-  if (typeof window === 'undefined') return false;
-  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-};
-
-/**
- * Moves focus to an element
- * @param selector CSS selector for the element to focus
- */
-export const focusElement = (selector: string): void => {
-  const element = document.querySelector(selector) as HTMLElement;
-  if (element) {
-    element.focus();
   }
-};
+
+  // Listen for mouse events
+  function handleMousedown() {
+    isKeyboardUser = false;
+    document.body.classList.remove('keyboard-navigation');
+  }
+
+  document.addEventListener('keydown', handleKeydown);
+  document.addEventListener('mousedown', handleMousedown);
+}
 
 /**
- * React hook to trap focus within a container
- * @param containerRef Reference to container element
- * @param active Whether focus trapping is active
+ * Hook to enable keyboard focus detection
  */
-export const useTrapFocus = (containerRef: React.RefObject<HTMLElement>, active: boolean = true) => {
+export function useKeyboardFocusDetection(): void {
   useEffect(() => {
-    if (!active || !containerRef.current) return;
+    detectKeyboardNavigation();
+  }, []);
+}
+
+/**
+ * Check if user prefers reduced motion
+ */
+export function prefersReducedMotion(): boolean {
+  try {
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Focus an element safely
+ */
+export function focusElement(element: HTMLElement | null): void {
+  if (element && typeof element.focus === 'function') {
+    try {
+      element.focus();
+    } catch (error) {
+      console.error('Error focusing element:', error);
+    }
+  }
+}
+
+/**
+ * Hook to trap focus within a container
+ */
+export function useTrapFocus(containerRef: React.RefObject<HTMLElement>, isActive: boolean = true) {
+  useEffect(() => {
+    if (!isActive || !containerRef.current) return;
 
     const container = containerRef.current;
     const focusableElements = container.querySelectorAll(
-      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
     );
     
     const firstElement = focusableElements[0] as HTMLElement;
     const lastElement = focusableElements[focusableElements.length - 1] as HTMLElement;
 
-    const handleTabKey = (e: KeyboardEvent) => {
+    function handleKeyDown(e: KeyboardEvent) {
       if (e.key !== 'Tab') return;
 
       if (e.shiftKey) {
-        // If shift + tab and on first element, move to last element
         if (document.activeElement === firstElement) {
           e.preventDefault();
-          lastElement.focus();
+          focusElement(lastElement);
         }
       } else {
-        // If tab and on last element, move to first element
         if (document.activeElement === lastElement) {
           e.preventDefault();
-          firstElement.focus();
+          focusElement(firstElement);
         }
       }
-    };
+    }
 
-    document.addEventListener('keydown', handleTabKey);
-    return () => document.removeEventListener('keydown', handleTabKey);
-  }, [containerRef, active]);
-};
+    container.addEventListener('keydown', handleKeyDown);
+    focusElement(firstElement);
+
+    return () => {
+      container.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [containerRef, isActive]);
+}

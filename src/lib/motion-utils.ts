@@ -1,45 +1,51 @@
 
 /**
- * Motion and animation utilities for accessibility and performance
+ * Motion utilities for handling reduced motion preferences
  */
 
 /**
- * Checks if user prefers reduced motion
+ * Check if user prefers reduced motion
  */
-export const prefersReducedMotion = (): boolean => {
-  if (typeof window === 'undefined') return false;
-  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-};
-
-/**
- * Applies reduced motion styles when needed
- */
-export const applyReducedMotionStyles = (forceReduce: boolean = false): void => {
-  const shouldReduce = forceReduce || prefersReducedMotion();
-  
-  if (shouldReduce) {
-    document.documentElement.classList.add('reduce-motion');
-  } else {
-    document.documentElement.classList.remove('reduce-motion');
+export function prefersReducedMotion(): boolean {
+  try {
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  } catch {
+    return false;
   }
-};
+}
 
 /**
- * Creates a motion-safe animation class
+ * Apply reduced motion styles
+ * @param shouldReduce Whether to apply reduced motion
  */
-export const motionSafeClass = (animationClass: string): string => {
-  return prefersReducedMotion() ? '' : animationClass;
-};
+export function applyReducedMotionStyles(shouldReduce: boolean): void {
+  try {
+    if (shouldReduce) {
+      document.documentElement.classList.add('reduce-motion');
+    } else {
+      document.documentElement.classList.remove('reduce-motion');
+    }
+  } catch (error) {
+    console.error('Error applying reduced motion styles:', error);
+  }
+}
 
 /**
- * Safe animation helper for React components
+ * Get appropriate animation duration based on motion preference
+ * @param normalDuration Normal animation duration in ms
+ * @param reducedDuration Reduced animation duration in ms (default: 0)
  */
-export const useMotionSafe = () => {
-  const isMotionSafe = !prefersReducedMotion();
-  
-  return {
-    isMotionSafe,
-    safeClass: (animationClass: string) => isMotionSafe ? animationClass : '',
-    safeDuration: (duration: number) => isMotionSafe ? duration : 0
-  };
-};
+export function getAnimationDuration(normalDuration: number, reducedDuration: number = 0): number {
+  return prefersReducedMotion() ? reducedDuration : normalDuration;
+}
+
+/**
+ * Create CSS transition string respecting motion preferences
+ * @param property CSS property to transition
+ * @param duration Duration in ms
+ * @param easing Easing function (default: ease)
+ */
+export function createTransition(property: string, duration: number, easing: string = 'ease'): string {
+  const actualDuration = getAnimationDuration(duration);
+  return `${property} ${actualDuration}ms ${easing}`;
+}
