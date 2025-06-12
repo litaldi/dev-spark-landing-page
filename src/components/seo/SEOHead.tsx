@@ -8,93 +8,41 @@ interface SEOHeadProps {
   keywords?: string;
   image?: string;
   url?: string;
-  type?: 'website' | 'article';
-  author?: string;
-  publishedTime?: string;
-  modifiedTime?: string;
+  type?: string;
 }
 
-export const SEOHead = ({
-  title = 'DevAI Learning Platform - AI-Powered Programming Education',
-  description = 'Master programming with AI-powered personalized learning, real-time code reviews, and interactive coding challenges. Join thousands of developers improving their skills.',
-  keywords = 'programming, coding, AI learning, web development, JavaScript, React, Python, code review, developer education',
-  image = '/og-image.jpg',
-  url = 'https://devai-learning.com',
-  type = 'website',
-  author = 'DevAI Learning Team',
-  publishedTime,
-  modifiedTime
-}: SEOHeadProps) => {
-  const fullTitle = title.includes('DevAI') ? title : `${title} | DevAI Learning Platform`;
-  const fullUrl = url.startsWith('http') ? url : `https://devai-learning.com${url}`;
-  const fullImage = image.startsWith('http') ? image : `https://devai-learning.com${image}`;
-
+export const SEOHead: React.FC<SEOHeadProps> = ({
+  title = "DevAI - AI-Powered Programming Education",
+  description = "Learn programming with AI assistance, build real projects, and advance your developer career with personalized learning paths.",
+  keywords = "programming, education, AI, coding, web development, career, learning",
+  image = "/og-image.png",
+  url = typeof window !== 'undefined' ? window.location.href : '',
+  type = "website"
+}) => {
   return (
     <Helmet>
-      {/* Basic Meta Tags */}
-      <title>{fullTitle}</title>
+      <title>{title}</title>
       <meta name="description" content={description} />
       <meta name="keywords" content={keywords} />
-      <meta name="author" content={author} />
-      <meta name="robots" content="index, follow" />
-      <meta name="language" content="English" />
-      <meta name="revisit-after" content="1 days" />
       
-      {/* Open Graph Tags */}
-      <meta property="og:title" content={fullTitle} />
+      {/* Open Graph */}
+      <meta property="og:title" content={title} />
       <meta property="og:description" content={description} />
-      <meta property="og:image" content={fullImage} />
-      <meta property="og:url" content={fullUrl} />
       <meta property="og:type" content={type} />
-      <meta property="og:site_name" content="DevAI Learning Platform" />
-      <meta property="og:locale" content="en_US" />
+      <meta property="og:url" content={url} />
+      <meta property="og:image" content={image} />
       
-      {/* Twitter Card Tags */}
+      {/* Twitter Card */}
       <meta name="twitter:card" content="summary_large_image" />
-      <meta name="twitter:title" content={fullTitle} />
+      <meta name="twitter:title" content={title} />
       <meta name="twitter:description" content={description} />
-      <meta name="twitter:image" content={fullImage} />
-      <meta name="twitter:site" content="@devailearning" />
-      <meta name="twitter:creator" content="@devailearning" />
+      <meta name="twitter:image" content={image} />
       
-      {/* Article specific tags */}
-      {type === 'article' && publishedTime && (
-        <meta property="article:published_time" content={publishedTime} />
-      )}
-      {type === 'article' && modifiedTime && (
-        <meta property="article:modified_time" content={modifiedTime} />
-      )}
-      {type === 'article' && (
-        <meta property="article:author" content={author} />
-      )}
-      
-      {/* Canonical URL */}
-      <link rel="canonical" href={fullUrl} />
-      
-      {/* Additional SEO tags */}
-      <meta name="theme-color" content="#3B82F6" />
-      <meta name="msapplication-navbutton-color" content="#3B82F6" />
-      <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-      
-      {/* Structured Data for Education */}
-      <script type="application/ld+json">
-        {JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "EducationalOrganization",
-          "name": "DevAI Learning Platform",
-          "description": description,
-          "url": fullUrl,
-          "logo": `${fullUrl}/logo.png`,
-          "sameAs": [
-            "https://twitter.com/devailearning",
-            "https://github.com/devai-learning",
-            "https://linkedin.com/company/devai-learning"
-          ],
-          "courseMode": "online",
-          "educationalLevel": "beginner to advanced",
-          "subject": "Computer Programming"
-        })}
-      </script>
+      {/* Additional Meta Tags */}
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <meta name="robots" content="index, follow" />
+      <meta name="author" content="DevAI Team" />
+      <link rel="canonical" href={url} />
     </Helmet>
   );
 };

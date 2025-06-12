@@ -2,75 +2,46 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
+import { Accessibility, Eye, Type, Contrast, Keyboard, Volume2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
+import { Slider } from '@/components/ui/slider';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { 
-  Accessibility, 
-  Eye, 
-  Volume2, 
-  Keyboard, 
-  Monitor, 
-  Sun, 
-  Moon, 
-  Languages,
-  Type,
-  Contrast,
-  MousePointer
-} from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useLocalStorage } from '@/hooks/use-local-storage';
 
 interface AccessibilitySettings {
   fontSize: number;
   highContrast: boolean;
   reducedMotion: boolean;
-  screenReaderMode: boolean;
   keyboardNavigation: boolean;
-  colorBlindMode: 'none' | 'protanopia' | 'deuteranopia' | 'tritanopia';
-  language: string;
-  direction: 'ltr' | 'rtl';
-  theme: 'light' | 'dark' | 'system';
-  cursorSize: number;
+  colorBlindMode: string;
+  screenReaderMode: boolean;
 }
 
 const defaultSettings: AccessibilitySettings = {
-  fontSize: 16,
+  fontSize: 100,
   highContrast: false,
   reducedMotion: false,
-  screenReaderMode: false,
-  keyboardNavigation: true,
+  keyboardNavigation: false,
   colorBlindMode: 'none',
-  language: 'en',
-  direction: 'ltr',
-  theme: 'system',
-  cursorSize: 1,
+  screenReaderMode: false
 };
 
 export const AccessibilityControls: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [settings, setSettings] = useState<AccessibilitySettings>(defaultSettings);
+  const [settings, setSettings] = useLocalStorage<AccessibilitySettings>(
+    'accessibility-settings',
+    defaultSettings
+  );
 
+  // Apply settings to document
   useEffect(() => {
-    // Load saved settings
-    const saved = localStorage.getItem('accessibility-settings');
-    if (saved) {
-      try {
-        const parsedSettings = JSON.parse(saved);
-        setSettings({ ...defaultSettings, ...parsedSettings });
-      } catch (error) {
-        console.error('Failed to parse accessibility settings:', error);
-      }
-    }
-  }, []);
-
-  useEffect(() => {
-    // Apply settings to document
     const root = document.documentElement;
     
     // Font size
-    root.style.fontSize = `${settings.fontSize}px`;
+    root.style.fontSize = `${settings.fontSize}%`;
     
     // High contrast
     if (settings.highContrast) {
@@ -86,324 +57,174 @@ export const AccessibilityControls: React.FC = () => {
       root.classList.remove('reduce-motion');
     }
     
-    // Direction
-    root.dir = settings.direction;
+    // Keyboard navigation
+    if (settings.keyboardNavigation) {
+      document.body.classList.add('keyboard-navigation');
+    } else {
+      document.body.classList.remove('keyboard-navigation');
+    }
     
     // Color blind mode
-    root.className = root.className.replace(/colorblind-\w+/g, '');
+    root.classList.remove('protanopia', 'deuteranopia', 'tritanopia');
     if (settings.colorBlindMode !== 'none') {
-      root.classList.add(`colorblind-${settings.colorBlindMode}`);
+      root.classList.add(settings.colorBlindMode);
     }
-    
-    // Cursor size
-    root.style.setProperty('--cursor-scale', settings.cursorSize.toString());
-    
-    // Keyboard navigation indicators
-    if (settings.keyboardNavigation) {
-      root.classList.add('keyboard-navigation');
-    } else {
-      root.classList.remove('keyboard-navigation');
-    }
-    
-    // Theme
-    if (settings.theme === 'dark') {
-      root.classList.add('dark');
-    } else if (settings.theme === 'light') {
-      root.classList.remove('dark');
-    } else {
-      // System theme
-      const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      if (isDarkMode) {
-        root.classList.add('dark');
-      } else {
-        root.classList.remove('dark');
-      }
-    }
-    
-    // Save settings
-    localStorage.setItem('accessibility-settings', JSON.stringify(settings));
   }, [settings]);
 
-  const updateSetting = <K extends keyof AccessibilitySettings>(
-    key: K,
-    value: AccessibilitySettings[K]
-  ) => {
+  const updateSetting = (key: keyof AccessibilitySettings, value: any) => {
     setSettings(prev => ({ ...prev, [key]: value }));
   };
 
   const resetSettings = () => {
     setSettings(defaultSettings);
-    localStorage.removeItem('accessibility-settings');
-  };
-
-  const announceChange = (message: string) => {
-    // Create or update ARIA live region for announcements
-    let announcer = document.getElementById('a11y-announcer');
-    if (!announcer) {
-      announcer = document.createElement('div');
-      announcer.id = 'a11y-announcer';
-      announcer.setAttribute('aria-live', 'polite');
-      announcer.setAttribute('aria-atomic', 'true');
-      announcer.className = 'sr-only';
-      document.body.appendChild(announcer);
-    }
-    announcer.textContent = message;
   };
 
   return (
     <>
-      {/* Accessibility Button */}
       <Button
         variant="outline"
         size="sm"
-        onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-4 right-4 z-50 rounded-full w-12 h-12 p-0 shadow-lg"
-        aria-label={`${isOpen ? 'Close' : 'Open'} accessibility controls`}
-        aria-expanded={isOpen}
-        aria-controls="accessibility-panel"
+        onClick={() => setIsOpen(true)}
+        className="fixed bottom-4 right-16 z-50 opacity-70 hover:opacity-100 transition-opacity"
+        aria-label="Open accessibility options"
       >
-        <Accessibility className="h-5 w-5" />
+        <Accessibility className="h-4 w-4" />
       </Button>
 
-      {/* Accessibility Panel */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.9, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            className="fixed bottom-20 right-4 z-50 w-80 max-h-96 overflow-y-auto"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4"
+            onClick={() => setIsOpen(false)}
           >
-            <Card id="accessibility-panel" className="shadow-xl">
-              <CardHeader className="pb-3">
-                <CardTitle className="flex items-center gap-2 text-lg">
-                  <Accessibility className="h-5 w-5" />
-                  Accessibility Controls
-                </CardTitle>
-              </CardHeader>
-              
-              <CardContent className="space-y-4">
-                {/* Font Size */}
-                <div className="space-y-2">
-                  <Label className="flex items-center gap-2">
-                    <Type className="h-4 w-4" />
-                    Font Size: {settings.fontSize}px
-                  </Label>
-                  <Slider
-                    value={[settings.fontSize]}
-                    onValueChange={([value]) => {
-                      updateSetting('fontSize', value);
-                      announceChange(`Font size changed to ${value} pixels`);
-                    }}
-                    min={12}
-                    max={24}
-                    step={1}
-                    className="w-full"
-                    aria-label="Adjust font size"
-                  />
-                </div>
-
-                {/* Theme */}
-                <div className="space-y-2">
-                  <Label className="flex items-center gap-2">
-                    <Monitor className="h-4 w-4" />
-                    Theme
-                  </Label>
-                  <Select
-                    value={settings.theme}
-                    onValueChange={(value: 'light' | 'dark' | 'system') => {
-                      updateSetting('theme', value);
-                      announceChange(`Theme changed to ${value}`);
-                    }}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="system">
-                        <div className="flex items-center gap-2">
-                          <Monitor className="h-3 w-3" />
-                          System
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="light">
-                        <div className="flex items-center gap-2">
-                          <Sun className="h-3 w-3" />
-                          Light
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="dark">
-                        <div className="flex items-center gap-2">
-                          <Moon className="h-3 w-3" />
-                          Dark
-                        </div>
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Language & Direction */}
-                <div className="grid grid-cols-2 gap-2">
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              onClick={e => e.stopPropagation()}
+              className="w-full max-w-md"
+            >
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Accessibility className="h-5 w-5" />
+                    Accessibility Settings
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  {/* Font Size */}
                   <div className="space-y-2">
                     <Label className="flex items-center gap-2">
-                      <Languages className="h-4 w-4" />
-                      Language
+                      <Type className="h-4 w-4" />
+                      Text Size: {settings.fontSize}%
                     </Label>
-                    <Select
-                      value={settings.language}
-                      onValueChange={(value) => {
-                        updateSetting('language', value);
-                        // Auto-set RTL for Hebrew and Arabic
-                        if (value === 'he' || value === 'ar') {
-                          updateSetting('direction', 'rtl');
-                        } else {
-                          updateSetting('direction', 'ltr');
-                        }
-                        announceChange(`Language changed to ${value}`);
-                      }}
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="en">English</SelectItem>
-                        <SelectItem value="he">עברית (Hebrew)</SelectItem>
-                        <SelectItem value="ar">العربية (Arabic)</SelectItem>
-                        <SelectItem value="es">Español</SelectItem>
-                        <SelectItem value="fr">Français</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <Slider
+                      value={[settings.fontSize]}
+                      onValueChange={(value) => updateSetting('fontSize', value[0])}
+                      min={75}
+                      max={150}
+                      step={5}
+                      className="w-full"
+                      aria-label="Adjust text size"
+                    />
                   </div>
-                  
-                  <div className="space-y-2">
-                    <Label>Direction</Label>
-                    <Select
-                      value={settings.direction}
-                      onValueChange={(value: 'ltr' | 'rtl') => {
-                        updateSetting('direction', value);
-                        announceChange(`Text direction changed to ${value === 'rtl' ? 'right-to-left' : 'left-to-right'}`);
-                      }}
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="ltr">LTR</SelectItem>
-                        <SelectItem value="rtl">RTL</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
 
-                {/* Accessibility Toggles */}
-                <div className="space-y-3">
+                  {/* High Contrast */}
                   <div className="flex items-center justify-between">
-                    <Label className="flex items-center gap-2">
+                    <Label htmlFor="high-contrast" className="flex items-center gap-2">
                       <Contrast className="h-4 w-4" />
-                      High Contrast
+                      High Contrast Mode
                     </Label>
                     <Switch
+                      id="high-contrast"
                       checked={settings.highContrast}
-                      onCheckedChange={(checked) => {
-                        updateSetting('highContrast', checked);
-                        announceChange(`High contrast ${checked ? 'enabled' : 'disabled'}`);
-                      }}
+                      onCheckedChange={(checked) => updateSetting('highContrast', checked)}
                       aria-label="Toggle high contrast mode"
                     />
                   </div>
 
+                  {/* Reduced Motion */}
                   <div className="flex items-center justify-between">
-                    <Label className="flex items-center gap-2">
+                    <Label htmlFor="reduced-motion" className="flex items-center gap-2">
                       <Eye className="h-4 w-4" />
                       Reduce Motion
                     </Label>
                     <Switch
+                      id="reduced-motion"
                       checked={settings.reducedMotion}
-                      onCheckedChange={(checked) => {
-                        updateSetting('reducedMotion', checked);
-                        announceChange(`Reduced motion ${checked ? 'enabled' : 'disabled'}`);
-                      }}
+                      onCheckedChange={(checked) => updateSetting('reducedMotion', checked)}
                       aria-label="Toggle reduced motion"
                     />
                   </div>
 
+                  {/* Keyboard Navigation */}
                   <div className="flex items-center justify-between">
-                    <Label className="flex items-center gap-2">
+                    <Label htmlFor="keyboard-nav" className="flex items-center gap-2">
                       <Keyboard className="h-4 w-4" />
-                      Keyboard Navigation
+                      Enhanced Keyboard Navigation
                     </Label>
                     <Switch
+                      id="keyboard-nav"
                       checked={settings.keyboardNavigation}
-                      onCheckedChange={(checked) => {
-                        updateSetting('keyboardNavigation', checked);
-                        announceChange(`Keyboard navigation ${checked ? 'enabled' : 'disabled'}`);
-                      }}
-                      aria-label="Toggle enhanced keyboard navigation"
+                      onCheckedChange={(checked) => updateSetting('keyboardNavigation', checked)}
+                      aria-label="Toggle keyboard navigation mode"
                     />
                   </div>
-                </div>
 
-                {/* Color Blind Support */}
-                <div className="space-y-2">
-                  <Label>Color Blind Support</Label>
-                  <Select
-                    value={settings.colorBlindMode}
-                    onValueChange={(value: AccessibilitySettings['colorBlindMode']) => {
-                      updateSetting('colorBlindMode', value);
-                      announceChange(`Color blind mode set to ${value === 'none' ? 'none' : value}`);
-                    }}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="none">None</SelectItem>
-                      <SelectItem value="protanopia">Protanopia</SelectItem>
-                      <SelectItem value="deuteranopia">Deuteranopia</SelectItem>
-                      <SelectItem value="tritanopia">Tritanopia</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+                  {/* Color Blind Support */}
+                  <div className="space-y-2">
+                    <Label className="flex items-center gap-2">
+                      <Eye className="h-4 w-4" />
+                      Color Blind Support
+                    </Label>
+                    <Select
+                      value={settings.colorBlindMode}
+                      onValueChange={(value) => updateSetting('colorBlindMode', value)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">None</SelectItem>
+                        <SelectItem value="protanopia">Protanopia</SelectItem>
+                        <SelectItem value="deuteranopia">Deuteranopia</SelectItem>
+                        <SelectItem value="tritanopia">Tritanopia</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
 
-                {/* Cursor Size */}
-                <div className="space-y-2">
-                  <Label className="flex items-center gap-2">
-                    <MousePointer className="h-4 w-4" />
-                    Cursor Size: {settings.cursorSize}x
-                  </Label>
-                  <Slider
-                    value={[settings.cursorSize]}
-                    onValueChange={([value]) => {
-                      updateSetting('cursorSize', value);
-                      announceChange(`Cursor size changed to ${value}x`);
-                    }}
-                    min={1}
-                    max={3}
-                    step={0.5}
-                    className="w-full"
-                    aria-label="Adjust cursor size"
-                  />
-                </div>
+                  {/* Screen Reader Mode */}
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="screen-reader" className="flex items-center gap-2">
+                      <Volume2 className="h-4 w-4" />
+                      Screen Reader Optimized
+                    </Label>
+                    <Switch
+                      id="screen-reader"
+                      checked={settings.screenReaderMode}
+                      onCheckedChange={(checked) => updateSetting('screenReaderMode', checked)}
+                      aria-label="Toggle screen reader optimization"
+                    />
+                  </div>
 
-                {/* Reset Button */}
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    resetSettings();
-                    announceChange('Accessibility settings reset to defaults');
-                  }}
-                  className="w-full"
-                >
-                  Reset to Defaults
-                </Button>
-              </CardContent>
-            </Card>
+                  {/* Actions */}
+                  <div className="flex gap-2 pt-4">
+                    <Button onClick={resetSettings} variant="outline" className="flex-1">
+                      Reset
+                    </Button>
+                    <Button onClick={() => setIsOpen(false)} className="flex-1">
+                      Close
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
-
-      {/* Screen reader announcer */}
-      <div id="a11y-announcer" aria-live="polite" aria-atomic="true" className="sr-only" />
     </>
   );
 };
