@@ -85,8 +85,8 @@ export function PerformanceMonitor({ children }: { children: React.ReactNode }) 
       console.log('DNS Lookup:', nav.domainLookupEnd - nav.domainLookupStart, 'ms');
       console.log('TCP Connection:', nav.connectEnd - nav.connectStart, 'ms');
       console.log('Request + Response:', nav.responseEnd - nav.requestStart, 'ms');
-      console.log('DOM Content Loaded:', nav.domContentLoadedEventEnd - nav.navigationStart, 'ms');
-      console.log('Page Load Complete:', nav.loadEventEnd - nav.navigationStart, 'ms');
+      console.log('DOM Content Loaded:', nav.domContentLoadedEventEnd - nav.startTime, 'ms');
+      console.log('Page Load Complete:', nav.loadEventEnd - nav.startTime, 'ms');
       
       if (metrics.paintTiming.length > 0) {
         metrics.paintTiming.forEach((paint) => {

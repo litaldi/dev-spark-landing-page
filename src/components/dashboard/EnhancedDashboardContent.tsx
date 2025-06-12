@@ -1,3 +1,4 @@
+
 import React from "react";
 import { WelcomeSection } from "@/components/dashboard/WelcomeSection";
 import { ProgressSection } from "@/components/dashboard/ProgressSection";
@@ -15,7 +16,6 @@ import { useViewportSize, useBreakpoint } from "@/hooks/use-mobile";
 import { exportProgressReport, exportProgressCSV } from "@/lib/export-utils";
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { EnhancedProgressSection } from "@/components/dashboard/EnhancedProgressSection";
-import { EnhancedNavigation } from "@/components/navigation/EnhancedNavigation";
 
 interface EnhancedDashboardContentProps {
   userName: string;
@@ -74,9 +74,6 @@ export const EnhancedDashboardContent: React.FC<EnhancedDashboardContentProps> =
   return (
     <ErrorBoundary>
       <div className="space-y-6 relative">
-        {/* Enhanced Navigation */}
-        <EnhancedNavigation />
-        
         {/* Streak Reminder */}
         <StreakReminder 
           currentStreak={currentStreak}
