@@ -16,28 +16,32 @@ export const getFocusableElements = (container: HTMLElement): HTMLElement[] => {
  * @param contentId ID of the main content element to skip to
  */
 export const createSkipLink = (contentId: string): void => {
-  let skipLink = document.getElementById('skip-nav-link');
-  
-  if (!skipLink) {
-    skipLink = document.createElement('a');
-    skipLink.id = 'skip-nav-link';
-    skipLink.className = 'sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 z-50 bg-primary text-primary-foreground px-4 py-2 rounded-md transition-all duration-200';
-    skipLink.innerText = 'Skip to content';
-    skipLink.setAttribute('href', `#${contentId}`);
+  try {
+    let skipLink = document.getElementById('skip-nav-link');
     
-    // Add keyboard event listener
-    skipLink.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        const targetElement = document.getElementById(contentId);
-        if (targetElement) {
-          targetElement.focus();
-          targetElement.scrollIntoView({ behavior: 'smooth' });
+    if (!skipLink) {
+      skipLink = document.createElement('a');
+      skipLink.id = 'skip-nav-link';
+      skipLink.className = 'sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 z-50 bg-primary text-primary-foreground px-4 py-2 rounded-md transition-all duration-200';
+      skipLink.innerText = 'Skip to content';
+      skipLink.setAttribute('href', `#${contentId}`);
+      
+      // Add keyboard event listener
+      skipLink.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          const targetElement = document.getElementById(contentId);
+          if (targetElement) {
+            targetElement.focus();
+            targetElement.scrollIntoView({ behavior: 'smooth' });
+          }
         }
-      }
-    });
-    
-    document.body.insertBefore(skipLink, document.body.firstChild);
+      });
+      
+      document.body.insertBefore(skipLink, document.body.firstChild);
+    }
+  } catch (error) {
+    console.error('Error creating skip link:', error);
   }
 };
 
@@ -47,28 +51,32 @@ export const createSkipLink = (contentId: string): void => {
  * @param priority Priority level for announcement (polite or assertive)
  */
 export const announceToScreenReader = (message: string, priority: 'polite' | 'assertive' = 'polite'): void => {
-  let announcer = document.getElementById('screen-reader-announcer');
-  
-  if (!announcer) {
-    announcer = document.createElement('div');
-    announcer.id = 'screen-reader-announcer';
-    announcer.setAttribute('aria-live', priority);
-    announcer.setAttribute('aria-atomic', 'true');
-    announcer.className = 'sr-only';
-    document.body.appendChild(announcer);
-  } else {
-    announcer.setAttribute('aria-live', priority);
-  }
-  
-  // Clear the announcer first
-  announcer.textContent = '';
-  
-  // Use setTimeout to ensure the announcement happens
-  setTimeout(() => {
-    if (announcer) {
-      announcer.textContent = message;
+  try {
+    let announcer = document.getElementById('screen-reader-announcer');
+    
+    if (!announcer) {
+      announcer = document.createElement('div');
+      announcer.id = 'screen-reader-announcer';
+      announcer.setAttribute('aria-live', priority);
+      announcer.setAttribute('aria-atomic', 'true');
+      announcer.className = 'sr-only';
+      document.body.appendChild(announcer);
+    } else {
+      announcer.setAttribute('aria-live', priority);
     }
-  }, 100);
+    
+    // Clear the announcer first
+    announcer.textContent = '';
+    
+    // Use setTimeout to ensure the announcement happens
+    setTimeout(() => {
+      if (announcer) {
+        announcer.textContent = message;
+      }
+    }, 100);
+  } catch (error) {
+    console.error('Error announcing to screen reader:', error);
+  }
 };
 
 /**
@@ -77,36 +85,41 @@ export const announceToScreenReader = (message: string, priority: 'polite' | 'as
  * @returns Cleanup function to remove event listeners
  */
 export const trapFocus = (container: HTMLElement): (() => void) => {
-  const focusableElements = getFocusableElements(container);
-  if (focusableElements.length === 0) return () => {};
-  
-  const firstElement = focusableElements[0];
-  const lastElement = focusableElements[focusableElements.length - 1];
-  
-  const handleKeyDown = (e: KeyboardEvent) => {
-    if (e.key !== 'Tab') return;
+  try {
+    const focusableElements = getFocusableElements(container);
+    if (focusableElements.length === 0) return () => {};
     
-    if (e.shiftKey) {
-      if (document.activeElement === firstElement) {
-        e.preventDefault();
-        lastElement.focus();
+    const firstElement = focusableElements[0];
+    const lastElement = focusableElements[focusableElements.length - 1];
+    
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key !== 'Tab') return;
+      
+      if (e.shiftKey) {
+        if (document.activeElement === firstElement) {
+          e.preventDefault();
+          lastElement.focus();
+        }
+      } else {
+        if (document.activeElement === lastElement) {
+          e.preventDefault();
+          firstElement.focus();
+        }
       }
-    } else {
-      if (document.activeElement === lastElement) {
-        e.preventDefault();
-        firstElement.focus();
-      }
-    }
-  };
-  
-  document.addEventListener('keydown', handleKeyDown);
-  
-  // Focus the first element initially
-  firstElement.focus();
-  
-  return () => {
-    document.removeEventListener('keydown', handleKeyDown);
-  };
+    };
+    
+    document.addEventListener('keydown', handleKeyDown);
+    
+    // Focus the first element initially
+    firstElement.focus();
+    
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  } catch (error) {
+    console.error('Error trapping focus:', error);
+    return () => {};
+  }
 };
 
 /**
