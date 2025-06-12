@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, Eye, EyeOff, Mail, Lock, AlertCircle, CheckCircle } from 'lucide-react';
-import { useAuth } from '@/hooks/auth/use-auth';
+import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 
 interface LoginFormProps {
@@ -25,18 +25,12 @@ export const EnhancedLoginForm: React.FC<LoginFormProps> = ({
   const [rememberMe, setRememberMe] = useState(false);
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [showSuccess, setShowSuccess] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   
   const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
-  
-  const { login, isLoading, errorMessage, clearError } = useAuth({
-    onSuccess: () => {
-      setShowSuccess(true);
-      setTimeout(() => {
-        onSuccess?.();
-      }, 1500);
-    }
-  });
+  const { toast } = useToast();
 
   const validateForm = () => {
     const errors: Record<string, string> = {};
@@ -59,7 +53,7 @@ export const EnhancedLoginForm: React.FC<LoginFormProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    clearError();
+    setErrorMessage('');
     
     if (!validateForm()) {
       const firstErrorField = Object.keys(validationErrors)[0];
@@ -71,7 +65,30 @@ export const EnhancedLoginForm: React.FC<LoginFormProps> = ({
       return;
     }
 
-    await login(email, password, rememberMe);
+    setIsLoading(true);
+
+    try {
+      // Simulate login process
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // Store login state
+      localStorage.setItem('isLoggedIn', 'true');
+      localStorage.setItem('userName', email.split('@')[0]);
+      
+      setShowSuccess(true);
+      toast({
+        title: "Login successful",
+        description: "Welcome back!",
+      });
+      
+      setTimeout(() => {
+        onSuccess?.();
+      }, 1500);
+    } catch (error) {
+      setErrorMessage('Login failed. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const inputVariants = {
