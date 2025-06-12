@@ -39,7 +39,7 @@ export function PageLayout({
   
   return (
     <>
-      <SkipNavLink contentId={mainId} />
+      <SkipNavLink contentId={mainId}>Skip to main content</SkipNavLink>
       
       {includeNavbar && <Navbar />}
       

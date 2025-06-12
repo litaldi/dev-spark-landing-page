@@ -16,6 +16,34 @@ export function sanitizeInput(input: string): string {
 }
 
 /**
+ * Validate email format
+ */
+export function isValidEmail(email: string): boolean {
+  if (typeof email !== 'string') {
+    return false;
+  }
+  
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email.trim());
+}
+
+/**
+ * Check if password meets strength requirements
+ */
+export function isStrongPassword(password: string): boolean {
+  if (typeof password !== 'string' || password.length < 8) {
+    return false;
+  }
+  
+  const hasUppercase = /[A-Z]/.test(password);
+  const hasLowercase = /[a-z]/.test(password);
+  const hasNumber = /\d/.test(password);
+  const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+  
+  return hasUppercase && hasLowercase && hasNumber && hasSpecialChar;
+}
+
+/**
  * Validate form inputs for security risks
  */
 export function validateFormSecurity(inputs: Record<string, any>): Record<string, string> {

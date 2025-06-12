@@ -19,7 +19,7 @@ import { SkipNavLink, SkipNavContent } from "@/components/a11y/skip-nav";
 const Settings = () => {
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <SkipNavLink contentId="main-content" />
+      <SkipNavLink contentId="main-content">Skip to main content</SkipNavLink>
       <Navbar />
       <SkipNavContent id="main-content">
         <main className="flex-1 container py-16">
