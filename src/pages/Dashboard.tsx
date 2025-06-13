@@ -1,92 +1,107 @@
-
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import Navbar from "@/components/landing/Navbar";
-import Footer from "@/components/landing/Footer";
-import { SkipNavLink, SkipNavContent } from "@/components/a11y/skip-nav";
-import { useToast } from "@/hooks/use-toast";
-import { AlertError } from "@/components/auth/AlertError";
+import React, { useState, useEffect } from "react";
+import { WebFirstLayout } from "@/components/layout/WebFirstLayout";
+import { DashboardContent } from "@/components/dashboard/DashboardContent";
 import { EnhancedDashboardContent } from "@/components/dashboard/EnhancedDashboardContent";
-import { EnhancedOnboardingOverlay } from "@/components/onboarding/EnhancedOnboardingOverlay";
-import { AccessibilityProvider } from "@/components/a11y/AccessibilityProvider";
+import { useAuth } from "@/hooks/auth/use-auth";
+import { useToast } from "@/hooks/use-toast";
+import { LoadingPage } from "@/components/ui/enhanced-loading";
+import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 
-const Dashboard = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
-  const [userName, setUserName] = useState<string>("User");
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [isFirstTimeUser, setIsFirstTimeUser] = useState<boolean>(false);
+export const Dashboard = () => {
+  const { currentUser, isAuthenticated } = useAuth();
+  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [showOnboarding, setShowOnboarding] = useState<boolean>(false);
-  const navigate = useNavigate();
+  
+  // Mock user data - in a real app this would come from your authentication system
+  const userName = currentUser?.name || "Alex";
+  const isFirstTimeUser = currentUser?.isFirstTimeUser || false;
   
   useEffect(() => {
-    // Simulate loading
+    // Simulate loading time and set up dashboard data
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 800);
-
-    // Check login status
-    const loginStatus = localStorage.getItem("isLoggedIn");
-    if (loginStatus !== "true") {
-      navigate("/auth/login");
-      return () => clearTimeout(timer);
-    }
-
-    setIsLoggedIn(true);
+      
+      // Initialize some sample data if not exists
+      if (!localStorage.getItem("currentStreak")) {
+        localStorage.setItem("currentStreak", "5");
+        localStorage.setItem("totalStudyHours", "15");
+        localStorage.setItem("lessonsCompleted", "8");
+        localStorage.setItem("projectsStarted", "3");
+        localStorage.setItem("lastSessionDate", new Date(Date.now() - 86400000).toISOString()); // Yesterday
+      }
+    }, 1000);
     
-    // Get user name
-    const storedUserName = localStorage.getItem("userName");
-    if (storedUserName) {
-      setUserName(storedUserName);
-    }
-    
-    // Check if first-time user (no lessons completed)
-    const onboardingComplete = localStorage.getItem("onboardingComplete");
-    const onboardingOverlayComplete = localStorage.getItem("onboarding-completed");
-    
-    setIsFirstTimeUser(onboardingComplete !== "true");
-    setShowOnboarding(onboardingOverlayComplete !== "true" && onboardingComplete !== "true");
-
     return () => clearTimeout(timer);
-  }, [navigate]);
-
-  const handleOnboardingComplete = () => {
-    setShowOnboarding(false);
+  }, []);
+  
+  const handleError = (errorMessage: string | null) => {
+    setError(errorMessage);
+    if (errorMessage) {
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    }
   };
-
-  if (!isLoggedIn) {
-    return null; // Will redirect in useEffect
+  
+  if (isLoading) {
+    return (
+      <LoadingPage 
+        message="Loading your dashboard..." 
+        submessage="Preparing your personalized learning experience"
+        showProgress={true}
+        progress={75}
+      />
+    );
   }
-
+  
+  if (error) {
+    return (
+      <WebFirstLayout 
+        title="Dashboard - Error"
+        description="Dashboard loading error"
+      >
+        <div className="container mx-auto px-4 py-8">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold text-destructive mb-4">
+              Something went wrong
+            </h1>
+            <p className="text-muted-foreground mb-4">{error}</p>
+            <button 
+              onClick={() => {
+                setError(null);
+                setIsLoading(true);
+                setTimeout(() => setIsLoading(false), 1000);
+              }}
+              className="px-4 py-2 bg-primary text-primary-foreground rounded hover:bg-primary/90"
+            >
+              Try Again
+            </button>
+          </div>
+        </div>
+      </WebFirstLayout>
+    );
+  }
+  
   return (
-    <AccessibilityProvider>
-      <div className="min-h-screen flex flex-col bg-background">
-        <SkipNavLink contentId="main-content">Skip to content</SkipNavLink>
-        <Navbar />
-        <main className="flex-1 container py-6 md:py-10 lg:py-12" id="main-content">
-          <SkipNavContent id="main-content">
-            <AlertError 
-              message={error}
-              onClose={() => setError(null)}
-              className="mb-6"
-            />
-            
-            <EnhancedDashboardContent
-              userName={userName}
-              isFirstTimeUser={isFirstTimeUser}
-              isLoading={isLoading}
-              onError={setError}
-            />
-          </SkipNavContent>
-        </main>
-        <Footer />
-        
-        {/* Enhanced Onboarding Overlay */}
-        {showOnboarding && (
-          <EnhancedOnboardingOverlay onComplete={handleOnboardingComplete} />
-        )}
-      </div>
-    </AccessibilityProvider>
+    <ErrorBoundary>
+      <WebFirstLayout
+        title={`${userName}'s Learning Dashboard`}
+        description="Track your progress, discover new content, and accelerate your learning journey"
+        className="bg-gradient-to-br from-background via-background to-muted/30"
+      >
+        <div className="container mx-auto px-4 py-6 lg:py-8 space-y-6">
+          <EnhancedDashboardContent
+            userName={userName}
+            isFirstTimeUser={isFirstTimeUser}
+            isLoading={isLoading}
+            onError={handleError}
+          />
+        </div>
+      </WebFirstLayout>
+    </ErrorBoundary>
   );
 };
 
