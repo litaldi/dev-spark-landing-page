@@ -63,33 +63,39 @@ export function getCurrentUserFromStorage(): SecureAuthUser | null {
 }
 
 export function isAuthenticated(): boolean {
-  if (!SecureAuth || typeof SecureAuth.getTokens !== "function") {
-    // Defensive: log a warning once, don't crash.
-    // You can remove this after confirming diagnostics.
-    // @ts-expect-error
-    if (window && !window.__SECUREAUTH_WARNED__) {
-      // @ts-expect-error
-      window.__SECUREAUTH_WARNED__ = true;
-      // eslint-disable-next-line no-console
-      console.warn("SecureAuth.getTokens is not a function. SecureAuth:", SecureAuth);
+  try {
+    // Defensive check to ensure SecureAuth exists and has the required methods
+    if (typeof SecureAuth === 'undefined' || !SecureAuth || typeof SecureAuth.isAuthenticated !== 'function') {
+      console.warn('SecureAuth class is not properly initialized');
+      return false;
     }
+    return SecureAuth.isAuthenticated();
+  } catch (error) {
+    console.error('Error checking authentication status:', error);
     return false;
   }
-  return SecureAuth.isAuthenticated();
 }
 
 export function clearUserData(): void {
-  SecureAuth.clearAuth();
+  try {
+    SecureAuth.clearAuth();
+  } catch (error) {
+    console.error('Error clearing user data:', error);
+  }
 }
 
 export function storeUserData(email: string, name: string, isFirstTimeUser: boolean = false): void {
-  const user: SecureAuthUser = {
-    id: 'user_' + Math.random().toString(36).substr(2, 9),
-    email,
-    name,
-    isFirstTimeUser
-  };
-  SecureAuth.storeUserData(user);
+  try {
+    const user: SecureAuthUser = {
+      id: 'user_' + Math.random().toString(36).substr(2, 9),
+      email,
+      name,
+      isFirstTimeUser
+    };
+    SecureAuth.storeUserData(user);
+  } catch (error) {
+    console.error('Error storing user data:', error);
+  }
 }
 
 export function getSecureHeaders(): Record<string, string> {
@@ -97,14 +103,18 @@ export function getSecureHeaders(): Record<string, string> {
     'Content-Type': 'application/json',
   };
 
-  const tokens = SecureAuth.getTokens();
-  if (tokens) {
-    headers['Authorization'] = `Bearer ${tokens.accessToken}`;
-  }
+  try {
+    const tokens = SecureAuth.getTokens();
+    if (tokens) {
+      headers['Authorization'] = `Bearer ${tokens.accessToken}`;
+    }
 
-  const csrfToken = EnhancedCSRFProtection.getToken();
-  if (csrfToken) {
-    headers['X-CSRF-Token'] = csrfToken;
+    const csrfToken = EnhancedCSRFProtection.getToken();
+    if (csrfToken) {
+      headers['X-CSRF-Token'] = csrfToken;
+    }
+  } catch (error) {
+    console.error('Error getting secure headers:', error);
   }
 
   return headers;
@@ -130,7 +140,8 @@ export async function refreshAuthTokens(): Promise<boolean> {
 
     SecureAuth.storeTokens(newTokens);
     return true;
-  } catch {
+  } catch (error) {
+    console.error('Error refreshing auth tokens:', error);
     return false;
   }
 }
