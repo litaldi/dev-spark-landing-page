@@ -1,4 +1,3 @@
-
 # DevAI Learning Platform 🚀
 
 A production-ready, AI-powered programming education platform built with React, TypeScript, and Tailwind CSS. This platform provides personalized learning experiences, interactive coding challenges, and comprehensive accessibility features to help developers master programming skills.
@@ -24,9 +23,10 @@ A production-ready, AI-powered programming education platform built with React, 
 - **Keyboard Navigation**: Full keyboard support with visible focus indicators
 - **Screen Reader Support**: Proper ARIA labels, landmarks, and semantic markup
 - **Enhanced Accessibility Menu**: User-configurable options for text size, contrast, and navigation
-- **Skip Links**: Quick navigation for assistive technology users
-- **Reduced Motion Support**: Respects user motion preferences
-- **High Contrast Mode**: Enhanced visual accessibility options
+- **Skip Links**: Quick navigation for assistive technology users  
+- **App-wide Error Boundaries**: Global error boundary catches all runtime errors and displays a friendly fallback with refresh option  
+- **Screen Reader Live Regions**: All main content labeled for ARIA and accessible via Skip navigation  
+- **Animated CTA Buttons**: Subtle micro-interaction for keyboard and pointer users
 
 ### 🔒 Security Features
 - **Input Sanitization**: Comprehensive XSS protection using DOMPurify
@@ -40,7 +40,7 @@ A production-ready, AI-powered programming education platform built with React, 
 ### 🧪 Testing & Quality
 - **100% Test Coverage**: Comprehensive unit, integration, and accessibility tests
 - **Security Testing**: Automated XSS, CSRF, and injection vulnerability testing
-- **Error Boundaries**: Graceful error handling with user-friendly fallbacks
+- **Error Boundaries**: Graceful error handling with user-friendly fallbacks and dedicated test coverage for error views
 - **Performance Monitoring**: Core Web Vitals optimization and monitoring
 - **Cross-browser Testing**: Verified compatibility across major browsers
 
@@ -171,6 +171,9 @@ const { isBlocked, registerAttempt } = useRateLimit('login', {
 ## ♿ Accessibility Features
 
 ### Built-in Accessibility
+- **Skip Links**: "Skip to content" navigation provided for keyboard and assistive tech users (try tabbing at the top of the app!)
+- **App-wide Error Boundaries**: Main app is protected from unexpected errors with a clear UI and refresh button
+- **Main Content ARIA Accessibility**: All main content is inside `<main id="main-content" aria-label="Main content">` for easier navigation
 - **Semantic HTML**: Proper heading hierarchy, landmarks, and form labels
 - **ARIA Support**: Comprehensive ARIA attributes and live regions
 - **Keyboard Navigation**: Full keyboard accessibility with focus management
@@ -217,6 +220,9 @@ npm run test:a11y
 
 # Test keyboard navigation
 npm test -- --testNamePattern="keyboard"
+
+# Test error boundary rendering
+npm test -- --testNamePattern="AppErrorBoundary"
 ```
 
 ## 🚀 Deployment

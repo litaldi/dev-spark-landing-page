@@ -1,53 +1,19 @@
-
 import React from "react";
-import { Button } from "@/components/ui/button";
+import { AnimatedCtaButton } from "@/components/ui/AnimatedCtaButton";
 
 const JoinNowSection: React.FC = () => {
   return (
-    <section className="py-16 md:py-24 relative" aria-labelledby="cta-heading">
-      <div className="absolute inset-0 bg-gradient-to-b from-white via-brand-100/50 to-brand-50/70"></div>
-      <div className="container relative z-10">
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="animate-fade-up">
-            <h2 id="cta-heading" className="text-3xl md:text-4xl font-bold mb-6 text-brand-800">
-              Start Your <span className="text-brand-500">Journey Today</span>
-            </h2>
-            
-            <p className="text-xl text-gray-700 mb-8 md:mb-10 max-w-3xl mx-auto">
-              Join hundreds of junior developers already building skills and confidence with our AI-powered platform.
-            </p>
-            
-            <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 md:p-10 shadow-lg border border-brand-100">
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button 
-                  size="lg" 
-                  className="rounded-full bg-brand-500 hover:bg-brand-600 text-white px-8 py-6 relative overflow-hidden group focus:outline-none focus:ring-2 focus:ring-brand-400 focus:ring-offset-2"
-                >
-                  <span className="relative z-10">Try Free Practice</span>
-                  <span className="absolute inset-0 bg-gradient-to-r from-brand-500 to-brand-600 opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true"></span>
-                  <span className="absolute top-0 left-0 w-full h-full bg-white opacity-20 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left" aria-hidden="true"></span>
-                </Button>
-                
-                <Button 
-                  size="lg" 
-                  variant="outline" 
-                  className="rounded-full border-brand-500 text-brand-600 hover:bg-brand-50 px-8 py-6 relative overflow-hidden group focus:outline-none focus:ring-2 focus:ring-brand-400 focus:ring-offset-2"
-                >
-                  <span className="relative z-10">Join Beta Program</span>
-                  <span className="absolute top-0 left-0 w-full h-full bg-brand-100/50 opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true"></span>
-                </Button>
-              </div>
-              
-              <div className="mt-8 text-center" aria-live="polite">
-                <p className="text-sm text-brand-600 font-medium">
-                  <span className="inline-block bg-brand-100/50 px-3 py-1 rounded-full">
-                    Limited spots available: 94% full
-                  </span>
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
+    <section className="py-16 text-center bg-brand-100/40 dark:bg-brand-900/40">
+      <div className="container mx-auto max-w-2xl">
+        <h2 className="text-3xl md:text-4xl font-bold text-brand-800 dark:text-brand-100 mb-4">
+          Ready to <span className="text-brand-500 dark:text-brand-400">transform</span> your programming journey?
+        </h2>
+        <p className="max-w-xl mx-auto text-lg text-gray-700 dark:text-gray-200 mb-8">
+          Sign up today and unlock access to personalized learning, community support, and cutting-edge tools!
+        </p>
+        <AnimatedCtaButton>
+          Get Started
+        </AnimatedCtaButton>
       </div>
     </section>
   );
