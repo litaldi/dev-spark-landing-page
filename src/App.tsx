@@ -1,36 +1,63 @@
 
-import React, { useState } from "react";
-import { AppErrorBoundary } from "@/components/error/AppErrorBoundary";
+import React from "react";
+import { AppErrorBoundary } from "@/components/error/EnhancedErrorBoundary";
 import { Toaster } from "@/components/ui/toaster";
-import { LoadingSpinnerOverlay } from "@/components/ui/LoadingSpinnerOverlay";
 import { SkipNavLink } from "@/components/a11y/skip-nav";
 import { Outlet } from "react-router-dom";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { useSecurityMonitor } from "@/hooks/use-security-monitor";
 
-function App() {
-  const [loading, setLoading] = useState(false);
-  const queryClient = new QueryClient();
+// Create a stable query client instance
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: (failureCount, error) => {
+        // Don't retry on 4xx errors
+        if (error && typeof error === 'object' && 'status' in error) {
+          const status = (error as any).status;
+          if (status >= 400 && status < 500) return false;
+        }
+        return failureCount < 3;
+      },
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
-  // In a real app, loading state may come from context or suspense, etc.
-  // Here for demo purposes only.
-  const toggleLoading = () => setLoading(prev => !prev);
+function AppContent() {
+  // Initialize security monitoring
+  useSecurityMonitor({
+    trackFailedLogins: true,
+    trackRateLimits: true,
+    trackCSRFViolations: true
+  });
 
   return (
-    <AppErrorBoundary>
-      <SkipNavLink contentId="main-content" className="fixed top-0 left-0">
+    <>
+      <SkipNavLink contentId="main-content" className="fixed top-0 left-0 z-50">
         Skip to main content
       </SkipNavLink>
+      <main id="main-content" aria-label="Main content" tabIndex={-1}>
+        <Outlet />
+      </main>
+      <Toaster />
+    </>
+  );
+}
+
+function App() {
+  return (
+    <AppErrorBoundary>
       <QueryClientProvider client={queryClient}>
         <ThemeProvider defaultTheme="system" storageKey="ui-theme">
-          <LoadingSpinnerOverlay visible={loading} />
-          <main id="main-content" aria-label="Main content">
-            <Outlet />
-          </main>
-          <Toaster />
+          <AppContent />
         </ThemeProvider>
-        <ReactQueryDevtools initialIsOpen={false} />
+        {process.env.NODE_ENV === 'development' && (
+          <ReactQueryDevtools initialIsOpen={false} />
+        )}
       </QueryClientProvider>
     </AppErrorBoundary>
   );

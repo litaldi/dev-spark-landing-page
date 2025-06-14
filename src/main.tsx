@@ -7,17 +7,15 @@ import './index.css'
 import { ThemeProvider } from '@/components/theme/ThemeProvider'
 import { AccessibilityProvider } from '@/components/a11y/AccessibilityProvider'
 import { EnhancedErrorBoundary } from '@/components/error/EnhancedErrorBoundary'
-import { initializeCSRF } from '@/lib/security/csrf-protection'
-import { applySecurityDefenses, logSecurityEvent } from '@/lib/security/http-security'
+import { initializeApplicationSecurity } from '@/lib/security/consolidated-security'
 
-// Initialize security features with enhanced logging
+// Initialize comprehensive security system
 try {
-  initializeCSRF();
-  applySecurityDefenses();
-  logSecurityEvent('APP_STARTUP', { timestamp: Date.now() });
+  initializeApplicationSecurity();
 } catch (error) {
-  console.error('Security initialization failed:', error);
-  logSecurityEvent('SECURITY_STARTUP_ERROR', { error: error?.toString() });
+  console.error('Critical security initialization failure:', error);
+  // Continue loading but with warning
+  console.warn('⚠️  Application started with reduced security features');
 }
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
