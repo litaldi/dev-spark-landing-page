@@ -89,6 +89,36 @@ export function generateNonce(): string {
 }
 
 /**
+ * Apply security defenses to the application
+ */
+export function applySecurityDefenses(): void {
+  try {
+    // Set security headers via meta tags where possible
+    const setMetaTag = (name: string, content: string) => {
+      let meta = document.querySelector(`meta[http-equiv="${name}"]`) as HTMLMetaElement;
+      if (!meta) {
+        meta = document.createElement('meta');
+        meta.httpEquiv = name;
+        document.head.appendChild(meta);
+      }
+      meta.content = content;
+    };
+
+    // Apply CSP via meta tag
+    setMetaTag('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'");
+    
+    // Apply other security headers where possible
+    setMetaTag('X-Content-Type-Options', 'nosniff');
+    setMetaTag('X-Frame-Options', 'DENY');
+    setMetaTag('X-XSS-Protection', '1; mode=block');
+    
+    console.log('Security defenses applied');
+  } catch (error) {
+    console.error('Error applying security defenses:', error);
+  }
+}
+
+/**
  * Secure storage utilities
  */
 export const secureStorage = {

@@ -9,6 +9,11 @@ interface RateLimitConfig {
   blockDurationMs?: number;
 }
 
+interface RateLimitOptions {
+  maxRequests: number;
+  timeWindow?: number;
+}
+
 class RateLimiter {
   private attempts: Map<string, number[]> = new Map();
   private blocked: Map<string, number> = new Map();
@@ -70,6 +75,40 @@ class RateLimiter {
 // Global rate limiter instance
 export const rateLimiter = new RateLimiter();
 
+/**
+ * Simple rate limiting function for backward compatibility
+ */
+export function isRateLimited(key: string, options: RateLimitOptions): boolean {
+  const config: RateLimitConfig = {
+    maxAttempts: options.maxRequests,
+    windowMs: options.timeWindow || 60000, // Default 1 minute
+  };
+  
+  const storageKey = `rateLimit_${key}`;
+  
+  try {
+    const stored = localStorage.getItem(storageKey);
+    const attempts = stored ? JSON.parse(stored) : [];
+    const now = Date.now();
+    
+    // Filter out old attempts
+    const validAttempts = attempts.filter((time: number) => now - time < config.windowMs);
+    
+    if (validAttempts.length >= config.maxAttempts) {
+      return true; // Rate limited
+    }
+    
+    // Add this attempt
+    validAttempts.push(now);
+    localStorage.setItem(storageKey, JSON.stringify(validAttempts));
+    
+    return false; // Not rate limited
+  } catch (error) {
+    console.error('Error checking rate limit:', error);
+    return false; // Fail open
+  }
+}
+
 // Common rate limit configurations
 export const rateLimitConfigs = {
   login: {
@@ -94,4 +133,4 @@ export const rateLimitConfigs = {
   }
 };
 
-export type { RateLimitConfig };
+export type { RateLimitConfig, RateLimitOptions };

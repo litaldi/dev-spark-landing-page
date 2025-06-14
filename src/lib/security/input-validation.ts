@@ -57,6 +57,9 @@ export function validateEmail(email: string): boolean {
   return emailRegex.test(email);
 }
 
+// Export with expected test names
+export const isValidEmail = validateEmail;
+
 /**
  * Validate password strength
  */
@@ -86,4 +89,11 @@ export function validatePassword(password: string): {
     isValid: errors.length === 0,
     errors
   };
+}
+
+/**
+ * Check if password is strong (simplified boolean version for tests)
+ */
+export function isStrongPassword(password: string): boolean {
+  return validatePassword(password).isValid;
 }
