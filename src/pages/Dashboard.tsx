@@ -1,7 +1,8 @@
 
 import React, { useState, useEffect } from "react";
-import { WebFirstLayout } from "@/components/layout/WebFirstLayout";
+import { EnhancedWebFirstLayout } from "@/components/layout/EnhancedWebFirstLayout";
 import { EnhancedDashboardContent } from "@/components/dashboard/EnhancedDashboardContent";
+import { EnhancedDashboardStats } from "@/components/dashboard/enhanced/EnhancedDashboardStats";
 import { useAuth } from "@/hooks/auth/use-auth";
 import { useToast } from "@/hooks/use-toast";
 import { LoadingPage } from "@/components/ui/enhanced-loading";
@@ -56,40 +57,55 @@ export const Dashboard = () => {
   
   if (error) {
     return (
-      <WebFirstLayout 
+      <EnhancedWebFirstLayout 
         title="Dashboard - Error"
         description="Dashboard loading error"
+        variant="centered"
       >
-        <div className="container mx-auto px-4 py-8">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold text-destructive mb-4">
-              Something went wrong
-            </h1>
-            <p className="text-muted-foreground mb-4">{error}</p>
-            <button 
-              onClick={() => {
-                setError(null);
-                setIsLoading(true);
-                setTimeout(() => setIsLoading(false), 1000);
-              }}
-              className="px-4 py-2 bg-primary text-primary-foreground rounded hover:bg-primary/90"
-            >
-              Try Again
-            </button>
-          </div>
+        <div className="text-center space-y-6">
+          <h1 className="text-2xl font-bold text-destructive">
+            Something went wrong
+          </h1>
+          <p className="text-muted-foreground">{error}</p>
+          <button 
+            onClick={() => {
+              setError(null);
+              setIsLoading(true);
+              setTimeout(() => setIsLoading(false), 1000);
+            }}
+            className="px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
+          >
+            Try Again
+          </button>
         </div>
-      </WebFirstLayout>
+      </EnhancedWebFirstLayout>
     );
   }
   
   return (
     <ErrorBoundary>
-      <WebFirstLayout
+      <EnhancedWebFirstLayout
         title={`${userName}'s Learning Dashboard`}
         description="Track your progress, discover new content, and accelerate your learning journey"
         className="bg-gradient-to-br from-background via-background to-muted/30"
+        maxWidth="2xl"
       >
-        <div className="container mx-auto px-4 py-6 lg:py-8 space-y-6">
+        <div className="py-6 lg:py-8 space-y-8">
+          {/* Enhanced Stats Section */}
+          <div className="space-y-6">
+            <div>
+              <h1 className="text-2xl lg:text-3xl font-bold text-foreground mb-2">
+                Welcome back, {userName}! 👋
+              </h1>
+              <p className="text-muted-foreground">
+                Here's your learning progress and what's next on your journey.
+              </p>
+            </div>
+            
+            <EnhancedDashboardStats />
+          </div>
+          
+          {/* Main Dashboard Content */}
           <EnhancedDashboardContent
             userName={userName}
             isFirstTimeUser={isFirstTimeUser}
@@ -97,7 +113,7 @@ export const Dashboard = () => {
             onError={handleError}
           />
         </div>
-      </WebFirstLayout>
+      </EnhancedWebFirstLayout>
     </ErrorBoundary>
   );
 };

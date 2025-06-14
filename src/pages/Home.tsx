@@ -1,8 +1,8 @@
 
 import React from "react";
-import { WebFirstLayout } from "@/components/layout/WebFirstLayout";
+import { EnhancedWebFirstLayout } from "@/components/layout/EnhancedWebFirstLayout";
 import { ResponsiveContainer, ResponsiveText } from "@/components/ui/enhanced-responsive";
-import HeroSection from "@/components/landing/HeroSection";
+import EnhancedHeroSection from "@/components/landing/enhanced/EnhancedHeroSection";
 import FeatureGrid from "@/components/landing/FeatureGrid"; 
 import TestimonialCard from "@/components/landing/TestimonialCard";
 import JoinNowSection from "@/components/landing/JoinNowSection";
@@ -11,19 +11,20 @@ import Footer from "@/components/landing/Footer";
 
 const Home = () => {
   return (
-    <WebFirstLayout
+    <EnhancedWebFirstLayout
       title="DevAI Learning Platform - AI-Powered Programming Education"
       description="Master programming with personalized AI assistance, interactive challenges, and real-time code reviews"
       includeBreadcrumbs={false}
       fullWidth={true}
+      variant="minimal"
       className="bg-background"
     >
-      <HeroSection />
+      <EnhancedHeroSection />
       
       <section className="py-16 lg:py-24 bg-white dark:bg-gray-800">
         <ResponsiveContainer maxWidth="xl">
-          <div className="text-center mb-12">
-            <ResponsiveText variant="h2" className="text-gray-800 dark:text-white mb-4">
+          <div className="text-center mb-12 space-y-4">
+            <ResponsiveText variant="h2" className="text-gray-800 dark:text-white">
               Elevate Your Coding Journey
             </ResponsiveText>
             <ResponsiveText variant="p" className="text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
@@ -36,8 +37,8 @@ const Home = () => {
       
       <section className="py-16 lg:py-20 bg-gray-50 dark:bg-gray-900">
         <ResponsiveContainer maxWidth="xl">
-          <div className="text-center mb-12">
-            <ResponsiveText variant="h2" className="text-gray-800 dark:text-white mb-4">
+          <div className="text-center mb-12 space-y-4">
+            <ResponsiveText variant="h2" className="text-gray-800 dark:text-white">
               Success Stories from Our Community
             </ResponsiveText>
             <ResponsiveText variant="p" className="text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
@@ -52,7 +53,7 @@ const Home = () => {
       
       <Footer />
       <StickyCTABar />
-    </WebFirstLayout>
+    </EnhancedWebFirstLayout>
   );
 };
 
