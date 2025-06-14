@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { EnhancedWebFirstLayout } from '@/components/layout/EnhancedWebFirstLayout';
+import { ConsolidatedLayout } from '@/components/layout/ConsolidatedLayout';
 import HeroSection from '@/components/landing/HeroSection';
 import FeatureGrid from '@/components/landing/FeatureGrid';
 import TestimonialCard from '@/components/landing/TestimonialCard';
@@ -9,10 +9,11 @@ import { motion } from 'framer-motion';
 
 export default function LandingPage() {
   return (
-    <EnhancedWebFirstLayout
+    <ConsolidatedLayout
       title="DevAI Learning Platform"
       description="Master programming with AI-powered personalized learning experiences"
       variant="minimal"
+      fullWidth={true}
     >
       <motion.div
         initial={{ opacity: 0 }}
@@ -36,6 +37,6 @@ export default function LandingPage() {
 
         <JoinNowSection />
       </motion.div>
-    </EnhancedWebFirstLayout>
+    </ConsolidatedLayout>
   );
 }

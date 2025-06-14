@@ -7,7 +7,7 @@ import { Breadcrumbs } from '@/components/navigation/Breadcrumbs';
 import { prefersReducedMotion, announceToScreenReader } from '@/lib/keyboard-utils';
 import { cn } from '@/lib/utils';
 
-interface WebFirstLayoutProps {
+interface ConsolidatedLayoutProps {
   children: React.ReactNode;
   title?: string;
   description?: string;
@@ -18,9 +18,10 @@ interface WebFirstLayoutProps {
   className?: string;
   containerClassName?: string;
   fullWidth?: boolean;
+  variant?: 'default' | 'minimal' | 'centered';
 }
 
-export function WebFirstLayout({
+export function ConsolidatedLayout({
   children,
   title,
   description,
@@ -30,8 +31,9 @@ export function WebFirstLayout({
   includeBackToTop = true,
   className = '',
   containerClassName = '',
-  fullWidth = false
-}: WebFirstLayoutProps) {
+  fullWidth = false,
+  variant = 'default'
+}: ConsolidatedLayoutProps) {
   React.useEffect(() => {
     if (title) {
       document.title = title;
@@ -44,16 +46,26 @@ export function WebFirstLayout({
     }
   }, [title]);
   
+  const isMinimal = variant === 'minimal';
+  const isCentered = variant === 'centered';
+  
   return (
-    <div className={cn("min-h-screen flex flex-col bg-background", className)}>
+    <div className={cn(
+      "min-h-screen flex flex-col bg-background",
+      isCentered && "items-center justify-center",
+      className
+    )}>
       <SkipNavLink contentId={mainId}>Skip to main content</SkipNavLink>
       
-      {includeHeader && <WebFirstHeader />}
+      {includeHeader && !isMinimal && <WebFirstHeader />}
       
       <SkipNavContent id={mainId}>
         <main 
           id="main-content" 
-          className="flex-1" 
+          className={cn(
+            "flex-1",
+            isCentered && "flex items-center justify-center w-full"
+          )} 
           tabIndex={-1}
           role="main"
           aria-label="Main content"
@@ -65,7 +77,7 @@ export function WebFirstLayout({
             </div>
           )}
           
-          {includeBreadcrumbs && (
+          {includeBreadcrumbs && !isMinimal && (
             <div className={cn("border-b bg-muted/30", fullWidth ? "" : "container mx-auto")}>
               <div className={cn("py-4 px-4 lg:px-6", fullWidth ? "max-w-none" : "")}>
                 <Breadcrumbs />
@@ -82,7 +94,11 @@ export function WebFirstLayout({
         </main>
       </SkipNavContent>
       
-      {includeBackToTop && <BackToTop />}
+      {includeBackToTop && !isMinimal && <BackToTop />}
     </div>
   );
 }
+
+// Export with original names for backward compatibility
+export { ConsolidatedLayout as WebFirstLayout };
+export { ConsolidatedLayout as EnhancedWebFirstLayout };

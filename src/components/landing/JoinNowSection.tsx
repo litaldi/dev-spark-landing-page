@@ -1,5 +1,6 @@
+
 import React from "react";
-import { AnimatedCtaButton } from "@/components/ui/AnimatedCtaButton";
+import { Button } from "@/components/ui/consolidated-button";
 
 const JoinNowSection: React.FC = () => {
   return (
@@ -11,9 +12,9 @@ const JoinNowSection: React.FC = () => {
         <p className="max-w-xl mx-auto text-lg text-gray-700 dark:text-gray-200 mb-8">
           Sign up today and unlock access to personalized learning, community support, and cutting-edge tools!
         </p>
-        <AnimatedCtaButton>
+        <Button variant="cta" size="lg">
           Get Started
-        </AnimatedCtaButton>
+        </Button>
       </div>
     </section>
   );

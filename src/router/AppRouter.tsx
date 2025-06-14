@@ -3,26 +3,26 @@ import React, { Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { PageLoading } from '@/components/ui/enhanced-loading';
 import { EnhancedErrorBoundary } from '@/components/error/EnhancedErrorBoundary';
-
-// Lazy load page components for better performance
-const LandingPage = React.lazy(() => import('@/pages/LandingPage'));
-const LoginPage = React.lazy(() => import('@/pages/auth/LoginPage'));
-const RegisterPage = React.lazy(() => import('@/pages/auth/RegisterPage'));
-const DashboardPage = React.lazy(() => import('@/pages/dashboard/DashboardPage'));
-const OnboardingPage = React.lazy(() => import('@/pages/auth/OnboardingPage'));
-const NotFoundPage = React.lazy(() => import('@/pages/NotFoundPage'));
+import { routes } from './routes';
 
 interface AppRouterProps {
   isAuthenticated: boolean;
 }
 
 export function AppRouter({ isAuthenticated }: AppRouterProps) {
+  const HomePage = routes.home;
+  const LoginPage = routes.login;
+  const RegisterPage = routes.register;
+  const DashboardPage = routes.dashboard;
+  const OnboardingPage = routes.onboarding;
+  const NotFoundPage = routes.notFound;
+
   return (
     <EnhancedErrorBoundary>
       <Suspense fallback={<PageLoading text="Loading page..." />}>
         <Routes>
           {/* Public routes */}
-          <Route path="/" element={<LandingPage />} />
+          <Route path="/" element={<HomePage />} />
           <Route 
             path="/auth/login" 
             element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <LoginPage />} 
