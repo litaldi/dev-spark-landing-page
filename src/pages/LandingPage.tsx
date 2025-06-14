@@ -28,8 +28,25 @@ export default function LandingPage() {
             <h2 className="text-3xl font-bold text-center mb-12">
               What Our Learners Say
             </h2>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              <TestimonialCard />
+            <div className="grid gap-8 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+              <TestimonialCard
+                name="Sarah Chen"
+                role="Full Stack Developer"
+                content="This platform transformed my coding journey. The AI recommendations are spot-on!"
+                rating={5}
+              />
+              <TestimonialCard
+                name="Marcus Johnson"
+                role="Frontend Engineer"
+                content="Finally, a learning platform that adapts to my pace and style. Highly recommended!"
+                rating={5}
+              />
+              <TestimonialCard
+                name="Elena Rodriguez"
+                role="Software Engineer"
+                content="The personalized approach helped me land my dream job in tech. Thank you!"
+                rating={5}
+              />
             </div>
           </div>
         </section>
