@@ -1,14 +1,15 @@
 
 import React, { ReactElement } from 'react';
-import { render, RenderOptions } from '@testing-library/react';
+import { render, RenderOptions, screen, fireEvent, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ThemeProvider } from '@/components/theme/ThemeProvider';
 import { TooltipProvider } from '@/components/ui/tooltip';
 
-// Export all testing library utilities
+// Export all testing library utilities explicitly
+export { screen, fireEvent, waitFor, userEvent };
 export * from '@testing-library/react';
-export { default as userEvent } from '@testing-library/user-event';
 
 // Custom render function that includes providers
 const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
