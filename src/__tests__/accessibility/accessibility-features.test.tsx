@@ -6,7 +6,7 @@ import { a11yTests } from '../utils/a11y-test-utils';
 
 import { AccessibilityMenu } from '@/components/a11y/AccessibilityMenu';
 import { SkipNavLink, SkipNavContent } from '@/components/a11y/skip-nav';
-import { PageLayout } from '@/components/layout/PageLayout';
+import { WebFirstLayout } from '@/components/layout/WebFirstLayout';
 
 // Import test setup
 import './setup/a11y-test-setup';
@@ -46,11 +46,11 @@ describe('Accessibility Features', () => {
     expect(button).toBeInTheDocument();
   });
   
-  test('PageLayout includes proper landmarks', async () => {
+  test('WebFirstLayout includes proper landmarks', async () => {
     const { container } = render(
-      <PageLayout title="Test Page" description="Test description">
+      <WebFirstLayout title="Test Page" description="Test description">
         <div>Page content</div>
-      </PageLayout>
+      </WebFirstLayout>
     );
     
     const results = await axe(container);

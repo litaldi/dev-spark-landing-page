@@ -1,7 +1,8 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { Lightbulb, TrendingUp, Star, Code, Users } from 'lucide-react';
+import { Lightbulb, TrendingUp, Star, Code, Users, FileText, BookOpen, Video } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { CategoryFilter } from './recommendations/CategoryFilter';
 import { RecommendationCard } from './recommendations/RecommendationCard';

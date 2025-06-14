@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { render } from '@testing-library/react';
-import { DashboardContent } from '@/components/dashboard/DashboardContent';
+import { EnhancedDashboardContent } from '@/components/dashboard/EnhancedDashboardContent';
 import * as dashboardActionsHook from '@/hooks/dashboard/use-dashboard-actions';
 
 // Setup dashboardActions mock hooks
@@ -26,10 +26,10 @@ export const setupDashboardActionsMocks = () => {
   };
 };
 
-// Helper to render DashboardContent with props
+// Helper to render EnhancedDashboardContent with props
 export const renderDashboard = (props) => {
   return render(
-    <DashboardContent
+    <EnhancedDashboardContent
       userName={props.userName || "Test User"}
       isFirstTimeUser={props.isFirstTimeUser !== undefined ? props.isFirstTimeUser : false}
       isLoading={props.isLoading !== undefined ? props.isLoading : false}

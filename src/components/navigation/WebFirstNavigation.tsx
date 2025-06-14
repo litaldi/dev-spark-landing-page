@@ -2,7 +2,7 @@
 import React from "react";
 import { NavDropdown } from "./NavDropdown";
 import { UserMenu } from "./UserMenu";
-import { AuthButtons } from "./AuthButtons";
+import { AuthButtons } from "../landing/AuthButtons";
 import { mainNavigationItems } from "./navigation-data";
 
 interface WebFirstNavigationProps {
