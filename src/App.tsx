@@ -5,7 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
-import { useKeyboardFocusDetection } from "@/lib/keyboard-utils";
+import { useKeyboardFocusDetection } from "@/lib/keyboard-utils/focus-management";
 import { EnhancedErrorBoundary } from "@/components/error/EnhancedErrorBoundary";
 import { HelmetProvider } from 'react-helmet-async';
 import Home from "./pages/Home";
@@ -95,7 +95,7 @@ function App() {
         <QueryClientProvider client={queryClient}>
           <ThemeProvider defaultTheme="light">
             <TooltipProvider>
-              <div className="relative">
+              <div className="relative min-h-screen w-full">
                 <EnhancedErrorBoundary>
                   <Routes>
                     {/* Home page route */}
@@ -124,11 +124,13 @@ function App() {
                     <Route path="/auth/onboarding" element={<OnboardingPage />} />
                     <Route path="/auth/logout" element={<LogoutPage />} />
                     <Route path="/auth/error" element={<AuthErrorPage />} />
-                    
-                    {/* Catch-all route for 404 pages */}
+
+                    {/* 404 fallback */}
                     <Route path="*" element={<NotFound />} />
                   </Routes>
                 </EnhancedErrorBoundary>
+                
+                {/* Global UI Components */}
                 <Toaster />
                 <Sonner />
               </div>
@@ -138,6 +140,6 @@ function App() {
       </HelmetProvider>
     </EnhancedErrorBoundary>
   );
-};
+}
 
 export default App;

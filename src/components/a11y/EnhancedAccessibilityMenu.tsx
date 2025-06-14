@@ -1,231 +1,301 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Button } from '@/components/ui/button';
+import { Settings, Type, Contrast, Keyboard, RotateCcw, Check } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Slider } from '@/components/ui/slider';
+import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
+import { Slider } from '@/components/ui/slider';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { useAccessibility } from '@/components/a11y/AccessibilityProvider';
-import { 
-  Accessibility, 
-  Eye, 
-  Keyboard, 
-  MousePointer, 
-  Volume2, 
-  Contrast,
-  Type,
-  RotateCcw,
-  Settings,
-  X
-} from 'lucide-react';
 
-interface EnhancedAccessibilityMenuProps {
-  isOpen: boolean;
-  onClose: () => void;
+interface AccessibilitySettings {
+  textSize: number;
+  highContrast: boolean;
+  keyboardNavigation: boolean;
+  reduceMotion: boolean;
+  largePointer: boolean;
 }
 
-export const EnhancedAccessibilityMenu: React.FC<EnhancedAccessibilityMenuProps> = ({
-  isOpen,
-  onClose
-}) => {
-  const { settings, updateSettings, resetSettings } = useAccessibility();
+const defaultSettings: AccessibilitySettings = {
+  textSize: 100,
+  highContrast: false,
+  keyboardNavigation: false,
+  reduceMotion: false,
+  largePointer: false,
+};
 
-  const accessibilityOptions = [
-    {
-      id: 'textSize',
-      title: 'Text Size',
-      description: 'Adjust the text size for better readability',
-      icon: <Type className="h-4 w-4" />,
-      type: 'slider' as const,
-      value: settings.textSize,
-      min: 75,
-      max: 150,
-      step: 5,
-      unit: '%'
-    },
-    {
-      id: 'highContrast',
-      title: 'High Contrast',
-      description: 'Increase contrast for better visibility',
-      icon: <Contrast className="h-4 w-4" />,
-      type: 'switch' as const,
-      value: settings.highContrast
-    },
-    {
-      id: 'keyboardMode',
-      title: 'Keyboard Navigation',
-      description: 'Enhanced focus indicators for keyboard users',
-      icon: <Keyboard className="h-4 w-4" />,
-      type: 'switch' as const,
-      value: settings.keyboardMode
-    },
-    {
-      id: 'reducedMotion',
-      title: 'Reduce Motion',
-      description: 'Minimize animations and transitions',
-      icon: <Volume2 className="h-4 w-4" />,
-      type: 'switch' as const,
-      value: settings.reducedMotion
-    },
-    {
-      id: 'largePointer',
-      title: 'Large Pointer',
-      description: 'Increase cursor size for better visibility',
-      icon: <MousePointer className="h-4 w-4" />,
-      type: 'switch' as const,
-      value: settings.largePointer
+export const EnhancedAccessibilityMenu: React.FC = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [settings, setSettings] = useState<AccessibilitySettings>(defaultSettings);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+
+  // Load settings from localStorage on mount
+  useEffect(() => {
+    try {
+      const savedSettings = localStorage.getItem('accessibility-settings');
+      if (savedSettings) {
+        const parsed = JSON.parse(savedSettings);
+        setSettings({ ...defaultSettings, ...parsed });
+        applySettings({ ...defaultSettings, ...parsed });
+      }
+    } catch (error) {
+      console.error('Error loading accessibility settings:', error);
     }
-  ];
+  }, []);
+
+  // Apply settings to the document
+  const applySettings = (newSettings: AccessibilitySettings) => {
+    try {
+      // Text size
+      document.documentElement.style.fontSize = `${newSettings.textSize}%`;
+      
+      // High contrast
+      if (newSettings.highContrast) {
+        document.documentElement.classList.add('high-contrast');
+      } else {
+        document.documentElement.classList.remove('high-contrast');
+      }
+      
+      // Keyboard navigation
+      if (newSettings.keyboardNavigation) {
+        document.body.classList.add('keyboard-navigation');
+      } else {
+        document.body.classList.remove('keyboard-navigation');
+      }
+      
+      // Reduce motion
+      if (newSettings.reduceMotion) {
+        document.documentElement.classList.add('reduce-motion');
+      } else {
+        document.documentElement.classList.remove('reduce-motion');
+      }
+      
+      // Large pointer
+      if (newSettings.largePointer) {
+        document.documentElement.classList.add('large-pointer');
+      } else {
+        document.documentElement.classList.remove('large-pointer');
+      }
+    } catch (error) {
+      console.error('Error applying accessibility settings:', error);
+    }
+  };
+
+  // Save settings to localStorage and apply them
+  const saveSettings = () => {
+    try {
+      localStorage.setItem('accessibility-settings', JSON.stringify(settings));
+      applySettings(settings);
+      setHasUnsavedChanges(false);
+    } catch (error) {
+      console.error('Error saving accessibility settings:', error);
+    }
+  };
+
+  // Update a specific setting
+  const updateSetting = <K extends keyof AccessibilitySettings>(
+    key: K,
+    value: AccessibilitySettings[K]
+  ) => {
+    setSettings(prev => ({ ...prev, [key]: value }));
+    setHasUnsavedChanges(true);
+  };
+
+  // Reset all settings to default
+  const resetSettings = () => {
+    setSettings(defaultSettings);
+    applySettings(defaultSettings);
+    localStorage.removeItem('accessibility-settings');
+    setHasUnsavedChanges(false);
+  };
 
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <>
-          {/* Backdrop */}
+    <div className="relative">
+      {/* Trigger Button */}
+      <Button
+        variant="outline"
+        size="icon"
+        onClick={() => setIsOpen(!isOpen)}
+        className="relative"
+        aria-label="Accessibility options"
+        aria-expanded={isOpen}
+        aria-haspopup="dialog"
+      >
+        <Settings className="h-4 w-4" />
+        {hasUnsavedChanges && (
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 z-50"
-            onClick={onClose}
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"
           />
+        )}
+      </Button>
 
-          {/* Menu Panel */}
+      {/* Accessibility Menu */}
+      <AnimatePresence>
+        {isOpen && (
           <motion.div
-            initial={{ opacity: 0, x: 300 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 300 }}
-            transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className="fixed right-0 top-0 h-full w-80 bg-background border-l border-border z-50 overflow-y-auto"
+            initial={{ opacity: 0, scale: 0.95, y: -10 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: -10 }}
+            transition={{ duration: 0.2 }}
+            className="absolute right-0 mt-2 w-80 z-50"
           >
-            <Card className="h-full rounded-none border-0">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-                <div className="flex items-center gap-2">
-                  <Accessibility className="h-5 w-5 text-primary" />
-                  <CardTitle className="text-lg">Accessibility</CardTitle>
+            <Card className="border shadow-xl bg-background/95 backdrop-blur-sm">
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <Settings className="h-5 w-5" />
+                    Accessibility Settings
+                  </CardTitle>
+                  {hasUnsavedChanges && (
+                    <Badge variant="secondary" className="text-xs">
+                      Unsaved
+                    </Badge>
+                  )}
                 </div>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={onClose}
-                  aria-label="Close accessibility menu"
-                >
-                  <X className="h-4 w-4" />
-                </Button>
               </CardHeader>
 
               <CardContent className="space-y-6">
-                {/* Quick Actions */}
+                {/* Text Size Control */}
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-sm font-medium">Quick Actions</h3>
-                    <Badge variant="secondary" className="text-xs">
-                      {Object.values(settings).filter(Boolean).length} active
-                    </Badge>
+                    <label className="text-sm font-medium flex items-center gap-2">
+                      <Type className="h-4 w-4" />
+                      Text Size
+                    </label>
+                    <span className="text-sm text-muted-foreground">
+                      {settings.textSize}%
+                    </span>
                   </div>
+                  <Slider
+                    value={[settings.textSize]}
+                    onValueChange={([value]) => updateSetting('textSize', value)}
+                    min={75}
+                    max={150}
+                    step={5}
+                    className="w-full"
+                    aria-label="Adjust text size"
+                  />
+                  <div className="flex justify-between text-xs text-muted-foreground">
+                    <span>Small</span>
+                    <span>Normal</span>
+                    <span>Large</span>
+                  </div>
+                </div>
+
+                <Separator />
+
+                {/* Toggle Settings */}
+                <div className="space-y-4">
+                  {/* High Contrast */}
+                  <div className="flex items-center justify-between">
+                    <label className="text-sm font-medium flex items-center gap-2 cursor-pointer">
+                      <Contrast className="h-4 w-4" />
+                      High Contrast Mode
+                    </label>
+                    <Switch
+                      checked={settings.highContrast}
+                      onCheckedChange={(checked) => updateSetting('highContrast', checked)}
+                      aria-label="Toggle high contrast mode"
+                    />
+                  </div>
+
+                  {/* Keyboard Navigation */}
+                  <div className="flex items-center justify-between">
+                    <label className="text-sm font-medium flex items-center gap-2 cursor-pointer">
+                      <Keyboard className="h-4 w-4" />
+                      Enhanced Focus
+                    </label>
+                    <Switch
+                      checked={settings.keyboardNavigation}
+                      onCheckedChange={(checked) => updateSetting('keyboardNavigation', checked)}
+                      aria-label="Toggle keyboard navigation mode"
+                    />
+                  </div>
+
+                  {/* Reduce Motion */}
+                  <div className="flex items-center justify-between">
+                    <label className="text-sm font-medium flex items-center gap-2 cursor-pointer">
+                      <RotateCcw className="h-4 w-4" />
+                      Reduce Motion
+                    </label>
+                    <Switch
+                      checked={settings.reduceMotion}
+                      onCheckedChange={(checked) => updateSetting('reduceMotion', checked)}
+                      aria-label="Toggle reduced motion"
+                    />
+                  </div>
+
+                  {/* Large Pointer */}
+                  <div className="flex items-center justify-between">
+                    <label className="text-sm font-medium flex items-center gap-2 cursor-pointer">
+                      <span className="w-4 h-4 rounded-full border-2 border-current" />
+                      Large Pointer
+                    </label>
+                    <Switch
+                      checked={settings.largePointer}
+                      onCheckedChange={(checked) => updateSetting('largePointer', checked)}
+                      aria-label="Toggle large pointer"
+                    />
+                  </div>
+                </div>
+
+                <Separator />
+
+                {/* Action Buttons */}
+                <div className="flex gap-2">
+                  <Button
+                    onClick={saveSettings}
+                    disabled={!hasUnsavedChanges}
+                    size="sm"
+                    className="flex-1 flex items-center gap-2"
+                  >
+                    <Check className="h-4 w-4" />
+                    {hasUnsavedChanges ? 'Save Changes' : 'Saved'}
+                  </Button>
                   
                   <Button
+                    onClick={resetSettings}
                     variant="outline"
                     size="sm"
-                    onClick={resetSettings}
-                    className="w-full justify-start"
+                    className="flex items-center gap-2"
                   >
-                    <RotateCcw className="h-4 w-4 mr-2" />
-                    Reset All Settings
+                    <RotateCcw className="h-4 w-4" />
+                    Reset
                   </Button>
                 </div>
 
-                <Separator />
-
-                {/* Accessibility Options */}
-                <div className="space-y-6">
-                  {accessibilityOptions.map((option, index) => (
-                    <motion.div
-                      key={option.id}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.05 }}
-                      className="space-y-3"
-                    >
-                      <div className="flex items-start gap-3">
-                        <div className="mt-1 p-2 rounded-lg bg-primary/10 text-primary">
-                          {option.icon}
-                        </div>
-                        
-                        <div className="flex-1 space-y-2">
-                          <div className="flex items-center justify-between">
-                            <h4 className="text-sm font-medium">{option.title}</h4>
-                            
-                            {option.type === 'switch' && (
-                              <Switch
-                                checked={option.value as boolean}
-                                onCheckedChange={(checked) => 
-                                  updateSettings(option.id as any, checked)
-                                }
-                                aria-label={`Toggle ${option.title}`}
-                              />
-                            )}
-                          </div>
-                          
-                          <p className="text-xs text-muted-foreground">
-                            {option.description}
-                          </p>
-                          
-                          {option.type === 'slider' && (
-                            <div className="space-y-2">
-                              <Slider
-                                value={[option.value as number]}
-                                onValueChange={([value]) => 
-                                  updateSettings(option.id as any, value)
-                                }
-                                min={option.min}
-                                max={option.max}
-                                step={option.step}
-                                className="w-full"
-                                aria-label={`Adjust ${option.title}`}
-                              />
-                              <div className="flex justify-between text-xs text-muted-foreground">
-                                <span>{option.min}{option.unit}</span>
-                                <span className="font-medium">
-                                  {option.value}{option.unit}
-                                </span>
-                                <span>{option.max}{option.unit}</span>
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-
-                <Separator />
-
-                {/* Additional Resources */}
-                <div className="space-y-3">
-                  <h3 className="text-sm font-medium">Additional Resources</h3>
-                  <div className="space-y-2">
-                    <Button variant="ghost" size="sm" className="w-full justify-start">
-                      <Eye className="h-4 w-4 mr-2" />
-                      Screen Reader Guide
-                    </Button>
-                    <Button variant="ghost" size="sm" className="w-full justify-start">
-                      <Keyboard className="h-4 w-4 mr-2" />
-                      Keyboard Shortcuts
-                    </Button>
-                    <Button variant="ghost" size="sm" className="w-full justify-start">
-                      <Settings className="h-4 w-4 mr-2" />
-                      Browser Settings
-                    </Button>
-                  </div>
+                {/* Help Text */}
+                <div className="text-xs text-muted-foreground bg-muted/50 p-3 rounded-lg">
+                  <p className="font-medium mb-1">About these settings:</p>
+                  <ul className="space-y-1 text-xs">
+                    <li>• Text Size: Adjusts font sizes across the entire application</li>
+                    <li>• High Contrast: Increases color contrast for better visibility</li>
+                    <li>• Enhanced Focus: Shows clearer focus indicators when navigating with keyboard</li>
+                    <li>• Reduce Motion: Minimizes animations and transitions</li>
+                  </ul>
                 </div>
               </CardContent>
             </Card>
           </motion.div>
-        </>
-      )}
-    </AnimatePresence>
+        )}
+      </AnimatePresence>
+
+      {/* Backdrop */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-40"
+            onClick={() => setIsOpen(false)}
+            aria-hidden="true"
+          />
+        )}
+      </AnimatePresence>
+    </div>
   );
 };

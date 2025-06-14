@@ -90,6 +90,30 @@
   top: 0;
 }
 
+/* Screen Reader Only Content */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.sr-only:focus {
+  position: static;
+  width: auto;
+  height: auto;
+  padding: inherit;
+  margin: inherit;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+}
+
 /* Ensure form controls have visible labels */
 label {
   display: block;
@@ -120,6 +144,15 @@ label {
 .dark .keyboard-navigation [role="button"]:focus,
 .dark .keyboard-navigation [tabindex]:focus {
   box-shadow: 0 0 0 3px rgb(129, 205, 255) !important;
+}
+
+/* Large Pointer Styles */
+.large-pointer * {
+  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 16 16"><circle cx="8" cy="8" r="8" fill="black"/><circle cx="8" cy="8" r="6" fill="white"/></svg>') 16 16, auto !important;
+}
+
+.dark .large-pointer * {
+  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 16 16"><circle cx="8" cy="8" r="8" fill="white"/><circle cx="8" cy="8" r="6" fill="black"/></svg>') 16 16, auto !important;
 }
 
 /* Enhanced Animation Classes */
@@ -208,13 +241,4 @@ label {
     transform: scale(0.95);
     opacity: 0;
   }
-}
-
-/* Large Pointer Styles */
-.large-pointer * {
-  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 16 16"><circle cx="8" cy="8" r="8" fill="black"/><circle cx="8" cy="8" r="6" fill="white"/></svg>') 16 16, auto !important;
-}
-
-.dark .large-pointer * {
-  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 16 16"><circle cx="8" cy="8" r="8" fill="white"/><circle cx="8" cy="8" r="6" fill="black"/></svg>') 16 16, auto !important;
 }
