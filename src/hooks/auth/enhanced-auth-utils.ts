@@ -57,6 +57,29 @@ export class SecureAuth {
   }
 }
 
+// Legacy function exports for backward compatibility
+export function getCurrentUserFromStorage(): SecureAuthUser | null {
+  return SecureAuth.getCurrentUser();
+}
+
+export function isAuthenticated(): boolean {
+  return SecureAuth.isAuthenticated();
+}
+
+export function clearUserData(): void {
+  SecureAuth.clearAuth();
+}
+
+export function storeUserData(email: string, name: string, isFirstTimeUser: boolean = false): void {
+  const user: SecureAuthUser = {
+    id: 'user_' + Math.random().toString(36).substr(2, 9),
+    email,
+    name,
+    isFirstTimeUser
+  };
+  SecureAuth.storeUserData(user);
+}
+
 export function getSecureHeaders(): Record<string, string> {
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
