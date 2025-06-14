@@ -9,13 +9,17 @@ import { AIRecommendations } from "@/components/dashboard/AIRecommendations";
 import { AIStudyCompanion } from "@/components/dashboard/AIStudyCompanion";
 import { MotivationalPrompts } from "@/components/dashboard/MotivationalPrompts";
 import { StreakReminder } from "@/components/dashboard/StreakReminder";
+import { EnhancedProgressSection } from "@/components/dashboard/EnhancedProgressSection";
+import { InteractiveLearningMetrics } from "@/components/dashboard/InteractiveLearningMetrics";
+import { StudySessionTimer } from "@/components/dashboard/StudySessionTimer";
+import { SmartRecommendationEngine } from "@/components/dashboard/SmartRecommendationEngine";
+import { LearningPathCustomizer } from "@/components/dashboard/LearningPathCustomizer";
 import { useDashboardActions } from "@/hooks/dashboard/use-dashboard-actions";
 import { Button } from "@/components/ui/button";
 import { HelpCircle, Download } from "lucide-react";
 import { useViewportSize, useBreakpoint } from "@/hooks/use-mobile";
 import { exportProgressReport, exportProgressCSV } from "@/lib/export-utils";
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
-import { EnhancedProgressSection } from "@/components/dashboard/EnhancedProgressSection";
 
 interface EnhancedDashboardContentProps {
   userName: string;
@@ -75,21 +79,31 @@ export const EnhancedDashboardContent: React.FC<EnhancedDashboardContentProps> =
     <ErrorBoundary>
       <div className="space-y-6 relative">
         {/* Streak Reminder */}
-        <StreakReminder 
-          currentStreak={currentStreak}
-          lastActivityDate={lastActivityDate || undefined}
-        />
+        <ErrorBoundary>
+          <StreakReminder 
+            currentStreak={currentStreak}
+            lastActivityDate={lastActivityDate || undefined}
+          />
+        </ErrorBoundary>
 
-        <WelcomeSection
-          userName={userName}
-          isFirstTimeUser={isFirstTimeUser}
-          isLoading={isLoading}
-          onStartFirstLesson={startFirstLesson}
-          onStartTodaysSession={startSession}
-        />
+        <ErrorBoundary>
+          <WelcomeSection
+            userName={userName}
+            isFirstTimeUser={isFirstTimeUser}
+            isLoading={isLoading}
+            onStartFirstLesson={startFirstLesson}
+            onStartTodaysSession={startSession}
+          />
+        </ErrorBoundary>
 
+        {/* Main Dashboard Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 xs:gap-4 sm:gap-6">
+          {/* Left Column - Main Content */}
           <div className="lg:col-span-2 space-y-3 xs:space-y-4 sm:space-y-6">
+            <ErrorBoundary>
+              <InteractiveLearningMetrics />
+            </ErrorBoundary>
+            
             <ErrorBoundary>
               <EnhancedProgressSection 
                 weeklyGoalHours={10}
@@ -99,6 +113,17 @@ export const EnhancedDashboardContent: React.FC<EnhancedDashboardContentProps> =
                 projectsStarted={projectsStarted}
                 isLoading={isLoading}
               />
+            </ErrorBoundary>
+            
+            <ErrorBoundary>
+              <SmartRecommendationEngine 
+                userLevel="intermediate"
+                interests={userTopics.split(", ")}
+              />
+            </ErrorBoundary>
+            
+            <ErrorBoundary>
+              <LearningPathCustomizer />
             </ErrorBoundary>
             
             <ErrorBoundary>
@@ -124,7 +149,12 @@ export const EnhancedDashboardContent: React.FC<EnhancedDashboardContentProps> =
             </ErrorBoundary>
           </div>
           
+          {/* Right Column - Sidebar */}
           <div className="lg:col-span-1 space-y-3 xs:space-y-4 sm:space-y-6">
+            <ErrorBoundary>
+              <StudySessionTimer />
+            </ErrorBoundary>
+            
             <ErrorBoundary>
               <RecentActivitySection isLoading={isLoading} />
             </ErrorBoundary>
