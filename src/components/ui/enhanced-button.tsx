@@ -4,7 +4,7 @@ import { motion, MotionProps } from 'framer-motion';
 import { Loader } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-interface EnhancedButtonProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'onDrag' | 'onDragStart' | 'onDragEnd'> {
+interface EnhancedButtonProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'onDrag' | 'onDragStart' | 'onDragEnd' | 'onAnimationStart' | 'onAnimationEnd' | 'onAnimationIteration'> {
   variant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link' | 'gradient';
   size?: 'default' | 'sm' | 'lg' | 'icon';
   loading?: boolean;
