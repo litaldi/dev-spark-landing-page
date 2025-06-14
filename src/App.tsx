@@ -6,7 +6,6 @@ import { LoadingSpinnerOverlay } from "@/components/ui/LoadingSpinnerOverlay";
 import { SkipNavLink } from "@/components/a11y/skip-nav";
 import { Outlet } from "react-router-dom";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
-import { AuthProvider } from "@/context/auth-context";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
@@ -25,13 +24,11 @@ function App() {
       </SkipNavLink>
       <QueryClientProvider client={queryClient}>
         <ThemeProvider defaultTheme="system" storageKey="ui-theme">
-          <AuthProvider>
-            <LoadingSpinnerOverlay visible={loading} />
-            <main id="main-content" aria-label="Main content">
-              <Outlet />
-            </main>
-            <Toaster />
-          </AuthProvider>
+          <LoadingSpinnerOverlay visible={loading} />
+          <main id="main-content" aria-label="Main content">
+            <Outlet />
+          </main>
+          <Toaster />
         </ThemeProvider>
         <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>
