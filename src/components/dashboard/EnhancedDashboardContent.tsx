@@ -1,4 +1,3 @@
-
 import React from "react";
 import { WelcomeSection } from "@/components/dashboard/WelcomeSection";
 import { ProgressSection } from "@/components/dashboard/ProgressSection";
@@ -17,7 +16,7 @@ import { LearningPathCustomizer } from "@/components/dashboard/LearningPathCusto
 import { useDashboardActions } from "@/hooks/dashboard/use-dashboard-actions";
 import { Button } from "@/components/ui/button";
 import { HelpCircle, Download } from "lucide-react";
-import { useViewportSize, useBreakpoint } from "@/hooks/use-mobile";
+import { useBreakpoint } from "@/hooks/use-mobile";
 import { exportProgressReport, exportProgressCSV } from "@/lib/export-utils";
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 
@@ -43,7 +42,7 @@ export const EnhancedDashboardContent: React.FC<EnhancedDashboardContentProps> =
   
   const breakpoint = useBreakpoint();
   const isSmallScreen = breakpoint === "xs" || breakpoint === "mobile";
-  const isTabletScreen = breakpoint === "tablet";
+  const isMediumScreen = breakpoint === "sm" || breakpoint === "md";
 
   // Get data from localStorage for progress tracking
   const lastActivityDate = localStorage.getItem("lastSessionDate");
@@ -185,7 +184,7 @@ export const EnhancedDashboardContent: React.FC<EnhancedDashboardContentProps> =
               </div>
             </div>
             
-            <div className={`${isSmallScreen || isTabletScreen ? 'fixed bottom-6 right-6 z-10' : 'mt-4 flex justify-end'}`}>
+            <div className={`${isSmallScreen || isMediumScreen ? 'fixed bottom-6 right-6 z-10' : 'mt-4 flex justify-end'}`}>
               <Button 
                 variant="outline"
                 size={isSmallScreen ? "icon" : "sm"}

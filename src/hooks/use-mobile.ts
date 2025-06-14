@@ -50,3 +50,26 @@ export function useIsMobile(): boolean {
   const breakpoint = useBreakpoint();
   return breakpoint === 'xs' || breakpoint === 'mobile';
 }
+
+export function useViewportSize() {
+  const [size, setSize] = useState({
+    width: typeof window !== 'undefined' ? window.innerWidth : 0,
+    height: typeof window !== 'undefined' ? window.innerHeight : 0,
+  });
+
+  useEffect(() => {
+    const updateSize = () => {
+      setSize({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+    };
+
+    updateSize();
+    window.addEventListener('resize', updateSize);
+
+    return () => window.removeEventListener('resize', updateSize);
+  }, []);
+
+  return size;
+}

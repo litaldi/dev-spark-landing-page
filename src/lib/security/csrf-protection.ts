@@ -58,6 +58,11 @@ export function initializeCSRFProtection(): string {
 }
 
 /**
+ * Legacy alias for backward compatibility
+ */
+export const initializeCSRF = initializeCSRFProtection;
+
+/**
  * Add CSRF token to form data
  */
 export function addCSRFTokenToFormData(formData: FormData): void {

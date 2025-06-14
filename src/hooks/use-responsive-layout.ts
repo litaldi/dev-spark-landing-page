@@ -66,7 +66,8 @@ export const useResponsiveLayout = (): ResponsiveLayout => {
           }
         });
         break;
-      case 'tablet':
+      case 'sm':
+      case 'md':
         setLayout({
           isMobile: false,
           isTablet: true,
