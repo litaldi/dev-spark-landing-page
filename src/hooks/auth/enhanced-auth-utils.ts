@@ -63,6 +63,18 @@ export function getCurrentUserFromStorage(): SecureAuthUser | null {
 }
 
 export function isAuthenticated(): boolean {
+  if (!SecureAuth || typeof SecureAuth.getTokens !== "function") {
+    // Defensive: log a warning once, don't crash.
+    // You can remove this after confirming diagnostics.
+    // @ts-expect-error
+    if (window && !window.__SECUREAUTH_WARNED__) {
+      // @ts-expect-error
+      window.__SECUREAUTH_WARNED__ = true;
+      // eslint-disable-next-line no-console
+      console.warn("SecureAuth.getTokens is not a function. SecureAuth:", SecureAuth);
+    }
+    return false;
+  }
   return SecureAuth.isAuthenticated();
 }
 
