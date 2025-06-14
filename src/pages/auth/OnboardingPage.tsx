@@ -2,8 +2,16 @@
 import React from 'react';
 import { EnhancedOnboardingOverlay } from '@/components/onboarding/EnhancedOnboardingOverlay';
 import { EnhancedWebFirstLayout } from '@/components/layout/EnhancedWebFirstLayout';
+import { useNavigate } from 'react-router-dom';
 
 export default function OnboardingPage() {
+  const navigate = useNavigate();
+
+  const handleOnboardingComplete = () => {
+    // Navigate to dashboard after onboarding completion
+    navigate('/dashboard');
+  };
+
   return (
     <EnhancedWebFirstLayout
       title="Welcome - Let's Get Started"
@@ -11,7 +19,7 @@ export default function OnboardingPage() {
       variant="minimal"
       className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20"
     >
-      <EnhancedOnboardingOverlay />
+      <EnhancedOnboardingOverlay onComplete={handleOnboardingComplete} />
     </EnhancedWebFirstLayout>
   );
 }

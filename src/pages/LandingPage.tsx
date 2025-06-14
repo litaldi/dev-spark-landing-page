@@ -1,10 +1,10 @@
 
 import React from 'react';
 import { EnhancedWebFirstLayout } from '@/components/layout/EnhancedWebFirstLayout';
-import { HeroSection } from '@/components/landing/HeroSection';
-import { FeatureGrid } from '@/components/landing/FeatureGrid';
-import { TestimonialCard } from '@/components/landing/TestimonialCard';
-import { JoinNowSection } from '@/components/landing/JoinNowSection';
+import HeroSection from '@/components/landing/HeroSection';
+import FeatureGrid from '@/components/landing/FeatureGrid';
+import TestimonialCard from '@/components/landing/TestimonialCard';
+import JoinNowSection from '@/components/landing/JoinNowSection';
 import { motion } from 'framer-motion';
 
 export default function LandingPage() {
@@ -29,24 +29,7 @@ export default function LandingPage() {
               What Our Learners Say
             </h2>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              <TestimonialCard
-                name="Sarah Chen"
-                role="Full Stack Developer"
-                content="This platform transformed my coding journey. The AI recommendations are spot-on!"
-                rating={5}
-              />
-              <TestimonialCard
-                name="Marcus Johnson"
-                role="Frontend Engineer"
-                content="Finally, a learning platform that adapts to my pace and style. Highly recommended!"
-                rating={5}
-              />
-              <TestimonialCard
-                name="Elena Rodriguez"
-                role="Software Engineer"
-                content="The personalized approach helped me land my dream job in tech. Thank you!"
-                rating={5}
-              />
+              <TestimonialCard />
             </div>
           </div>
         </section>
