@@ -126,3 +126,14 @@ export async function refreshAuthTokens(): Promise<boolean> {
     return false;
   }
 }
+
+// Create a SecureAuth-like object for backward compatibility
+export const SecureAuth = {
+  isAuthenticated,
+  getCurrentUser: getCurrentUserFromStorage,
+  storeUserData: (user: SecureAuthUser) => {
+    storeUserData(user.email, user.name, user.isFirstTimeUser);
+  },
+  storeTokens: storeAuthTokens,
+  clearAuth: clearUserData
+};

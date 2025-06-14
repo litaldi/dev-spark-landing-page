@@ -1,11 +1,12 @@
+
 import React from 'react';
-import { WebFirstLayout } from '@/components/layout/WebFirstLayout';
+import { ConsolidatedLayout } from '@/components/layout/ConsolidatedLayout';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 
 export default function AccessibilityStatement() {
   return (
-    <WebFirstLayout 
+    <ConsolidatedLayout 
       title="Accessibility Statement" 
       description="Our commitment to creating an accessible website for all users"
     >
@@ -131,6 +132,6 @@ export default function AccessibilityStatement() {
           </p>
         </div>
       </div>
-    </WebFirstLayout>
+    </ConsolidatedLayout>
   );
 }
