@@ -1,4 +1,3 @@
-
 /**
  * Performance monitoring utilities for Core Web Vitals and user experience metrics
  */
@@ -81,12 +80,12 @@ class PerformanceMonitor {
         this.recordMetric('TTFB', ttfb);
         this.coreWebVitals.ttfb = ttfb;
 
-        // DOM Content Loaded
-        const dcl = navigation.domContentLoadedEventEnd - navigation.navigationStart;
+        // DOM Content Loaded - use domContentLoadedEventEnd and startTime
+        const dcl = navigation.domContentLoadedEventEnd - navigation.startTime;
         this.recordMetric('DCL', dcl);
 
-        // Load Complete
-        const loadComplete = navigation.loadEventEnd - navigation.navigationStart;
+        // Load Complete - use loadEventEnd and startTime
+        const loadComplete = navigation.loadEventEnd - navigation.startTime;
         this.recordMetric('Load', loadComplete);
       }
     });

@@ -162,8 +162,8 @@ describe('Authentication & Dashboard Flow Integration', () => {
     it('supports full keyboard navigation', () => {
       renderWithProviders(<LoginForm />);
       
-      const emailInput = screen.getByLabelText(/email/i);
-      const passwordInput = screen.getByLabelText(/password/i);
+      const emailInput = screen.getByLabelText(/email/i) as HTMLInputElement;
+      const passwordInput = screen.getByLabelText(/password/i) as HTMLInputElement;
       const submitButton = screen.getByRole('button', { name: /sign in/i });
       
       // Tab navigation should work
@@ -180,8 +180,8 @@ describe('Authentication & Dashboard Flow Integration', () => {
     it('handles Enter key submission', () => {
       renderWithProviders(<LoginForm />);
       
-      const emailInput = screen.getByLabelText(/email/i);
-      const passwordInput = screen.getByLabelText(/password/i);
+      const emailInput = screen.getByLabelText(/email/i) as HTMLInputElement;
+      const passwordInput = screen.getByLabelText(/password/i) as HTMLInputElement;
       
       fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
       fireEvent.change(passwordInput, { target: { value: 'password123' } });
