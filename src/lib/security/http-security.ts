@@ -1,4 +1,3 @@
-
 /**
  * HTTP security utilities for web application protection
  */
@@ -92,12 +91,12 @@ export async function secureFetch(
 }
 
 /**
- * Content Security Policy configuration
+ * Enhanced Content Security Policy configuration - More restrictive
  */
 export const CSPDirectives = {
   defaultSrc: ["'self'"],
-  scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
-  styleSrc: ["'self'", "'unsafe-inline'"],
+  scriptSrc: ["'self'"],
+  styleSrc: ["'self'", "'unsafe-inline'"], // Keep for Tailwind CSS
   imgSrc: ["'self'", "data:", "https:"],
   fontSrc: ["'self'", "https:", "data:"],
   connectSrc: ["'self'", "https:"],
@@ -105,6 +104,7 @@ export const CSPDirectives = {
   objectSrc: ["'none'"],
   baseUri: ["'self'"],
   formAction: ["'self'"],
+  upgradeInsecureRequests: [],
 };
 
 /**
@@ -114,9 +114,41 @@ export function generateCSPHeader(): string {
   return Object.entries(CSPDirectives)
     .map(([directive, sources]) => {
       const kebabDirective = directive.replace(/([A-Z])/g, '-$1').toLowerCase();
+      if (sources.length === 0) {
+        return kebabDirective; // Directives without sources
+      }
       return `${kebabDirective} ${sources.join(' ')}`;
     })
     .join('; ');
+}
+
+/**
+ * Security event logging for monitoring
+ */
+export function logSecurityEvent(eventType: string, details: Record<string, any> = {}): void {
+  if (process.env.NODE_ENV === 'development') {
+    console.warn(`[SECURITY EVENT] ${eventType}:`, details);
+  }
+  
+  // In production, this would send to a monitoring service
+  // For now, we'll just track in session storage for debugging
+  try {
+    const events = JSON.parse(sessionStorage.getItem('security-events') || '[]');
+    events.push({
+      timestamp: Date.now(),
+      type: eventType,
+      details,
+    });
+    
+    // Keep only the last 50 events
+    if (events.length > 50) {
+      events.splice(0, events.length - 50);
+    }
+    
+    sessionStorage.setItem('security-events', JSON.stringify(events));
+  } catch (error) {
+    console.error('Failed to log security event:', error);
+  }
 }
 
 /**
@@ -132,18 +164,24 @@ export function applySecurityDefenses(): void {
       document.head.appendChild(meta);
     }
     
+    // Log security initialization
+    logSecurityEvent('SECURITY_INIT', { timestamp: Date.now() });
+    
     // Disable right-click context menu in production (optional)
     if (process.env.NODE_ENV === 'production') {
       document.addEventListener('contextmenu', (e) => {
         e.preventDefault();
+        logSecurityEvent('CONTEXT_MENU_BLOCKED', { timestamp: Date.now() });
       });
     }
     
     // Prevent frame embedding
     if (window !== window.top) {
+      logSecurityEvent('FRAME_EMBEDDING_DETECTED', { timestamp: Date.now() });
       window.top!.location = window.location;
     }
   } catch (error) {
     console.warn('Could not apply all security defenses:', error);
+    logSecurityEvent('SECURITY_INIT_ERROR', { error: error?.toString() });
   }
 }

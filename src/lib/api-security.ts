@@ -32,8 +32,8 @@ export async function secureApiCall(
     },
   };
   
-  // Add CSRF token if available
-  const csrfToken = localStorage.getItem('csrf-token');
+  // Add CSRF token if available - using sessionStorage consistently
+  const csrfToken = sessionStorage.getItem('csrf-token');
   if (csrfToken) {
     secureOptions.headers = {
       ...secureOptions.headers,

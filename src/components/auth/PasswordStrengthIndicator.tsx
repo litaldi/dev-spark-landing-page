@@ -11,11 +11,11 @@ interface PasswordStrengthIndicatorProps {
 export const PasswordStrengthIndicator: React.FC<PasswordStrengthIndicatorProps> = ({ password }) => {
   if (!password) return null;
   
-  const hasLength = password.length >= 8;
+  const hasLength = password.length >= 12; // Updated to 12 characters
   const hasUpperCase = /[A-Z]/.test(password);
   const hasLowerCase = /[a-z]/.test(password);
   const hasNumber = /[0-9]/.test(password);
-  const hasSpecialChar = /[^A-Za-z0-9]/.test(password);
+  const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
   
   const strength = [hasLength, hasUpperCase, hasLowerCase, hasNumber, hasSpecialChar].filter(Boolean).length;
   
@@ -46,7 +46,7 @@ export const PasswordStrengthIndicator: React.FC<PasswordStrengthIndicatorProps>
       <ul className="text-xs text-muted-foreground space-y-1">
         <li className="flex items-center gap-1">
           {hasLength ? <Check size={12} className="text-emerald-500" /> : <AlertTriangle size={12} className="text-amber-500" />}
-          <span>At least 8 characters</span>
+          <span>At least 12 characters</span>
         </li>
         <li className="flex items-center gap-1">
           {hasUpperCase ? <Check size={12} className="text-emerald-500" /> : <AlertTriangle size={12} className="text-amber-500" />}

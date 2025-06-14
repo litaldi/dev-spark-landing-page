@@ -61,7 +61,7 @@ export function validateEmail(email: string): boolean {
 export const isValidEmail = validateEmail;
 
 /**
- * Validate password strength
+ * Validate password strength - Updated to require 12+ characters
  */
 export function validatePassword(password: string): {
   isValid: boolean;
@@ -69,8 +69,8 @@ export function validatePassword(password: string): {
 } {
   const errors: string[] = [];
   
-  if (password.length < 8) {
-    errors.push('Password must be at least 8 characters long');
+  if (password.length < 12) {
+    errors.push('Password must be at least 12 characters long');
   }
   
   if (!/[A-Z]/.test(password)) {
@@ -83,6 +83,10 @@ export function validatePassword(password: string): {
   
   if (!/\d/.test(password)) {
     errors.push('Password must contain at least one number');
+  }
+  
+  if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+    errors.push('Password must contain at least one special character');
   }
   
   return {
