@@ -133,3 +133,26 @@ export function InlineLoading({ text }: { text?: string }) {
     />
   );
 }
+
+// Add the missing LoadingSkeleton component
+export function LoadingSkeleton({ 
+  className, 
+  lines = 3 
+}: { 
+  className?: string; 
+  lines?: number 
+}) {
+  return (
+    <div className={cn("space-y-2", className)} aria-hidden="true">
+      {Array.from({ length: lines }).map((_, i) => (
+        <div
+          key={i}
+          className={cn(
+            "h-4 bg-muted rounded animate-pulse",
+            i === lines - 1 && "w-3/4" // Last line is shorter
+          )}
+        />
+      ))}
+    </div>
+  );
+}

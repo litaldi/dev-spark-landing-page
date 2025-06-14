@@ -1,98 +1,101 @@
 
-import { SecureAuth, SecureAuthUser } from "@/lib/security/secure-auth";
-import { EnhancedInputValidator } from "@/lib/security/enhanced-input-validation";
+import { EnhancedInputValidator } from '@/lib/security/enhanced-input-validation';
+import { EnhancedCSRFProtection } from '@/lib/security/enhanced-csrf-protection';
 
-/**
- * Enhanced authentication utilities with secure token management
- */
-
-/**
- * Check if user is authenticated with valid token
- */
-export function isAuthenticated(): boolean {
-  return SecureAuth.isAuthenticated();
+export interface SecureAuthUser {
+  id: string;
+  email: string;
+  name: string;
+  isFirstTimeUser?: boolean;
 }
 
-/**
- * Get current user data from secure storage
- */
-export function getCurrentUserFromStorage(): SecureAuthUser | null {
-  return SecureAuth.getCurrentUser();
+export interface AuthTokens {
+  accessToken: string;
+  refreshToken: string;
+  expiresAt: number;
+  userId: string;
 }
 
-/**
- * Store user data securely after successful login
- */
-export function storeUserData(
-  email: string, 
-  name: string, 
-  skipOnboarding = false
-): void {
-  // Validate and sanitize inputs
-  const emailValidation = EnhancedInputValidator.validateEmail(email);
-  const nameValidation = EnhancedInputValidator.validateInput(name, {
-    required: true,
-    maxLength: 100
-  });
+export class SecureAuth {
+  private static readonly USER_KEY = 'secure_user';
+  private static readonly TOKEN_KEY = 'secure_tokens';
 
-  if (!emailValidation.isValid) {
-    throw new Error('Invalid email format');
+  static isAuthenticated(): boolean {
+    const tokens = this.getTokens();
+    return tokens !== null && tokens.expiresAt > Date.now();
   }
 
-  if (!nameValidation.isValid) {
-    throw new Error('Invalid name format');
+  static getCurrentUser(): SecureAuthUser | null {
+    try {
+      const userData = sessionStorage.getItem(this.USER_KEY);
+      return userData ? JSON.parse(userData) : null;
+    } catch {
+      return null;
+    }
   }
 
-  const user: SecureAuthUser = {
-    id: 'user_' + Math.random().toString(36).substr(2, 9),
-    email: emailValidation.sanitizedValue,
-    name: nameValidation.sanitizedValue,
-    isFirstTimeUser: !skipOnboarding
-  };
+  static storeUserData(user: SecureAuthUser): void {
+    sessionStorage.setItem(this.USER_KEY, JSON.stringify(user));
+  }
 
-  // Store user data securely
-  SecureAuth.storeUserData(user);
+  static storeTokens(tokens: AuthTokens): void {
+    sessionStorage.setItem(this.TOKEN_KEY, JSON.stringify(tokens));
+  }
 
-  // Simulate storing auth tokens (in production, these would come from your auth API)
-  SecureAuth.storeTokens({
-    accessToken: 'access_' + Math.random().toString(36),
-    refreshToken: 'refresh_' + Math.random().toString(36),
-    expiresAt: Date.now() + (60 * 60 * 1000), // 1 hour
-    userId: user.id
-  });
+  static getTokens(): AuthTokens | null {
+    try {
+      const tokens = sessionStorage.getItem(this.TOKEN_KEY);
+      return tokens ? JSON.parse(tokens) : null;
+    } catch {
+      return null;
+    }
+  }
 
-  if (skipOnboarding) {
-    localStorage.setItem("onboardingComplete", "true");
+  static clearAuth(): void {
+    sessionStorage.removeItem(this.USER_KEY);
+    sessionStorage.removeItem(this.TOKEN_KEY);
   }
 }
 
-/**
- * Clear user data during logout
- */
-export function clearUserData(): void {
-  SecureAuth.clearAuth();
-  localStorage.removeItem("onboardingComplete");
-}
-
-/**
- * Refresh authentication tokens
- */
-export async function refreshAuthTokens(): Promise<boolean> {
-  return await SecureAuth.refreshTokens();
-}
-
-/**
- * Get secure headers for API requests
- */
 export function getSecureHeaders(): Record<string, string> {
-  const token = SecureAuth.getAccessToken();
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
   };
 
-  if (token) {
-    headers.Authorization = `Bearer ${token}`;
+  const tokens = SecureAuth.getTokens();
+  if (tokens) {
+    headers['Authorization'] = `Bearer ${tokens.accessToken}`;
+  }
+
+  const csrfToken = EnhancedCSRFProtection.getToken();
+  if (csrfToken) {
+    headers['X-CSRF-Token'] = csrfToken;
   }
 
   return headers;
+}
+
+export async function refreshAuthTokens(): Promise<boolean> {
+  try {
+    const tokens = SecureAuth.getTokens();
+    if (!tokens || !tokens.refreshToken) {
+      return false;
+    }
+
+    // Simulate API call to refresh tokens
+    // In a real app, this would be an actual API call
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    const newTokens: AuthTokens = {
+      accessToken: 'new_access_' + Math.random().toString(36),
+      refreshToken: tokens.refreshToken, // Keep the same refresh token
+      expiresAt: Date.now() + (60 * 60 * 1000), // 1 hour
+      userId: tokens.userId
+    };
+
+    SecureAuth.storeTokens(newTokens);
+    return true;
+  } catch {
+    return false;
+  }
 }
