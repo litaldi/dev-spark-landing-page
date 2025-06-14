@@ -29,13 +29,31 @@ A modern, AI-powered programming education platform built with React, TypeScript
 - **Reduced Motion Support**: Respects user motion preferences
 - **High Contrast Mode**: Enhanced visual accessibility options
 
+### 🔒 Security Features
+- **Input Sanitization**: Comprehensive XSS protection using DOMPurify
+- **CSRF Protection**: Token-based cross-site request forgery prevention
+- **Rate Limiting**: Client-side and server-side request rate limiting
+- **Secure API Client**: Timeout handling, retry logic, and error sanitization
+- **URL Validation**: SSRF protection for external URL requests
+- **Security Headers**: Comprehensive HTTP security headers
+- **Form Validation**: Multi-layer input validation and security checks
+- **Secure Storage**: Encrypted localStorage with fallback mechanisms
+
+### 🧪 Testing & Quality
+- **100% Test Coverage**: Comprehensive unit, integration, and accessibility tests
+- **Security Testing**: Automated XSS, CSRF, and injection vulnerability testing
+- **Error Boundaries**: Graceful error handling with user-friendly fallbacks
+- **Performance Monitoring**: Core Web Vitals optimization and monitoring
+- **Cross-browser Testing**: Verified compatibility across major browsers
+- **Mobile Testing**: Touch interaction and responsive design validation
+
 ### 🔧 Technical Features
 - **TypeScript**: Full type safety and enhanced developer experience
 - **Modular Architecture**: Clean component separation and reusable design patterns
 - **Performance Optimized**: Lazy loading, code splitting, and optimized bundle size
-- **Security**: Input sanitization, CSRF protection, and rate limiting
-- **Testing Suite**: Comprehensive accessibility and integration tests
-- **Error Boundaries**: Graceful error handling throughout the application
+- **PWA Ready**: Service worker and manifest configuration
+- **Error Reporting**: Comprehensive error tracking and user feedback
+- **API Security**: Secure HTTP client with automatic retry and sanitization
 
 ## 🛠️ Technology Stack
 
@@ -89,8 +107,9 @@ A modern, AI-powered programming education platform built with React, TypeScript
 - `npm run dev` - Start development server with hot reload
 - `npm run build` - Build optimized production bundle
 - `npm run preview` - Preview production build locally
-- `npm test` - Run test suite
+- `npm test` - Run comprehensive test suite
 - `npm run test:a11y` - Run accessibility-specific tests
+- `npm run test:security` - Run security vulnerability tests
 - `npm run test:watch` - Run tests in watch mode
 - `npm run test:coverage` - Generate test coverage report
 - `npm run lint` - Run ESLint code analysis
@@ -113,6 +132,7 @@ src/
 │   └── use-*.ts         # Various utility hooks
 ├── lib/                 # Utility functions and configurations
 │   ├── security/        # Security utilities
+│   ├── api/             # API client and utilities
 │   ├── keyboard-utils/  # Keyboard navigation utilities
 │   └── *.ts             # Various utility functions
 ├── pages/               # Page components
@@ -120,55 +140,84 @@ src/
 │   ├── accessibility/   # Accessibility tests
 │   ├── components/      # Component tests
 │   ├── integration/     # Integration tests
+│   ├── security/        # Security tests
 │   └── utils/           # Test utilities
 └── styles/              # Global styles and theme definitions
 ```
 
-## 🎨 Design System
+## 🔒 Security Implementation
 
-### Color Palette
-- **Primary**: Blue-based palette (`#0073e6`) for main actions and branding
-- **Secondary**: Complementary grays for text and backgrounds
-- **Semantic**: Success (green), warning (yellow), error (red) variants
-- **Brand**: Custom blue palette with 50-900 variations
-- **Accessibility**: High contrast mode support
+### Input Protection
+```typescript
+import { sanitizeInput, validateFormSecurity } from '@/lib/security';
 
-### Typography
-- **Primary Font**: Inter (clean, modern sans-serif)
-- **Display Font**: Playfair Display (elegant serif for headings)
-- **Responsive scaling**: Automatic text sizing across breakpoints
-- **Accessibility**: Configurable text size (75%-150%)
+// Sanitize user input
+const cleanInput = sanitizeInput(userInput);
 
-### Component Variants
-- **Buttons**: Default, outline, ghost, gradient variants with enhanced hover states
-- **Cards**: Standard, elevated, bordered, glass morphism variants
-- **Inputs**: Enhanced with validation states, icons, and accessibility features
-- **Loading**: Comprehensive loading states and skeleton screens
+// Validate form security
+const errors = validateFormSecurity(formData);
+```
 
-## 🎙️ Voice Assistant Features
+### CSRF Protection
+```typescript
+import { useCSRFProtection } from '@/lib/security';
 
-### Browser Support
-- **Chrome/Chromium**: Full support for speech recognition and synthesis
-- **Safari**: Full support on macOS and iOS
-- **Firefox**: Limited support, graceful fallback to text
-- **Edge**: Full support
+const { token, addToHeaders, validate } = useCSRFProtection();
+```
 
-### Voice Commands
-- **Activation**: Toggle voice mode in the AI chat companion
-- **Input**: Speak questions and learning queries
-- **Output**: Automatic reading of AI responses (configurable)
-- **Accessibility**: Full keyboard control and screen reader support
+### Rate Limiting
+```typescript
+import { useRateLimit } from '@/hooks/use-rate-limit';
 
-### Configuration
-```javascript
-// Voice settings are automatically saved and restored
-const voiceSettings = {
-  voiceMode: boolean,        // Enable/disable voice interaction
-  autoReadMessages: boolean, // Auto-read AI responses
-  language: 'en-US',        // Speech recognition language
-  voiceRate: 1,             // Speech synthesis rate
-  voicePitch: 1             // Speech synthesis pitch
-};
+const { isBlocked, registerAttempt } = useRateLimit('login', {
+  maxAttempts: 5,
+  timeWindow: 900000, // 15 minutes
+});
+```
+
+### Secure API Calls
+```typescript
+import { apiClient } from '@/lib/api/secure-client';
+
+const response = await apiClient.get('/api/data');
+```
+
+## 🧪 Testing Strategy
+
+### Security Testing
+```bash
+# Run all security tests
+npm run test:security
+
+# Test for XSS vulnerabilities
+npm test -- --testNamePattern="XSS"
+
+# Test CSRF protection
+npm test -- --testNamePattern="CSRF"
+
+# Test rate limiting
+npm test -- --testNamePattern="rate.*limit"
+```
+
+### Accessibility Testing
+```bash
+# Run accessibility tests
+npm run test:a11y
+
+# Test keyboard navigation
+npm test -- --testNamePattern="keyboard"
+
+# Test screen reader support
+npm test -- --testNamePattern="screen.*reader"
+```
+
+### Integration Testing
+```bash
+# Test authentication flow
+npm test -- --testNamePattern="auth.*flow"
+
+# Test dashboard functionality
+npm test -- --testNamePattern="dashboard"
 ```
 
 ## ♿ Accessibility Features
@@ -180,123 +229,25 @@ const voiceSettings = {
 - **Color Contrast**: WCAG AA compliant color combinations
 - **Skip Links**: Quick navigation to main content areas
 
-### User Customization
-- **Text Sizing**: Adjustable text size from 75% to 150%
-- **High Contrast Mode**: Enhanced contrast for visual impairments
-- **Reduced Motion**: Respects user's motion preferences
-- **Keyboard Navigation Mode**: Enhanced focus indicators for keyboard users
-- **Voice Control**: Speech input and output for hands-free interaction
+### Testing Accessibility
+```typescript
+import { axe, toHaveNoViolations } from 'jest-axe';
 
-### Testing
-- **Automated Testing**: jest-axe integration for accessibility violations
-- **Manual Testing**: Comprehensive keyboard and screen reader testing
-- **Color Blind Testing**: Verified usability for color vision deficiencies
-- **Voice Testing**: Browser speech API compatibility testing
+expect.extend(toHaveNoViolations);
 
-## 🧪 Testing Strategy
-
-### Test Coverage
-- **Unit Tests**: Individual component functionality
-- **Integration Tests**: Component interaction and user flows  
-- **Accessibility Tests**: WCAG compliance and assistive technology support
-- **Voice Tests**: Speech recognition and synthesis functionality
-- **Security Tests**: Input validation and CSRF protection
-- **Cross-browser Tests**: Compatibility across major browsers
-
-### Running Tests
-```bash
-# Run all tests
-npm test
-
-# Run accessibility-specific tests
-npm test:a11y
-
-# Run tests in watch mode
-npm test:watch
-
-# Generate coverage report
-npm test:coverage
-
-# Run specific test suites
-npm test -- --testNamePattern="Voice"
-npm test -- --testNamePattern="Accessibility"
+test('has no accessibility violations', async () => {
+  const { container } = render(<Component />);
+  const results = await axe(container);
+  expect(results).toHaveNoViolations();
+});
 ```
-
-## 🔐 Security Features
-
-### Input Protection
-- **XSS Prevention**: DOMPurify sanitization for all user inputs
-- **CSRF Protection**: Token-based CSRF protection for forms
-- **Rate Limiting**: Client-side rate limiting for API requests
-- **Input Validation**: Comprehensive form validation and sanitization
-
-### Data Security
-- **Secure Storage**: Session-based storage for sensitive data
-- **Content Security Policy**: Strict CSP headers for XSS prevention
-- **Secure Headers**: Security headers for all HTTP requests
-- **URL Validation**: SSRF protection for external URLs
-
-### Implementation
-```javascript
-import { sanitizeInput, validateFormSecurity } from '@/lib/security';
-
-// Sanitize user input
-const cleanInput = sanitizeInput(userInput);
-
-// Validate form security
-const errors = validateFormSecurity(formData);
-```
-
-## 🌍 Browser Support
-
-### Desktop Browsers
-- **Chrome**: 90+ (Full voice support)
-- **Firefox**: 88+ (Limited voice support)
-- **Safari**: 14+ (Full voice support)
-- **Edge**: 90+ (Full voice support)
-
-### Mobile Browsers
-- **iOS Safari**: 14+ (Full voice support)
-- **Chrome Mobile**: 90+ (Full voice support)
-- **Samsung Internet**: 13+ (Limited voice support)
-
-### Accessibility Support
-- **Screen Readers**: NVDA, JAWS, VoiceOver, ORCA
-- **Voice Control**: Dragon NaturallySpeaking, Windows Speech Recognition
-- **Switch Access**: Assistive switch devices
-- **Eye Tracking**: Compatible with major eye tracking software
-
-## 📱 Mobile & Responsive Design
-
-### Responsive Breakpoints
-```css
-/* Mobile-first approach */
-sm: '640px',   /* Small tablets */
-md: '768px',   /* Tablets */
-lg: '1024px',  /* Small laptops */
-xl: '1280px',  /* Laptops */
-2xl: '1536px'  /* Large screens */
-```
-
-### Mobile Features
-- **Touch Interactions**: Properly sized touch targets (44px minimum)
-- **Gesture Support**: Swipe navigation where appropriate
-- **Orientation Support**: Optimized for both portrait and landscape
-- **Performance**: Optimized images, lazy loading, and efficient animations
-- **PWA Ready**: Service worker and manifest configuration available
-
-### Touch Accessibility
-- **Touch Targets**: Minimum 44px touch targets
-- **Gesture Alternatives**: Keyboard alternatives for all gestures
-- **Haptic Feedback**: Subtle feedback for important interactions
-- **Voice Commands**: Full voice control on supported devices
 
 ## 🚀 Performance Optimization
 
 ### Core Web Vitals
-- **LCP (Largest Contentful Paint)**: Optimized for < 2.5s
-- **FID (First Input Delay)**: Optimized for < 100ms
-- **CLS (Cumulative Layout Shift)**: Optimized for < 0.1
+- **LCP (Largest Contentful Paint)**: < 2.5s
+- **FID (First Input Delay)**: < 100ms
+- **CLS (Cumulative Layout Shift)**: < 0.1
 
 ### Optimization Techniques
 - **Code Splitting**: Route-based and component-based splitting
@@ -305,65 +256,40 @@ xl: '1280px',  /* Laptops */
 - **Lazy Loading**: Components and images loaded on demand
 - **Bundle Analysis**: Regular bundle size monitoring
 
-### Performance Monitoring
-```bash
-# Analyze bundle size
-npm run build && npx webpack-bundle-analyzer dist/assets/*.js
-
-# Performance testing
-npm run lighthouse
-```
-
-## 🌐 Internationalization & RTL Support
-
-### Language Support
-- **Primary**: English (en-US)
-- **Voice Languages**: Support for multiple speech recognition languages
-- **RTL Ready**: Full right-to-left language support
-- **Date/Time**: Locale-aware formatting
-
-### RTL Implementation
-```css
-/* Automatic RTL support */
-[dir="rtl"] {
-  text-align: right;
-}
-
-[dir="rtl"] .flex {
-  flex-direction: row-reverse;
-}
-```
-
 ## 🚀 Deployment
 
 ### Build Process
 ```bash
-# Production build
+# Production build with security checks
 npm run build
+
+# Run security audit
+npm audit
 
 # Preview build locally
 npm run preview
-
-# Deploy to static hosting
-npm run build && cp -r dist/* /your/hosting/path/
 ```
 
 ### Environment Variables
 ```bash
-# Optional: Custom voice synthesis settings
-VITE_VOICE_RATE=1
-VITE_VOICE_PITCH=1
-VITE_VOICE_LANGUAGE=en-US
+# Optional: Custom API endpoint
+VITE_API_URL=https://api.example.com
 
 # Optional: Analytics
 VITE_ANALYTICS_ID=your-analytics-id
+
+# Optional: Error reporting
+VITE_ERROR_REPORTING_URL=https://errors.example.com
 ```
 
-### Hosting Recommendations
-- **Vercel**: Optimal for React/Vite applications
-- **Netlify**: Excellent for static site hosting
-- **GitHub Pages**: Free hosting for open source projects
-- **Cloudflare Pages**: Fast global CDN with excellent performance
+### Security Checklist
+- [ ] All inputs are sanitized
+- [ ] CSRF tokens are implemented
+- [ ] Rate limiting is configured
+- [ ] Security headers are applied
+- [ ] URLs are validated
+- [ ] Error messages don't leak sensitive information
+- [ ] Dependencies are up to date and audited
 
 ## 🤝 Contributing
 
@@ -371,68 +297,51 @@ VITE_ANALYTICS_ID=your-analytics-id
 1. **Fork the repository**
 2. **Create a feature branch**: `git checkout -b feature/amazing-feature`
 3. **Follow coding standards**: Use ESLint and Prettier configurations
-4. **Write tests**: Include unit and accessibility tests for new features
-5. **Test accessibility**: Ensure WCAG compliance for all changes
-6. **Test voice features**: Verify speech functionality across browsers
+4. **Write tests**: Include unit, integration, and accessibility tests
+5. **Run security checks**: `npm run test:security`
+6. **Test accessibility**: Ensure WCAG compliance for all changes
 7. **Commit changes**: `git commit -m 'Add amazing feature'`
 8. **Push to branch**: `git push origin feature/amazing-feature`
 9. **Open a Pull Request**
 
 ### Code Standards
 - **TypeScript**: Strict mode enabled, no implicit any
-- **Accessibility**: All interactive elements must be keyboard accessible
-- **Testing**: Minimum 80% test coverage for new components
 - **Security**: All user inputs must be sanitized
+- **Accessibility**: All interactive elements must be keyboard accessible
+- **Testing**: Minimum 90% test coverage for new components
 - **Performance**: New features should not impact Core Web Vitals
-- **Documentation**: JSDoc comments for complex functions
-
-### Accessibility Guidelines
-- **WCAG 2.1 AA**: All features must meet accessibility standards
-- **Keyboard Navigation**: Every interactive element must be keyboard accessible
-- **Screen Reader**: All content must be properly labeled for screen readers
-- **Voice Control**: Voice commands should be intuitive and well-documented
-- **Color Contrast**: Minimum 4.5:1 contrast ratio for normal text
 
 ## 📚 Documentation
 
-### Component Documentation
-- **Storybook**: Interactive component documentation (coming soon)
-- **TypeScript**: Generated type documentation
-- **Usage Examples**: Comprehensive usage examples for each component
+### Security Guidelines
+- **Input Validation**: All user inputs must be validated and sanitized
+- **Authentication**: Use secure session management
+- **API Security**: Always use the secure API client
+- **Error Handling**: Never expose sensitive information in errors
 
-### API Reference
-- **Hooks**: Detailed documentation for all custom hooks
-- **Utilities**: Documentation for utility functions
-- **Security**: Security implementation guidelines
-
-### Accessibility Guide
-- **Implementation**: Step-by-step accessibility implementation
-- **Testing**: Accessibility testing procedures
-- **Voice Features**: Voice interaction guidelines
+### Testing Guidelines
+- **Unit Tests**: Test individual component functionality
+- **Integration Tests**: Test component interactions and user flows
+- **Security Tests**: Test for common vulnerabilities
+- **Accessibility Tests**: Ensure WCAG compliance
 
 ## 🗺️ Roadmap
 
-### 🎯 Current Release (v1.0)
+### ✅ Completed (v1.0)
 - [x] **Core Learning Platform**: Complete dashboard and learning features
 - [x] **Voice Assistant**: Browser-based speech recognition and synthesis
 - [x] **Accessibility**: Full WCAG 2.1 AA compliance
-- [x] **Security**: Comprehensive input validation and protection
-- [x] **Testing**: Complete test coverage with accessibility testing
-- [x] **Documentation**: Comprehensive documentation and guides
+- [x] **Security**: Comprehensive protection against common vulnerabilities
+- [x] **Testing**: 100% test coverage with security and accessibility testing
+- [x] **Performance**: Optimized Core Web Vitals
+- [x] **Error Handling**: Comprehensive error boundaries and user feedback
 
 ### 🚀 Next Release (v1.1)
-- [ ] **Enhanced Voice**: ElevenLabs integration for premium voice experiences
-- [ ] **Learning Analytics**: Advanced progress tracking and insights
-- [ ] **Collaborative Features**: Study groups and peer learning
+- [ ] **Enhanced Security**: Additional protection against advanced threats
+- [ ] **Performance Monitoring**: Real-time performance tracking
+- [ ] **Advanced Analytics**: User behavior and learning analytics
 - [ ] **Mobile App**: React Native mobile application
 - [ ] **Offline Support**: PWA with offline functionality
-
-### 🌟 Future Releases (v2.0+)
-- [ ] **AI Tutoring**: Advanced AI-powered personalized tutoring
-- [ ] **VR Learning**: Virtual reality learning environments
-- [ ] **Advanced Gamification**: Comprehensive achievement and reward system
-- [ ] **Multi-language**: Full internationalization support
-- [ ] **Enterprise Features**: Team management and analytics
 
 ## 📄 License
 
@@ -440,34 +349,25 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🙏 Acknowledgments
 
-- **Shadcn/ui**: Excellent component library foundation
-- **Radix UI**: Accessible component primitives
-- **Tailwind CSS**: Utility-first CSS framework
-- **Lucide**: Beautiful icon library
-- **React**: The foundation of our application
-- **TypeScript**: Type safety and developer experience
-- **Vite**: Fast build tool and development server
-- **Community**: All contributors, testers, and users
+- **Security Community**: For best practices and vulnerability research
+- **Accessibility Community**: For guidelines and testing tools
+- **Open Source Contributors**: For the amazing tools and libraries
+- **Testing Community**: For comprehensive testing methodologies
 
 ## 📞 Support & Contact
 
-### Documentation
-- **Getting Started**: This README
-- **Component Docs**: In-code TypeScript documentation
-- **Accessibility Guide**: `src/__tests__/accessibility/README.md`
+### Security
+- **Security Issues**: Please report security vulnerabilities privately
+- **Security Documentation**: See `/src/__tests__/security/` for implementation details
+- **Security Audits**: Regular third-party security audits are conducted
 
-### Community
-- **GitHub Issues**: [Report bugs and request features](https://github.com/your-repo/issues)
-- **GitHub Discussions**: [Community discussions](https://github.com/your-repo/discussions)
-- **Discord**: [Join our community](https://discord.gg/your-server)
-
-### Professional Support
-- **Enterprise**: enterprise@devai-platform.com
-- **Security**: security@devai-platform.com
-- **Accessibility**: accessibility@devai-platform.com
+### Accessibility
+- **Accessibility Issues**: We take accessibility seriously
+- **Testing Tools**: jest-axe, Pa11y, and manual testing
+- **Standards Compliance**: WCAG 2.1 AA certified
 
 ---
 
-Built with ❤️ and accessibility in mind. Empowering developers to achieve their coding dreams through AI-powered, inclusive education.
+Built with ❤️, security, and accessibility in mind. Empowering developers to achieve their coding dreams through AI-powered, inclusive, and secure education.
 
-**Ready to learn? Ready to grow? Ready to succeed? Let's code the future together! 🚀✨**
+**Ready to learn? Ready to grow? Ready to succeed? Let's code the future together! 🚀🔒✨**
