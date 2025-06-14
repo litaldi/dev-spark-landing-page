@@ -21,8 +21,13 @@ export class SecureAuth {
   private static readonly TOKEN_KEY = 'secure_tokens';
 
   static isAuthenticated(): boolean {
-    const tokens = this.getTokens();
-    return tokens !== null && tokens.expiresAt > Date.now();
+    try {
+      const tokens = this.getTokens();
+      return tokens !== null && tokens.expiresAt > Date.now();
+    } catch (error) {
+      console.error('Error checking authentication in SecureAuth class:', error);
+      return false;
+    }
   }
 
   static getCurrentUser(): SecureAuthUser | null {
@@ -64,12 +69,19 @@ export function getCurrentUserFromStorage(): SecureAuthUser | null {
 
 export function isAuthenticated(): boolean {
   try {
-    // Defensive check to ensure SecureAuth exists and has the required methods
-    if (typeof SecureAuth === 'undefined' || !SecureAuth || typeof SecureAuth.isAuthenticated !== 'function') {
+    // Comprehensive defensive check to ensure SecureAuth exists and has the required methods
+    if (typeof SecureAuth === 'undefined' || !SecureAuth) {
       console.warn('SecureAuth class is not properly initialized');
       return false;
     }
-    return SecureAuth.isAuthenticated();
+    
+    if (typeof SecureAuth.getTokens !== 'function') {
+      console.warn('SecureAuth.getTokens method is not available');
+      return false;
+    }
+    
+    const tokens = SecureAuth.getTokens();
+    return tokens !== null && tokens.expiresAt > Date.now();
   } catch (error) {
     console.error('Error checking authentication status:', error);
     return false;
