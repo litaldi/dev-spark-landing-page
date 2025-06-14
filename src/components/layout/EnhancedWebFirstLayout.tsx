@@ -1,4 +1,3 @@
-
 import React from "react";
 import { cn } from "@/lib/utils";
 import Navbar from "@/components/landing/Navbar";
@@ -13,6 +12,7 @@ interface EnhancedWebFirstLayoutProps {
   fullWidth?: boolean;
   variant?: "default" | "minimal";
   className?: string;
+  maxWidth?: string;
 }
 
 export function EnhancedWebFirstLayout({
@@ -23,6 +23,7 @@ export function EnhancedWebFirstLayout({
   fullWidth = false,
   variant = "default",
   className,
+  maxWidth
 }: EnhancedWebFirstLayoutProps) {
   return (
     <>
@@ -32,7 +33,14 @@ export function EnhancedWebFirstLayout({
       <div className="min-h-screen flex flex-col bg-background w-full">
         <Navbar />
         <main id="main-content" aria-label="Main content" tabIndex={-1}>
-          {children}
+          <div
+            className={cn(
+              !fullWidth && maxWidth ? `mx-auto max-w-${maxWidth}` : "",
+              className
+            )}
+          >
+            {children}
+          </div>
         </main>
         <Footer />
       </div>

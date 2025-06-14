@@ -5,6 +5,8 @@ import { AppErrorBoundary } from "@/components/error/AppErrorBoundary";
 
 function BrokenComponent() {
   throw new Error("Boom");
+  // Fix: add a return to satisfy React component type
+  return null;
 }
 
 describe("AppErrorBoundary", () => {
