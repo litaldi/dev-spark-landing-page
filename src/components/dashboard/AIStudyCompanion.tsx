@@ -1,8 +1,9 @@
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { useLocalStorage } from "@/hooks/use-local-storage";
+import { useVoiceAssistant } from "@/hooks/useVoiceAssistant";
+import { Volume2, Mic, MicOff, VolumeX } from "lucide-react";
 
 import { ChatMessage, AIStudyCompanionProps } from "./ai-companion/types";
 import { ChatHeader } from "./ai-companion/ChatHeader";
@@ -28,6 +29,16 @@ export const AIStudyCompanion = ({ userName }: AIStudyCompanionProps) => {
   ]);
 
   const [isThinking, setIsThinking] = useState(false);
+
+  // Voice assistant state
+  const [voiceMode, setVoiceMode] = useState(false);
+  const [autoReadMessages, setAutoReadMessages] = useState(true);
+  const [voiceNoticeViewed, setVoiceNoticeViewed] = useState(false);
+  const voiceAssistant = useVoiceAssistant({
+    onTranscript: (text) => {
+      handleSendMessage(text);
+    }
+  });
 
   const handleSendMessage = (inputValue: string) => {
     if (!inputValue.trim()) return;
@@ -69,6 +80,83 @@ export const AIStudyCompanion = ({ userName }: AIStudyCompanionProps) => {
     setIsMinimized(true);
   };
 
+  // Speak last AI message if voiceMode and autoReadMessages enabled
+  useEffect(() => {
+    if (
+      voiceMode &&
+      autoReadMessages &&
+      chatMessages.length > 1 &&
+      chatMessages[chatMessages.length - 1].sender === "ai"
+    ) {
+      voiceAssistant.speak(chatMessages[chatMessages.length - 1].text);
+    }
+    // eslint-disable-next-line
+  }, [chatMessages, voiceMode, autoReadMessages]);
+
+  // Voice controls overlay (simple, non-intrusive, always accessible via keyboard)
+  const renderVoiceControls = () => (
+    <div className="flex items-center gap-2 px-3 py-2 bg-white dark:bg-gray-900 border-b border-muted select-none text-xs rounded-t-lg">
+      <button 
+        className={`flex items-center gap-1 px-2 py-1 rounded-md border transition focus:outline-none focus-visible:ring-2 ${
+          voiceMode ? "bg-brand-100 dark:bg-brand-900 border-brand-400" : "bg-muted border-muted"
+        }`} 
+        onClick={() => setVoiceMode((prev) => !prev)}
+        aria-pressed={voiceMode}
+        tabIndex={0}
+      >
+        <Mic className="h-4 w-4 mr-0.5" /> {voiceMode ? "Voice ON" : "Voice"}
+      </button>
+      <button
+        className="px-2 py-1 rounded-md bg-muted border border-muted hover:bg-muted/70 disabled:opacity-40"
+        disabled={!voiceMode || voiceAssistant.isListening}
+        onClick={voiceAssistant.startListening}
+        aria-label="Start voice input"
+        tabIndex={0}
+      >
+        <Mic className={`h-4 w-4 ${voiceAssistant.isListening ? "animate-pulse text-primary" : ""}`} />
+      </button>
+      <button
+        className="px-2 py-1 rounded-md bg-muted border border-muted hover:bg-muted/70"
+        disabled={!voiceMode || !voiceAssistant.isListening}
+        onClick={voiceAssistant.stopListening}
+        aria-label="Stop voice input"
+        tabIndex={0}
+      >
+        <MicOff className="h-4 w-4" />
+      </button>
+      <button
+        className="px-2 py-1 rounded-md bg-muted border border-muted hover:bg-muted/70"
+        onClick={() => setAutoReadMessages((v) => !v)}
+        aria-pressed={autoReadMessages}
+        tabIndex={0}
+      >
+        {autoReadMessages ? (
+          <Volume2 className="h-4 w-4 text-green-600" />
+        ) : (
+          <VolumeX className="h-4 w-4 text-muted-foreground" />
+        )}
+        <span className="ml-1">{autoReadMessages ? "Speak" : "Mute"}</span>
+      </button>
+    </div>
+  );
+
+  // Voice-Mode Setup Notice (shows once)
+  const renderVoiceNotice = () =>
+    !voiceNoticeViewed && voiceMode && (
+      <div className="p-3 text-sm bg-yellow-50 dark:bg-yellow-950 text-yellow-700 dark:text-yellow-200 border-b border-yellow-200 dark:border-yellow-800 flex items-center gap-2" tabIndex={0}>
+        <Mic className="h-4 w-4 mr-2 text-yellow-600" />
+        <span>
+          Voice Assistant enabled! Grant microphone permissions and try saying your question out loud.
+        </span>
+        <button
+          className="ml-auto px-2 py-1 bg-muted rounded text-xs border"
+          onClick={() => setVoiceNoticeViewed(true)}
+        >
+          Got it
+        </button>
+      </div>
+    );
+
   if (!isOpen && !isMinimized) {
     return <ChatButton onClick={toggleChat} />;
   }
@@ -85,18 +173,24 @@ export const AIStudyCompanion = ({ userName }: AIStudyCompanionProps) => {
       {isMinimized ? (
         <MinimizedChat onExpand={toggleChat} />
       ) : (
-        <Card className="border shadow-lg overflow-hidden h-96">
+        <Card className="border shadow-lg overflow-hidden h-96 flex flex-col">
+          {/* Voice Controls at top */}
+          {renderVoiceControls()}
+          {/* One-time setup notice */}
+          {renderVoiceNotice()}
           <ChatHeader 
             onMinimize={minimizeChat} 
             onClose={() => setIsOpen(false)} 
           />
           <ChatBody 
             messages={chatMessages}
-            isThinking={isThinking}
+            isThinking={isThinking || voiceAssistant.isListening}
           />
+          {/* If voice mode is on, disable input while listening */}
           <ChatInput 
             onSendMessage={handleSendMessage}
-            isThinking={isThinking}
+            isThinking={isThinking || (voiceMode && voiceAssistant.isListening)}
+            disabled={voiceMode && voiceAssistant.isListening}
           />
         </Card>
       )}

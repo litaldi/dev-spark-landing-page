@@ -1,4 +1,3 @@
-
 # DevAI Learning Platform 🚀
 
 A modern, AI-powered programming education platform built with React, TypeScript, and Tailwind CSS. This platform provides personalized learning experiences, interactive coding challenges, and real-time AI assistance to help developers master programming skills.
@@ -9,6 +8,7 @@ A modern, AI-powered programming education platform built with React, TypeScript
 - **AI-Powered Personalization**: Adaptive learning paths based on user progress and preferences
 - **Interactive Dashboard**: Real-time progress tracking, streak counters, and achievement system
 - **Smart Recommendations**: AI-driven content suggestions tailored to individual learning goals
+- **AI Voice Assistant**: Hands-free learning support with speech input/output in the chat companion (browser SpeechRecognition/SpeechSynthesis)
 - **Study Session Timer**: Pomodoro-style timer with statistics and productivity insights
 
 ### 🎨 Enhanced UX/UI
@@ -23,6 +23,9 @@ A modern, AI-powered programming education platform built with React, TypeScript
 - **Screen Reader Support**: Proper ARIA labels, landmarks, and semantic markup
 - **Accessibility Menu**: User-configurable options for text size, contrast, and navigation
 - **Skip Links**: Quick navigation for assistive technology users
+- **Voice-based input/output** using browser APIs for enhanced accessibility
+- If microphone/speech is supported, toggle the AI voice assistant from the dashboard chat widget
+- Full ARIA, focus, and color-contrast compliance (see below for further expansion)
 
 ### 🔧 Technical Features
 - **TypeScript**: Full type safety and enhanced developer experience
@@ -208,10 +211,10 @@ npm run test:coverage
 ## 🗺️ Roadmap
 
 ### Q1 2024
-- [ ] Enhanced AI tutoring system
-- [ ] Advanced code editor integration
-- [ ] Real-time collaboration features
-- [ ] Mobile app development (React Native)
+- [x] **Voice-based AI learning assistant** (browser SpeechRecognition/SpeechSynthesis; fallback to text for unsupported browsers. ElevenLabs/pro voice optional future.)
+- [ ] Persona-adaptive learning journey and onboarding quiz
+- [ ] Gamified feedback loops (badges, celebrations, nudges)
+- [ ] Emotion-aware, context-sensitive learning prompts
 
 ### Q2 2024
 - [ ] Advanced analytics dashboard
