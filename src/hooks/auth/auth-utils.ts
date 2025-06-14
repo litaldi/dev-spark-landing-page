@@ -1,5 +1,6 @@
 
 import { sanitizeInput } from "@/lib/security";
+import { AuthUser } from "./types";
 
 /**
  * Helper functions for authentication
@@ -15,15 +16,17 @@ export function isAuthenticated(): boolean {
 /**
  * Get current user data from localStorage
  */
-export function getCurrentUserFromStorage() {
+export function getCurrentUserFromStorage(): AuthUser | null {
   if (!isAuthenticated()) return null;
   
   const isFirstTimeUser = localStorage.getItem("onboardingComplete") !== "true";
+  const email = localStorage.getItem("userEmail") || "";
+  const name = localStorage.getItem("userName") || "";
   
   return {
-    email: localStorage.getItem("userEmail") || "",
-    name: localStorage.getItem("userName") || "",
-    isDemoUser: false,
+    id: 'user_' + Math.random().toString(36).substr(2, 9),
+    email,
+    name,
     isFirstTimeUser
   };
 }

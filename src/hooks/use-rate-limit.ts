@@ -1,9 +1,9 @@
 
 import { useState, useCallback } from 'react';
-import { rateLimiter, rateLimitConfigs, RateLimitConfig } from '@/lib/security/rate-limiting';
+import { EnhancedRateLimit, RateLimitConfig } from '@/lib/security/rate-limiting';
 
 interface UseRateLimitOptions {
-  maxAttempts: number;
+  maxRequests: number;
   timeWindow?: number;
   blockDuration?: number;
 }
@@ -23,30 +23,29 @@ export function useRateLimit(
   const [lastUpdate, setLastUpdate] = useState(Date.now());
 
   const config: RateLimitConfig = {
-    maxAttempts: options.maxAttempts,
-    windowMs: options.timeWindow || 60000,
-    blockDurationMs: options.blockDuration || options.timeWindow || 60000,
+    maxRequests: options.maxRequests,
+    timeWindow: options.timeWindow || 60000,
+    blockDuration: options.blockDuration || options.timeWindow || 60000,
   };
 
-  const isBlocked = rateLimiter.isBlocked(key, config);
-  const blockedUntil = rateLimiter.getBlockedUntil(key);
-  const timeRemaining = blockedUntil ? Math.max(0, blockedUntil - Date.now()) : 0;
-  const remainingAttempts = rateLimiter.getRemainingAttempts(key, config);
+  // Get current status
+  const status = EnhancedRateLimit.checkLimit(key, config);
+  const isBlocked = !status.isAllowed;
+  const timeRemaining = status.retryAfter || 0;
+  const remainingAttempts = status.remainingRequests;
 
   const registerAttempt = useCallback(() => {
-    const isAllowed = rateLimiter.attempt(key, config);
+    const result = EnhancedRateLimit.registerRequest(key, config);
     setLastUpdate(Date.now()); // Trigger re-render
     
     return {
-      isAllowed,
-      remainingAttempts: rateLimiter.getRemainingAttempts(key, config)
+      isAllowed: result.isAllowed,
+      remainingAttempts: result.remainingRequests
     };
   }, [key, config]);
 
   const resetLimit = useCallback(() => {
-    // Clear attempts for this key
-    (rateLimiter as any).attempts.delete(key);
-    (rateLimiter as any).blocked.delete(key);
+    EnhancedRateLimit.resetLimit(key);
     setLastUpdate(Date.now());
   }, [key]);
 
@@ -61,13 +60,25 @@ export function useRateLimit(
 
 // Convenience hooks for common rate limiting scenarios
 export function useLoginRateLimit() {
-  return useRateLimit('login', rateLimitConfigs.login);
+  return useRateLimit('login', {
+    maxRequests: 5,
+    timeWindow: 60000 * 10, // 10 minutes
+    blockDuration: 60000 * 15 // 15 minutes
+  });
 }
 
 export function useRegistrationRateLimit() {
-  return useRateLimit('registration', rateLimitConfigs.registration);
+  return useRateLimit('registration', {
+    maxRequests: 3,
+    timeWindow: 60000 * 5, // 5 minutes
+    blockDuration: 60000 * 10 // 10 minutes
+  });
 }
 
 export function usePasswordResetRateLimit() {
-  return useRateLimit('passwordReset', rateLimitConfigs.passwordReset);
+  return useRateLimit('passwordReset', {
+    maxRequests: 3,
+    timeWindow: 60000 * 15, // 15 minutes
+    blockDuration: 60000 * 30 // 30 minutes
+  });
 }

@@ -38,9 +38,9 @@ export function useRegister(
       
       // Set current user state
       setCurrentUser({
+        id: 'user_' + Math.random().toString(36).substr(2, 9),
         name: userData.name,
         email: userData.email,
-        isDemoUser: false,
         isFirstTimeUser: true
       });
       

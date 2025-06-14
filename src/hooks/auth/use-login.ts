@@ -43,9 +43,9 @@ export function useLogin(
       
       // Set current user state
       setCurrentUser({
+        id: 'user_' + Math.random().toString(36).substr(2, 9),
         name: userName,
         email,
-        isDemoUser: false,
         isFirstTimeUser
       });
       
