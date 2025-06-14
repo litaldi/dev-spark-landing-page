@@ -3,11 +3,12 @@ import React from "react";
 import { AppErrorBoundary } from "@/components/error/EnhancedErrorBoundary";
 import { Toaster } from "@/components/ui/toaster";
 import { SkipNavLink } from "@/components/a11y/skip-nav";
-import { Outlet } from "react-router-dom";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { useSecurityMonitor } from "@/hooks/use-security-monitor";
+import { useUnifiedAuth } from "@/hooks/auth/use-unified-auth";
+import { AppRouter } from "@/router/AppRouter";
 
 // Create a stable query client instance
 const queryClient = new QueryClient({
@@ -35,13 +36,16 @@ function AppContent() {
     trackCSRFViolations: true
   });
 
+  // Get authentication state
+  const { isAuthenticated } = useUnifiedAuth();
+
   return (
     <>
       <SkipNavLink contentId="main-content" className="fixed top-0 left-0 z-50">
         Skip to main content
       </SkipNavLink>
       <main id="main-content" aria-label="Main content" tabIndex={-1}>
-        <Outlet />
+        <AppRouter isAuthenticated={isAuthenticated()} />
       </main>
       <Toaster />
     </>

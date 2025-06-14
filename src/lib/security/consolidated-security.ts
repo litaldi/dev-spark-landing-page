@@ -13,15 +13,17 @@ export * from './http-security';
 export * from './secure-auth';
 export * from './enhanced-crypto';
 
+// Import modules for initialization
+import { EnhancedCSRFProtection } from './enhanced-csrf-protection';
+import { applySecurityDefenses, logSecurityEvent } from './http-security';
+
 // Consolidated initialization function
 export function initializeApplicationSecurity(): void {
   try {
     // Initialize CSRF protection
-    const { EnhancedCSRFProtection } = require('./enhanced-csrf-protection');
     EnhancedCSRFProtection.initialize();
 
     // Apply HTTP security measures
-    const { applySecurityDefenses, logSecurityEvent } = require('./http-security');
     applySecurityDefenses();
     
     // Log successful initialization
@@ -41,7 +43,6 @@ export function initializeApplicationSecurity(): void {
     console.error('❌ Security initialization failed:', error);
     
     // Log the failure
-    const { logSecurityEvent } = require('./http-security');
     logSecurityEvent('SECURITY_INIT_FAILED', {
       timestamp: Date.now(),
       error: error?.toString()
@@ -52,32 +53,31 @@ export function initializeApplicationSecurity(): void {
 // Export convenience functions for common security operations
 export const SecurityUtils = {
   // Input validation
-  sanitizeUserInput: (input: string) => {
-    const { sanitizeInput } = require('./input-validation');
+  sanitizeUserInput: async (input: string) => {
+    const { sanitizeInput } = await import('./input-validation');
     return sanitizeInput(input);
   },
 
   // Authentication checks
-  isUserAuthenticated: () => {
-    const { SecureAuth } = require('./secure-auth');
+  isUserAuthenticated: async () => {
+    const { SecureAuth } = await import('./secure-auth');
     return SecureAuth.isAuthenticated();
   },
 
   // CSRF protection
   getCSRFToken: () => {
-    const { EnhancedCSRFProtection } = require('./enhanced-csrf-protection');
     return EnhancedCSRFProtection.getToken();
   },
 
   // Rate limiting
-  checkRateLimit: (key: string, maxRequests: number = 10, windowMs: number = 60000) => {
-    const { checkRateLimit } = require('../api-security');
+  checkRateLimit: async (key: string, maxRequests: number = 10, windowMs: number = 60000) => {
+    const { checkRateLimit } = await import('../api-security');
     return checkRateLimit(key, maxRequests, windowMs);
   },
 
   // Security headers
-  getSecureHeaders: () => {
-    const { applySecurityHeaders } = require('./http-security');
+  getSecureHeaders: async () => {
+    const { applySecurityHeaders } = await import('./http-security');
     return applySecurityHeaders();
   }
 };
