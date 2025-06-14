@@ -4,14 +4,14 @@ import { motion, MotionProps } from 'framer-motion';
 import { Loader } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-interface EnhancedButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface EnhancedButtonProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'onDrag' | 'onDragStart' | 'onDragEnd'> {
   variant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link' | 'gradient';
   size?: 'default' | 'sm' | 'lg' | 'icon';
   loading?: boolean;
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
   animation?: 'bounce' | 'scale' | 'slide' | 'glow' | 'none';
-  motionProps?: MotionProps;
+  motionProps?: Omit<MotionProps, 'ref'>;
 }
 
 export const EnhancedButton = React.forwardRef<HTMLButtonElement, EnhancedButtonProps>(

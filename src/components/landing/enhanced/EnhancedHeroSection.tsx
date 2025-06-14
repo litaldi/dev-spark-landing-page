@@ -69,7 +69,7 @@ const EnhancedHeroSection: React.FC = () => {
           <div className="flex flex-col sm:flex-row justify-center gap-4 sm:gap-6 pt-4">
             {isLoggedIn ? (
               <EnhancedButton 
-                size="xl" 
+                size="lg" 
                 variant="gradient"
                 onClick={handleDashboard}
                 className={cn("group", isMobile && "w-full")}
@@ -81,7 +81,7 @@ const EnhancedHeroSection: React.FC = () => {
             ) : (
               <>
                 <EnhancedButton 
-                  size="xl" 
+                  size="lg" 
                   variant="gradient"
                   onClick={handleGetStarted}
                   className={cn("group shadow-xl", isMobile && "w-full")}
@@ -92,7 +92,7 @@ const EnhancedHeroSection: React.FC = () => {
                 </EnhancedButton>
                 
                 <EnhancedButton 
-                  size="xl" 
+                  size="lg" 
                   variant="outline"
                   onClick={handleWatchDemo}
                   className={cn("group", isMobile && "w-full")}
