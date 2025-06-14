@@ -104,9 +104,12 @@ export function getSecureHeaders(): Record<string, string> {
   };
 
   try {
-    const tokens = SecureAuth.getTokens();
-    if (tokens) {
-      headers['Authorization'] = `Bearer ${tokens.accessToken}`;
+    // Add defensive check for SecureAuth
+    if (typeof SecureAuth !== 'undefined' && SecureAuth && typeof SecureAuth.getTokens === 'function') {
+      const tokens = SecureAuth.getTokens();
+      if (tokens) {
+        headers['Authorization'] = `Bearer ${tokens.accessToken}`;
+      }
     }
 
     const csrfToken = EnhancedCSRFProtection.getToken();
@@ -122,6 +125,12 @@ export function getSecureHeaders(): Record<string, string> {
 
 export async function refreshAuthTokens(): Promise<boolean> {
   try {
+    // Add defensive check for SecureAuth
+    if (typeof SecureAuth === 'undefined' || !SecureAuth || typeof SecureAuth.getTokens !== 'function') {
+      console.warn('SecureAuth class is not available for token refresh');
+      return false;
+    }
+
     const tokens = SecureAuth.getTokens();
     if (!tokens || !tokens.refreshToken) {
       return false;
