@@ -1,4 +1,6 @@
 
+import React from 'react';
+
 /**
  * Focus management utilities for accessibility
  */
