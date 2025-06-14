@@ -6,6 +6,10 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ThemeProvider } from '@/components/theme/ThemeProvider';
 import { TooltipProvider } from '@/components/ui/tooltip';
 
+// Export all testing library utilities
+export * from '@testing-library/react';
+export { default as userEvent } from '@testing-library/user-event';
+
 // Custom render function that includes providers
 const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
   const queryClient = new QueryClient({
@@ -34,7 +38,7 @@ const customRender = (
   options?: Omit<RenderOptions, 'wrapper'>,
 ) => render(ui, { wrapper: AllTheProviders, ...options });
 
-export * from '@testing-library/react';
+// Override the default render with our custom one
 export { customRender as render };
 
 // Helper function for screen reader announcements in tests
