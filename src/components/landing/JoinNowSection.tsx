@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Button } from "@/components/ui/consolidated-button";
+import { Button } from "@/components/ui/button";
 
 const JoinNowSection: React.FC = () => {
   return (
