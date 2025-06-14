@@ -2,7 +2,7 @@
 import React from "react";
 import { NavDropdown } from "./NavDropdown";
 import { UserMenu } from "./UserMenu";
-import { AuthButtons } from "../landing/AuthButtons";
+import AuthButtons from "../landing/AuthButtons";
 import { mainNavigationItems } from "./navigation-data";
 
 interface WebFirstNavigationProps {
@@ -22,7 +22,11 @@ export function WebFirstNavigation({ isLoggedIn, userName, onLogout }: WebFirstN
         {isLoggedIn && userName ? (
           <UserMenu userName={userName} onLogout={onLogout} />
         ) : (
-          <AuthButtons />
+          <AuthButtons 
+            isLoggedIn={isLoggedIn}
+            userName={userName}
+            onLogout={onLogout}
+          />
         )}
       </div>
     </nav>
