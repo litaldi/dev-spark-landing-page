@@ -1,14 +1,17 @@
 
 /**
- * Auth-related types for the authentication system
+ * Enhanced auth-related types for the authentication system
  */
 
 export interface AuthUser {
+  id: string;
   email: string;
   name: string;
-  isDemoUser: boolean;
   isFirstTimeUser?: boolean;
 }
+
+// Alias for backward compatibility
+export interface SecureAuthUser extends AuthUser {}
 
 export type RegisterFormData = {
   name: string;

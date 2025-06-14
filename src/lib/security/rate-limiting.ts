@@ -1,136 +1,242 @@
 
 /**
- * Client-side rate limiting utilities
+ * Enhanced rate limiting with multiple strategies
  */
 
 interface RateLimitConfig {
-  maxAttempts: number;
-  windowMs: number;
-  blockDurationMs?: number;
-}
-
-interface RateLimitOptions {
   maxRequests: number;
-  timeWindow?: number;
+  timeWindow: number; // in milliseconds
+  blockDuration?: number; // in milliseconds
+  strategy?: 'sliding' | 'fixed';
 }
 
-class RateLimiter {
-  private attempts: Map<string, number[]> = new Map();
-  private blocked: Map<string, number> = new Map();
+interface RateLimitResult {
+  isAllowed: boolean;
+  remainingRequests: number;
+  resetTime: number;
+  retryAfter?: number;
+}
 
-  isBlocked(key: string, config: RateLimitConfig): boolean {
-    const blockedUntil = this.blocked.get(key);
-    if (blockedUntil && Date.now() < blockedUntil) {
-      return true;
-    }
+interface RateLimitEntry {
+  requests: number[];
+  blockedUntil?: number;
+  strategy: 'sliding' | 'fixed';
+  windowStart?: number;
+}
+
+class EnhancedRateLimit {
+  private static storage = new Map<string, RateLimitEntry>();
+  private static readonly CLEANUP_INTERVAL = 5 * 60 * 1000; // 5 minutes
+  private static cleanupTimer: NodeJS.Timeout | null = null;
+
+  /**
+   * Check if request is rate limited
+   */
+  static checkLimit(key: string, config: RateLimitConfig): RateLimitResult {
+    this.ensureCleanup();
     
-    if (blockedUntil && Date.now() >= blockedUntil) {
-      this.blocked.delete(key);
-      this.attempts.delete(key);
-    }
-    
-    return false;
-  }
-
-  attempt(key: string, config: RateLimitConfig): boolean {
-    if (this.isBlocked(key, config)) {
-      return false;
-    }
-
     const now = Date.now();
-    const attempts = this.attempts.get(key) || [];
-    
-    // Remove attempts outside the window
-    const validAttempts = attempts.filter(time => now - time < config.windowMs);
-    
-    if (validAttempts.length >= config.maxAttempts) {
-      // Block the key
-      const blockDuration = config.blockDurationMs || config.windowMs;
-      this.blocked.set(key, now + blockDuration);
-      return false;
+    const entry = this.getOrCreateEntry(key, config);
+
+    // Check if currently blocked
+    if (entry.blockedUntil && now < entry.blockedUntil) {
+      return {
+        isAllowed: false,
+        remainingRequests: 0,
+        resetTime: entry.blockedUntil,
+        retryAfter: entry.blockedUntil - now
+      };
     }
-    
-    validAttempts.push(now);
-    this.attempts.set(key, validAttempts);
-    return true;
+
+    // Clear block if expired
+    if (entry.blockedUntil && now >= entry.blockedUntil) {
+      entry.blockedUntil = undefined;
+      entry.requests = [];
+    }
+
+    const result = config.strategy === 'sliding' 
+      ? this.checkSlidingWindow(entry, config, now)
+      : this.checkFixedWindow(entry, config, now);
+
+    // Apply blocking if limit exceeded
+    if (!result.isAllowed && config.blockDuration) {
+      entry.blockedUntil = now + config.blockDuration;
+      entry.requests = [];
+    }
+
+    this.storage.set(key, entry);
+    return result;
   }
 
-  getRemainingAttempts(key: string, config: RateLimitConfig): number {
-    if (this.isBlocked(key, config)) {
-      return 0;
+  /**
+   * Register a request attempt
+   */
+  static registerRequest(key: string, config: RateLimitConfig): RateLimitResult {
+    const result = this.checkLimit(key, config);
+    
+    if (result.isAllowed) {
+      const entry = this.storage.get(key)!;
+      entry.requests.push(Date.now());
+      this.storage.set(key, entry);
+    }
+    
+    return result;
+  }
+
+  /**
+   * Sliding window rate limiting
+   */
+  private static checkSlidingWindow(
+    entry: RateLimitEntry, 
+    config: RateLimitConfig, 
+    now: number
+  ): RateLimitResult {
+    const windowStart = now - config.timeWindow;
+    
+    // Remove old requests outside the window
+    entry.requests = entry.requests.filter(time => time > windowStart);
+    
+    const remainingRequests = Math.max(0, config.maxRequests - entry.requests.length);
+    const isAllowed = entry.requests.length < config.maxRequests;
+    
+    let resetTime = now + config.timeWindow;
+    if (entry.requests.length > 0) {
+      resetTime = entry.requests[0] + config.timeWindow;
     }
 
+    return {
+      isAllowed,
+      remainingRequests,
+      resetTime
+    };
+  }
+
+  /**
+   * Fixed window rate limiting
+   */
+  private static checkFixedWindow(
+    entry: RateLimitEntry, 
+    config: RateLimitConfig, 
+    now: number
+  ): RateLimitResult {
+    const windowStart = entry.windowStart || now;
+    const windowEnd = windowStart + config.timeWindow;
+
+    // Reset window if expired
+    if (now >= windowEnd) {
+      entry.requests = [];
+      entry.windowStart = now;
+    }
+
+    const remainingRequests = Math.max(0, config.maxRequests - entry.requests.length);
+    const isAllowed = entry.requests.length < config.maxRequests;
+
+    return {
+      isAllowed,
+      remainingRequests,
+      resetTime: entry.windowStart! + config.timeWindow
+    };
+  }
+
+  /**
+   * Get or create rate limit entry
+   */
+  private static getOrCreateEntry(key: string, config: RateLimitConfig): RateLimitEntry {
+    let entry = this.storage.get(key);
+    
+    if (!entry) {
+      entry = {
+        requests: [],
+        strategy: config.strategy || 'sliding'
+      };
+    }
+
+    return entry;
+  }
+
+  /**
+   * Reset rate limit for a key
+   */
+  static resetLimit(key: string): void {
+    this.storage.delete(key);
+  }
+
+  /**
+   * Clear all rate limits
+   */
+  static clearAllLimits(): void {
+    this.storage.clear();
+  }
+
+  /**
+   * Get current status for a key
+   */
+  static getStatus(key: string, config: RateLimitConfig): RateLimitResult {
+    return this.checkLimit(key, config);
+  }
+
+  /**
+   * Ensure cleanup timer is running
+   */
+  private static ensureCleanup(): void {
+    if (!this.cleanupTimer) {
+      this.cleanupTimer = setInterval(() => {
+        this.cleanup();
+      }, this.CLEANUP_INTERVAL);
+    }
+  }
+
+  /**
+   * Clean up expired entries
+   */
+  private static cleanup(): void {
     const now = Date.now();
-    const attempts = this.attempts.get(key) || [];
-    const validAttempts = attempts.filter(time => now - time < config.windowMs);
     
-    return Math.max(0, config.maxAttempts - validAttempts.length);
+    for (const [key, entry] of this.storage.entries()) {
+      // Remove entries that are no longer blocked and have no recent requests
+      const hasRecentRequests = entry.requests.some(time => 
+        now - time < this.CLEANUP_INTERVAL
+      );
+      
+      const isBlocked = entry.blockedUntil && now < entry.blockedUntil;
+      
+      if (!hasRecentRequests && !isBlocked) {
+        this.storage.delete(key);
+      }
+    }
   }
 
-  getBlockedUntil(key: string): number | null {
-    return this.blocked.get(key) || null;
+  /**
+   * Get storage size for monitoring
+   */
+  static getStorageSize(): number {
+    return this.storage.size;
   }
 }
 
-// Global rate limiter instance
-export const rateLimiter = new RateLimiter();
-
-/**
- * Simple rate limiting function for backward compatibility
- */
-export function isRateLimited(key: string, options: RateLimitOptions): boolean {
+// Legacy compatibility function
+export function isRateLimited(key: string, options: { maxRequests: number; timeWindow?: number }): boolean {
   const config: RateLimitConfig = {
-    maxAttempts: options.maxRequests,
-    windowMs: options.timeWindow || 60000, // Default 1 minute
+    maxRequests: options.maxRequests,
+    timeWindow: options.timeWindow || 60000, // 1 minute default
+    strategy: 'sliding'
   };
   
-  const storageKey = `rateLimit_${key}`;
-  
-  try {
-    const stored = localStorage.getItem(storageKey);
-    const attempts = stored ? JSON.parse(stored) : [];
-    const now = Date.now();
-    
-    // Filter out old attempts
-    const validAttempts = attempts.filter((time: number) => now - time < config.windowMs);
-    
-    if (validAttempts.length >= config.maxAttempts) {
-      return true; // Rate limited
-    }
-    
-    // Add this attempt
-    validAttempts.push(now);
-    localStorage.setItem(storageKey, JSON.stringify(validAttempts));
-    
-    return false; // Not rate limited
-  } catch (error) {
-    console.error('Error checking rate limit:', error);
-    return false; // Fail open
-  }
+  const result = EnhancedRateLimit.registerRequest(key, config);
+  return !result.isAllowed;
 }
 
-// Common rate limit configurations
-export const rateLimitConfigs = {
-  login: {
-    maxAttempts: 5,
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    blockDurationMs: 30 * 60 * 1000, // 30 minutes
-  },
-  registration: {
-    maxAttempts: 3,
-    windowMs: 60 * 60 * 1000, // 1 hour
-    blockDurationMs: 60 * 60 * 1000, // 1 hour
-  },
-  passwordReset: {
-    maxAttempts: 3,
-    windowMs: 60 * 60 * 1000, // 1 hour
-    blockDurationMs: 60 * 60 * 1000, // 1 hour
-  },
-  apiRequest: {
-    maxAttempts: 100,
-    windowMs: 60 * 1000, // 1 minute
-    blockDurationMs: 60 * 1000, // 1 minute
-  }
-};
+// Legacy compatibility function  
+export function checkRateLimit(key: string): boolean {
+  const config: RateLimitConfig = {
+    maxRequests: 10,
+    timeWindow: 60000, // 1 minute
+    strategy: 'sliding'
+  };
+  
+  const result = EnhancedRateLimit.checkLimit(key, config);
+  return result.isAllowed;
+}
 
-export type { RateLimitConfig, RateLimitOptions };
+export { EnhancedRateLimit };
+export type { RateLimitConfig, RateLimitResult };
