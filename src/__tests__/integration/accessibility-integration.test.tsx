@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { render, screen, fireEvent, act, waitFor } from '../test-utils';
 import { AccessibilityMenu } from '@/components/a11y/AccessibilityMenu';

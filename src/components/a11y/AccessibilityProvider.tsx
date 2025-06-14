@@ -1,10 +1,7 @@
-
-import React, { createContext, useContext, useEffect } from 'react';
+import React, { createContext, useContext, useEffect, useCallback } from 'react';
 import { useLocalStorage } from '@/hooks/use-local-storage';
 import { AccessibilitySettings } from '@/components/a11y/AccessibilityMenu';
-import { prefersReducedMotion } from '@/lib/keyboard-utils';
 import { createSkipLink } from '@/lib/keyboard-utils/a11y-helpers';
-import { applyReducedMotionStyles } from '@/lib/motion-utils';
 
 // Default settings if none are found in local storage
 const defaultSettings: AccessibilitySettings = {
@@ -23,7 +20,6 @@ interface AccessibilityContextType {
   resetSettings: () => void;
 }
 
-// Create the context
 const AccessibilityContext = createContext<AccessibilityContextType | undefined>(undefined);
 
 export function AccessibilityProvider({ children }: { children: React.ReactNode }) {
@@ -32,7 +28,6 @@ export function AccessibilityProvider({ children }: { children: React.ReactNode 
     defaultSettings
   );
 
-  // Ensure settings are properly typed and have fallbacks
   const safeSettings = React.useMemo(() => {
     if (!settings || typeof settings !== 'object') {
       return defaultSettings;
@@ -49,8 +44,8 @@ export function AccessibilityProvider({ children }: { children: React.ReactNode 
     };
   }, [settings]);
 
-  // Apply settings whenever they change
-  useEffect(() => {
+  // Memoized style application for better performance
+  const applyAccessibilityStyles = useCallback(() => {
     try {
       // Apply text size
       if (safeSettings.textSize > 0) {
@@ -58,46 +53,24 @@ export function AccessibilityProvider({ children }: { children: React.ReactNode 
       }
       
       // Apply high contrast mode
-      if (safeSettings.highContrast) {
-        document.documentElement.classList.add('high-contrast');
-      } else {
-        document.documentElement.classList.remove('high-contrast');
-      }
+      document.documentElement.classList.toggle('high-contrast', safeSettings.highContrast);
       
       // Apply keyboard navigation mode
-      if (safeSettings.keyboardMode) {
-        document.body.classList.add('keyboard-navigation');
-      } else {
-        document.body.classList.remove('keyboard-navigation');
-      }
-      
-      // Apply reduced motion (checks both settings and user preference)
-      const shouldReduceMotion = safeSettings.reducedMotion || (typeof prefersReducedMotion === 'function' ? prefersReducedMotion() : false);
-      if (typeof applyReducedMotionStyles === 'function') {
-        applyReducedMotionStyles(shouldReduceMotion);
-      }
+      document.body.classList.toggle('keyboard-navigation', safeSettings.keyboardMode);
       
       // Apply large pointer
-      if (safeSettings.largePointer) {
-        document.documentElement.classList.add('large-pointer');
-      } else {
-        document.documentElement.classList.remove('large-pointer');
-      }
+      document.documentElement.classList.toggle('large-pointer', safeSettings.largePointer);
       
-      // Apply line height
+      // Apply line height and letter spacing
       if (safeSettings.lineHeight > 0) {
         document.documentElement.style.setProperty('--a11y-line-height', safeSettings.lineHeight.toString());
       }
-      
-      // Apply letter spacing
       document.documentElement.style.setProperty('--a11y-letter-spacing', `${safeSettings.letterSpacing}px`);
       
-      // Create skip link for keyboard navigation
-      if (typeof createSkipLink === 'function') {
-        createSkipLink('main-content');
-      }
+      // Create skip link
+      createSkipLink('main-content');
       
-      // Add accessibility styles
+      // Enhanced accessibility styles
       const styleId = 'accessibility-styles';
       let styleElement = document.getElementById(styleId) as HTMLStyleElement;
       
@@ -131,34 +104,49 @@ export function AccessibilityProvider({ children }: { children: React.ReactNode 
         }
         
         .high-contrast {
-          filter: contrast(150%);
+          filter: contrast(150%) brightness(1.1);
+        }
+        
+        /* RTL Support */
+        [dir="rtl"] {
+          text-align: right;
+        }
+        
+        [dir="rtl"] .flex {
+          flex-direction: row-reverse;
+        }
+        
+        /* Enhanced focus indicators */
+        .keyboard-navigation button:focus,
+        .keyboard-navigation a:focus,
+        .keyboard-navigation input:focus,
+        .keyboard-navigation select:focus,
+        .keyboard-navigation textarea:focus {
+          box-shadow: 0 0 0 3px rgba(64, 156, 255, 0.3) !important;
         }
       `;
     } catch (error) {
       console.error('Error applying accessibility settings:', error);
     }
+  }, [safeSettings]);
+
+  useEffect(() => {
+    applyAccessibilityStyles();
 
     return () => {
       try {
-        // Clean up
+        // Cleanup
         document.documentElement.style.fontSize = '';
-        document.documentElement.classList.remove('high-contrast');
+        document.documentElement.classList.remove('high-contrast', 'large-pointer');
         document.body.classList.remove('keyboard-navigation');
-        document.documentElement.classList.remove('large-pointer');
         document.documentElement.style.removeProperty('--a11y-line-height');
         document.documentElement.style.removeProperty('--a11y-letter-spacing');
-        
-        const styleElement = document.getElementById('accessibility-styles');
-        if (styleElement) {
-          styleElement.remove();
-        }
       } catch (error) {
         console.error('Error cleaning up accessibility settings:', error);
       }
     };
-  }, [safeSettings]);
+  }, [applyAccessibilityStyles]);
 
-  // Create context value
   const contextValue: AccessibilityContextType = {
     settings: safeSettings,
     updateSettings: (key, value) => {
@@ -184,7 +172,6 @@ export function AccessibilityProvider({ children }: { children: React.ReactNode 
   );
 }
 
-// Hook to use the accessibility context
 export function useAccessibility() {
   const context = useContext(AccessibilityContext);
   if (context === undefined) {

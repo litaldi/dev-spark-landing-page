@@ -1,16 +1,6 @@
 
-// Export all security utilities from a central location
-export * from './csrf-protection';
-export * from './rate-limiting';
-export * from './http-security';
+// Security utilities central export
 export * from './input-validation';
-
-// Re-export with legacy names for backward compatibility
-export {
-  generateCSRFToken as generateCsrfToken,
-  getCSRFToken as getCsrfToken,
-  setCSRFToken as setCsrfToken,
-  validateCSRFToken as validateCsrfToken,
-  addCSRFToFormData as addCsrfToFormData,
-  initializeCSRF as initializeCsrf
-} from './csrf-protection';
+export * from './rate-limiting';
+export * from './csrf-protection';
+export * from './http-security';
