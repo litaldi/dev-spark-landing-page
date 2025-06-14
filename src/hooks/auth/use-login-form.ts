@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useAuth } from "@/hooks/auth";
 import { useToast } from "@/hooks/use-toast";
@@ -45,7 +44,7 @@ export function useLoginForm(onMagicLink?: (email: string) => void) {
     registerAttempt,
     resetLimit,
   } = useRateLimit("login", {
-    maxAttempts: 5,           // Max 5 attempts
+    maxRequests: 5,           // Max 5 attempts
     timeWindow: 60000 * 10,   // Within 10 minutes
     blockDuration: 60000 * 15 // Block for 15 minutes after exceeding
   });

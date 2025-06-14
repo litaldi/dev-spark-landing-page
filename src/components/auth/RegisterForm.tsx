@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
@@ -54,7 +53,7 @@ export function RegisterForm({ onGoogleSignUp }: RegisterFormProps) {
     timeRemaining,
     registerAttempt,
   } = useRateLimit("register", {
-    maxAttempts: 3,            // Max 3 attempts
+    maxRequests: 3,            // Max 3 attempts
     timeWindow: 60000 * 30,    // Within 30 minutes
     blockDuration: 60000 * 60  // Block for 1 hour after exceeding
   });
