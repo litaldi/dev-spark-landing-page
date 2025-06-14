@@ -1,38 +1,37 @@
 
 /**
- * CSRF Protection utilities
+ * CSRF (Cross-Site Request Forgery) protection utilities
  */
 
-let csrfToken: string | null = null;
-
 /**
- * Generate a CSRF token
+ * Generate a random CSRF token
  */
 export function generateCSRFToken(): string {
   const array = new Uint8Array(32);
   crypto.getRandomValues(array);
-  const token = Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
-  setCSRFToken(token);
-  return token;
+  return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
 }
 
 /**
- * Get the current CSRF token
+ * Store CSRF token in session storage
  */
-export function getCSRFToken(): string | null {
-  return csrfToken;
-}
-
-/**
- * Set the CSRF token
- */
-export function setCSRFToken(token: string): void {
-  csrfToken = token;
-  // Store in session storage for persistence across page reloads
+export function storeCSRFToken(token: string): void {
   try {
     sessionStorage.setItem('csrf-token', token);
   } catch (error) {
-    console.warn('Unable to store CSRF token in session storage:', error);
+    console.warn('Could not store CSRF token:', error);
+  }
+}
+
+/**
+ * Get CSRF token from session storage
+ */
+export function getCSRFToken(): string | null {
+  try {
+    return sessionStorage.getItem('csrf-token');
+  } catch (error) {
+    console.warn('Could not retrieve CSRF token:', error);
+    return null;
   }
 }
 
@@ -40,13 +39,28 @@ export function setCSRFToken(token: string): void {
  * Validate CSRF token
  */
 export function validateCSRFToken(token: string): boolean {
-  return token === csrfToken;
+  const storedToken = getCSRFToken();
+  return storedToken !== null && token === storedToken;
+}
+
+/**
+ * Initialize CSRF protection for the application
+ */
+export function initializeCSRFProtection(): string {
+  let token = getCSRFToken();
+  
+  if (!token) {
+    token = generateCSRFToken();
+    storeCSRFToken(token);
+  }
+  
+  return token;
 }
 
 /**
  * Add CSRF token to form data
  */
-export function addCSRFToFormData(formData: FormData): void {
+export function addCSRFTokenToFormData(formData: FormData): void {
   const token = getCSRFToken();
   if (token) {
     formData.append('csrf-token', token);
@@ -54,18 +68,29 @@ export function addCSRFToFormData(formData: FormData): void {
 }
 
 /**
- * Initialize CSRF protection
+ * Add CSRF token to request headers
  */
-export function initializeCSRF(): void {
-  try {
-    const storedToken = sessionStorage.getItem('csrf-token');
-    if (storedToken) {
-      setCSRFToken(storedToken);
-    } else {
-      generateCSRFToken();
-    }
-  } catch (error) {
-    console.warn('Unable to initialize CSRF protection:', error);
-    generateCSRFToken();
+export function addCSRFTokenToHeaders(headers: Record<string, string>): Record<string, string> {
+  const token = getCSRFToken();
+  if (token) {
+    return {
+      ...headers,
+      'X-CSRF-Token': token,
+    };
   }
+  return headers;
+}
+
+/**
+ * React hook for CSRF protection
+ */
+export function useCSRFProtection() {
+  const token = initializeCSRFProtection();
+  
+  return {
+    token,
+    addToFormData: addCSRFTokenToFormData,
+    addToHeaders: addCSRFTokenToHeaders,
+    validate: validateCSRFToken,
+  };
 }

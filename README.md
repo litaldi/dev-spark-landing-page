@@ -89,7 +89,7 @@ A modern, AI-powered programming education platform built with React, TypeScript
 - `npm run dev` - Start development server with hot reload
 - `npm run build` - Build optimized production bundle
 - `npm run preview` - Preview production build locally
-- `npm run test` - Run test suite
+- `npm test` - Run test suite
 - `npm run test:a11y` - Run accessibility-specific tests
 - `npm run test:watch` - Run tests in watch mode
 - `npm run test:coverage` - Generate test coverage report

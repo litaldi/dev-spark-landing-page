@@ -1,75 +1,38 @@
 
 /**
- * HTTP Security utilities
+ * HTTP security utilities for web application protection
  */
-
-/**
- * Security headers for fetch requests
- */
-export const securityHeaders = {
-  'Content-Type': 'application/json',
-  'X-Content-Type-Options': 'nosniff',
-  'X-Frame-Options': 'DENY',
-  'X-XSS-Protection': '1; mode=block',
-  'Referrer-Policy': 'strict-origin-when-cross-origin'
-};
-
-/**
- * Secure fetch wrapper with default security headers
- */
-export async function secureFetch(
-  url: string,
-  options: RequestInit = {}
-): Promise<Response> {
-  const secureOptions: RequestInit = {
-    ...options,
-    headers: {
-      ...securityHeaders,
-      ...options.headers
-    },
-    credentials: 'same-origin', // Prevent CSRF
-    mode: 'cors'
-  };
-
-  try {
-    const response = await fetch(url, secureOptions);
-    
-    // Check for common security issues
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-    }
-    
-    return response;
-  } catch (error) {
-    console.error('Secure fetch error:', error);
-    throw error;
-  }
-}
 
 /**
  * Validate URL to prevent SSRF attacks
  */
 export function validateURL(url: string): boolean {
   try {
-    const parsedURL = new URL(url);
+    const parsedUrl = new URL(url);
     
-    // Only allow HTTP and HTTPS
-    if (!['http:', 'https:'].includes(parsedURL.protocol)) {
-      return false;
-    }
+    // Block private/internal network addresses
+    const hostname = parsedUrl.hostname.toLowerCase();
     
-    // Prevent access to local/private networks
-    const hostname = parsedURL.hostname.toLowerCase();
-    
-    // Reject localhost and private IPs
+    // Block localhost and private IPs
     if (
       hostname === 'localhost' ||
       hostname === '127.0.0.1' ||
       hostname === '::1' ||
       hostname.startsWith('192.168.') ||
       hostname.startsWith('10.') ||
-      hostname.startsWith('172.')
+      hostname.startsWith('172.16.') ||
+      hostname.startsWith('172.17.') ||
+      hostname.startsWith('172.18.') ||
+      hostname.startsWith('172.19.') ||
+      hostname.startsWith('172.2') ||
+      hostname.startsWith('172.30.') ||
+      hostname.startsWith('172.31.')
     ) {
+      return false;
+    }
+    
+    // Only allow HTTP and HTTPS protocols
+    if (!['http:', 'https:'].includes(parsedUrl.protocol)) {
       return false;
     }
     
@@ -80,79 +43,107 @@ export function validateURL(url: string): boolean {
 }
 
 /**
- * Content Security Policy helpers
+ * Apply security headers to fetch requests
  */
-export function generateNonce(): string {
-  const array = new Uint8Array(16);
-  crypto.getRandomValues(array);
-  return btoa(String.fromCharCode(...array));
+export function applySecurityHeaders(headers: Record<string, string> = {}): Record<string, string> {
+  return {
+    ...headers,
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
+    'X-XSS-Protection': '1; mode=block',
+    'Referrer-Policy': 'strict-origin-when-cross-origin',
+  };
 }
 
 /**
- * Apply security defenses to the application
+ * Secure fetch wrapper with built-in protections
+ */
+export async function secureFetch(
+  url: string, 
+  options: RequestInit = {}
+): Promise<Response> {
+  // Validate URL
+  if (!validateURL(url)) {
+    throw new Error('Invalid or potentially unsafe URL');
+  }
+  
+  // Apply security headers
+  const secureHeaders = applySecurityHeaders(
+    options.headers as Record<string, string>
+  );
+  
+  // Add timeout to prevent hanging requests
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+  
+  try {
+    const response = await fetch(url, {
+      ...options,
+      headers: secureHeaders,
+      signal: controller.signal,
+    });
+    
+    clearTimeout(timeout);
+    return response;
+  } catch (error) {
+    clearTimeout(timeout);
+    throw error;
+  }
+}
+
+/**
+ * Content Security Policy configuration
+ */
+export const CSPDirectives = {
+  defaultSrc: ["'self'"],
+  scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+  styleSrc: ["'self'", "'unsafe-inline'"],
+  imgSrc: ["'self'", "data:", "https:"],
+  fontSrc: ["'self'", "https:", "data:"],
+  connectSrc: ["'self'", "https:"],
+  frameSrc: ["'none'"],
+  objectSrc: ["'none'"],
+  baseUri: ["'self'"],
+  formAction: ["'self'"],
+};
+
+/**
+ * Generate CSP header value
+ */
+export function generateCSPHeader(): string {
+  return Object.entries(CSPDirectives)
+    .map(([directive, sources]) => {
+      const kebabDirective = directive.replace(/([A-Z])/g, '-$1').toLowerCase();
+      return `${kebabDirective} ${sources.join(' ')}`;
+    })
+    .join('; ');
+}
+
+/**
+ * Apply comprehensive security defenses
  */
 export function applySecurityDefenses(): void {
   try {
-    // Set security headers via meta tags where possible
-    const setMetaTag = (name: string, content: string) => {
-      let meta = document.querySelector(`meta[http-equiv="${name}"]`) as HTMLMetaElement;
-      if (!meta) {
-        meta = document.createElement('meta');
-        meta.httpEquiv = name;
-        document.head.appendChild(meta);
-      }
-      meta.content = content;
-    };
-
-    // Apply CSP via meta tag
-    setMetaTag('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'");
+    // Set CSP via meta tag if not already set
+    if (!document.querySelector('meta[http-equiv="Content-Security-Policy"]')) {
+      const meta = document.createElement('meta');
+      meta.httpEquiv = 'Content-Security-Policy';
+      meta.content = generateCSPHeader();
+      document.head.appendChild(meta);
+    }
     
-    // Apply other security headers where possible
-    setMetaTag('X-Content-Type-Options', 'nosniff');
-    setMetaTag('X-Frame-Options', 'DENY');
-    setMetaTag('X-XSS-Protection', '1; mode=block');
+    // Disable right-click context menu in production (optional)
+    if (process.env.NODE_ENV === 'production') {
+      document.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+      });
+    }
     
-    console.log('Security defenses applied');
+    // Prevent frame embedding
+    if (window !== window.top) {
+      window.top!.location = window.location;
+    }
   } catch (error) {
-    console.error('Error applying security defenses:', error);
+    console.warn('Could not apply all security defenses:', error);
   }
 }
-
-/**
- * Secure storage utilities
- */
-export const secureStorage = {
-  set(key: string, value: string): void {
-    try {
-      // Use sessionStorage for sensitive data
-      sessionStorage.setItem(key, value);
-    } catch (error) {
-      console.error('Error storing secure data:', error);
-    }
-  },
-  
-  get(key: string): string | null {
-    try {
-      return sessionStorage.getItem(key);
-    } catch (error) {
-      console.error('Error retrieving secure data:', error);
-      return null;
-    }
-  },
-  
-  remove(key: string): void {
-    try {
-      sessionStorage.removeItem(key);
-    } catch (error) {
-      console.error('Error removing secure data:', error);
-    }
-  },
-  
-  clear(): void {
-    try {
-      sessionStorage.clear();
-    } catch (error) {
-      console.error('Error clearing secure data:', error);
-    }
-  }
-};
