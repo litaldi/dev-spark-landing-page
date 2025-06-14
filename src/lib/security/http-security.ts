@@ -1,73 +1,128 @@
 
 /**
- * HTTP Security utilities for CSP, HSTS, and other security headers
+ * HTTP Security utilities
  */
 
-// Content Security Policy configuration
-const CSP_DIRECTIVES = {
-  'default-src': ["'self'"],
-  'script-src': ["'self'", "'unsafe-inline'", "https://cdn.gpteng.co"],
-  'style-src': ["'self'", "'unsafe-inline'"],
-  'img-src': ["'self'", "data:", "https:"],
-  'connect-src': ["'self'", "https:"],
-  'font-src': ["'self'", "https:", "data:"],
-  'frame-ancestors': ["'none'"], // This was causing the iframe embedding error
-  'base-uri': ["'self'"],
-  'form-action': ["'self'"]
+/**
+ * Security headers for fetch requests
+ */
+export const securityHeaders = {
+  'Content-Type': 'application/json',
+  'X-Content-Type-Options': 'nosniff',
+  'X-Frame-Options': 'DENY',
+  'X-XSS-Protection': '1; mode=block',
+  'Referrer-Policy': 'strict-origin-when-cross-origin'
 };
 
 /**
- * Apply security defenses to the application
+ * Secure fetch wrapper with default security headers
  */
-export function applySecurityDefenses(): void {
+export async function secureFetch(
+  url: string,
+  options: RequestInit = {}
+): Promise<Response> {
+  const secureOptions: RequestInit = {
+    ...options,
+    headers: {
+      ...securityHeaders,
+      ...options.headers
+    },
+    credentials: 'same-origin', // Prevent CSRF
+    mode: 'cors'
+  };
+
   try {
-    // Check if we're in an iframe (for Lovable preview)
-    const isInIframe = window !== window.parent;
+    const response = await fetch(url, secureOptions);
     
-    // Only apply frame-ancestors restriction if not in iframe
-    if (!isInIframe) {
-      // Apply Content Security Policy
-      const cspString = Object.entries(CSP_DIRECTIVES)
-        .map(([directive, sources]) => `${directive} ${sources.join(' ')}`)
-        .join('; ');
-      
-      const metaCSP = document.createElement('meta');
-      metaCSP.setAttribute('http-equiv', 'Content-Security-Policy');
-      metaCSP.setAttribute('content', cspString);
-      document.head.appendChild(metaCSP);
+    // Check for common security issues
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
     
-    // Apply other security headers via meta tags
-    const securityHeaders = [
-      { name: 'X-Content-Type-Options', content: 'nosniff' },
-      { name: 'X-Frame-Options', content: isInIframe ? 'ALLOWALL' : 'DENY' },
-      { name: 'X-XSS-Protection', content: '1; mode=block' },
-      { name: 'Referrer-Policy', content: 'strict-origin-when-cross-origin' }
-    ];
-    
-    securityHeaders.forEach(header => {
-      const meta = document.createElement('meta');
-      meta.setAttribute('http-equiv', header.name);
-      meta.setAttribute('content', header.content);
-      document.head.appendChild(meta);
-    });
-    
-    console.log('Security defenses applied successfully');
+    return response;
   } catch (error) {
-    console.error('Failed to apply security defenses:', error);
-    // Don't throw error to prevent app from breaking
+    console.error('Secure fetch error:', error);
+    throw error;
   }
 }
 
 /**
- * Validate that current page meets security requirements
+ * Validate URL to prevent SSRF attacks
  */
-export function validatePageSecurity(): boolean {
-  // Check for HTTPS in production
-  if (location.protocol !== 'https:' && location.hostname !== 'localhost') {
-    console.warn('Page should be served over HTTPS in production');
+export function validateURL(url: string): boolean {
+  try {
+    const parsedURL = new URL(url);
+    
+    // Only allow HTTP and HTTPS
+    if (!['http:', 'https:'].includes(parsedURL.protocol)) {
+      return false;
+    }
+    
+    // Prevent access to local/private networks
+    const hostname = parsedURL.hostname.toLowerCase();
+    
+    // Reject localhost and private IPs
+    if (
+      hostname === 'localhost' ||
+      hostname === '127.0.0.1' ||
+      hostname === '::1' ||
+      hostname.startsWith('192.168.') ||
+      hostname.startsWith('10.') ||
+      hostname.startsWith('172.')
+    ) {
+      return false;
+    }
+    
+    return true;
+  } catch {
     return false;
   }
-  
-  return true;
 }
+
+/**
+ * Content Security Policy helpers
+ */
+export function generateNonce(): string {
+  const array = new Uint8Array(16);
+  crypto.getRandomValues(array);
+  return btoa(String.fromCharCode(...array));
+}
+
+/**
+ * Secure storage utilities
+ */
+export const secureStorage = {
+  set(key: string, value: string): void {
+    try {
+      // Use sessionStorage for sensitive data
+      sessionStorage.setItem(key, value);
+    } catch (error) {
+      console.error('Error storing secure data:', error);
+    }
+  },
+  
+  get(key: string): string | null {
+    try {
+      return sessionStorage.getItem(key);
+    } catch (error) {
+      console.error('Error retrieving secure data:', error);
+      return null;
+    }
+  },
+  
+  remove(key: string): void {
+    try {
+      sessionStorage.removeItem(key);
+    } catch (error) {
+      console.error('Error removing secure data:', error);
+    }
+  },
+  
+  clear(): void {
+    try {
+      sessionStorage.clear();
+    } catch (error) {
+      console.error('Error clearing secure data:', error);
+    }
+  }
+};

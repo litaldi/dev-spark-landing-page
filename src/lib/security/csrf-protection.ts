@@ -3,53 +3,69 @@
  * CSRF Protection utilities
  */
 
-// Generate a random CSRF token
+let csrfToken: string | null = null;
+
+/**
+ * Generate a CSRF token
+ */
 export function generateCSRFToken(): string {
   const array = new Uint8Array(32);
   crypto.getRandomValues(array);
-  return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
-}
-
-/**
- * Set CSRF token in localStorage and return it
- */
-export function setCSRFToken(): string {
-  const token = generateCSRFToken();
-  localStorage.setItem('csrf-token', token);
+  const token = Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
+  setCSRFToken(token);
   return token;
 }
 
 /**
- * Get CSRF token from localStorage
+ * Get the current CSRF token
  */
 export function getCSRFToken(): string | null {
-  return localStorage.getItem('csrf-token');
+  return csrfToken;
+}
+
+/**
+ * Set the CSRF token
+ */
+export function setCSRFToken(token: string): void {
+  csrfToken = token;
+  // Store in session storage for persistence across page reloads
+  try {
+    sessionStorage.setItem('csrf-token', token);
+  } catch (error) {
+    console.warn('Unable to store CSRF token in session storage:', error);
+  }
 }
 
 /**
  * Validate CSRF token
  */
 export function validateCSRFToken(token: string): boolean {
-  const storedToken = getCSRFToken();
-  return storedToken !== null && storedToken === token;
+  return token === csrfToken;
 }
 
 /**
  * Add CSRF token to form data
  */
-export function addCSRFToFormData(formData: FormData): FormData {
+export function addCSRFToFormData(formData: FormData): void {
   const token = getCSRFToken();
   if (token) {
-    formData.append('csrf_token', token);
+    formData.append('csrf-token', token);
   }
-  return formData;
 }
 
 /**
- * Initialize CSRF protection on app start
+ * Initialize CSRF protection
  */
 export function initializeCSRF(): void {
-  if (!getCSRFToken()) {
-    setCSRFToken();
+  try {
+    const storedToken = sessionStorage.getItem('csrf-token');
+    if (storedToken) {
+      setCSRFToken(storedToken);
+    } else {
+      generateCSRFToken();
+    }
+  } catch (error) {
+    console.warn('Unable to initialize CSRF protection:', error);
+    generateCSRFToken();
   }
 }

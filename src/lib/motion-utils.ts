@@ -1,6 +1,6 @@
 
 /**
- * Motion utilities for handling reduced motion preferences
+ * Motion and animation utilities for accessibility and performance
  */
 
 /**
@@ -15,8 +15,7 @@ export function prefersReducedMotion(): boolean {
 }
 
 /**
- * Apply reduced motion styles
- * @param shouldReduce Whether to apply reduced motion
+ * Apply reduced motion styles globally
  */
 export function applyReducedMotionStyles(shouldReduce: boolean): void {
   try {
@@ -31,21 +30,49 @@ export function applyReducedMotionStyles(shouldReduce: boolean): void {
 }
 
 /**
- * Get appropriate animation duration based on motion preference
- * @param normalDuration Normal animation duration in ms
- * @param reducedDuration Reduced animation duration in ms (default: 0)
+ * Safe animation wrapper that respects motion preferences
  */
-export function getAnimationDuration(normalDuration: number, reducedDuration: number = 0): number {
-  return prefersReducedMotion() ? reducedDuration : normalDuration;
+export function safeAnimate(
+  element: HTMLElement,
+  animation: Keyframe[] | PropertyIndexedKeyframes,
+  options?: KeyframeAnimationOptions
+): Animation | null {
+  try {
+    if (prefersReducedMotion()) {
+      return null;
+    }
+    return element.animate(animation, options);
+  } catch (error) {
+    console.error('Error creating animation:', error);
+    return null;
+  }
 }
 
 /**
- * Create CSS transition string respecting motion preferences
- * @param property CSS property to transition
- * @param duration Duration in ms
- * @param easing Easing function (default: ease)
+ * Create a fade in animation that respects motion preferences
  */
-export function createTransition(property: string, duration: number, easing: string = 'ease'): string {
-  const actualDuration = getAnimationDuration(duration);
-  return `${property} ${actualDuration}ms ${easing}`;
+export function createFadeInAnimation(element: HTMLElement, duration = 300): Animation | null {
+  return safeAnimate(
+    element,
+    [
+      { opacity: 0, transform: 'translateY(10px)' },
+      { opacity: 1, transform: 'translateY(0)' }
+    ],
+    { duration, easing: 'ease-out', fill: 'forwards' }
+  );
+}
+
+/**
+ * Create a scale animation that respects motion preferences
+ */
+export function createScaleAnimation(element: HTMLElement, scale = 1.05, duration = 200): Animation | null {
+  return safeAnimate(
+    element,
+    [
+      { transform: 'scale(1)' },
+      { transform: `scale(${scale})` },
+      { transform: 'scale(1)' }
+    ],
+    { duration, easing: 'ease-out' }
+  );
 }
