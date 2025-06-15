@@ -14,7 +14,18 @@ const breakpoints = {
 };
 
 export function useBreakpoint(): Breakpoint {
-  const [breakpoint, setBreakpoint] = useState<Breakpoint>('lg');
+  const [breakpoint, setBreakpoint] = useState<Breakpoint>(() => {
+    if (typeof window === 'undefined') return 'lg';
+    const width = window.innerWidth;
+    
+    if (width >= breakpoints['2xl']) return '2xl';
+    if (width >= breakpoints.xl) return 'xl';
+    if (width >= breakpoints.lg) return 'lg';
+    if (width >= breakpoints.md) return 'md';
+    if (width >= breakpoints.sm) return 'sm';
+    if (width >= breakpoints.mobile) return 'mobile';
+    return 'xs';
+  });
 
   useEffect(() => {
     const updateBreakpoint = () => {
@@ -37,10 +48,10 @@ export function useBreakpoint(): Breakpoint {
       }
     };
 
-    updateBreakpoint();
-    window.addEventListener('resize', updateBreakpoint);
+    const debouncedUpdate = debounce(updateBreakpoint, 100);
+    window.addEventListener('resize', debouncedUpdate, { passive: true });
 
-    return () => window.removeEventListener('resize', updateBreakpoint);
+    return () => window.removeEventListener('resize', debouncedUpdate);
   }, []);
 
   return breakpoint;
@@ -65,11 +76,23 @@ export function useViewportSize() {
       });
     };
 
-    updateSize();
-    window.addEventListener('resize', updateSize);
+    const debouncedUpdate = debounce(updateSize, 100);
+    window.addEventListener('resize', debouncedUpdate, { passive: true });
 
-    return () => window.removeEventListener('resize', updateSize);
+    return () => window.removeEventListener('resize', debouncedUpdate);
   }, []);
 
   return size;
+}
+
+// Utility function for debouncing
+function debounce<T extends (...args: any[]) => void>(
+  func: T,
+  wait: number
+): (...args: Parameters<T>) => void {
+  let timeout: ReturnType<typeof setTimeout>;
+  return (...args: Parameters<T>) => {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func(...args), wait);
+  };
 }

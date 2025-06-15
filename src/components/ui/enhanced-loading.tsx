@@ -9,6 +9,7 @@ interface EnhancedLoadingProps {
   text?: string;
   className?: string;
   fullScreen?: boolean;
+  'aria-label'?: string;
 }
 
 export function EnhancedLoading({
@@ -16,7 +17,9 @@ export function EnhancedLoading({
   variant = "spinner",
   text,
   className,
-  fullScreen = false
+  fullScreen = false,
+  'aria-label': ariaLabel,
+  ...props
 }: EnhancedLoadingProps) {
   const sizeClasses = {
     sm: "w-4 h-4",
@@ -87,7 +90,13 @@ export function EnhancedLoading({
   };
 
   return (
-    <div className={containerClasses} role="status" aria-live="polite">
+    <div 
+      className={containerClasses} 
+      role="status" 
+      aria-live="polite"
+      aria-label={ariaLabel || text || "Loading"}
+      {...props}
+    >
       {renderLoader()}
       {text && (
         <p className="text-sm text-muted-foreground animate-fade-in">
@@ -109,6 +118,7 @@ export function PageLoading({ text = "Loading page..." }: { text?: string }) {
       variant="spinner"
       text={text}
       fullScreen
+      aria-label="Page is loading"
     />
   );
 }
@@ -119,6 +129,7 @@ export function ButtonLoading({ size = "sm" }: { size?: "sm" | "md" | "lg" }) {
       size={size}
       variant="spinner"
       className="inline-flex"
+      aria-label="Button action in progress"
     />
   );
 }
@@ -130,20 +141,27 @@ export function InlineLoading({ text }: { text?: string }) {
       variant="dots"
       text={text}
       className="inline-flex"
+      aria-label="Content loading"
     />
   );
 }
 
-// Add the missing LoadingSkeleton component
 export function LoadingSkeleton({ 
   className, 
-  lines = 3 
+  lines = 3,
+  'aria-label': ariaLabel = "Content placeholder"
 }: { 
   className?: string; 
-  lines?: number 
+  lines?: number;
+  'aria-label'?: string;
 }) {
   return (
-    <div className={cn("space-y-2", className)} aria-hidden="true">
+    <div 
+      className={cn("space-y-2", className)} 
+      aria-hidden="true"
+      role="img"
+      aria-label={ariaLabel}
+    >
       {Array.from({ length: lines }).map((_, i) => (
         <div
           key={i}

@@ -1,8 +1,8 @@
 
-import React from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Play, X } from "lucide-react";
+import React from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogClose } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Play, X } from 'lucide-react';
 
 interface DemoModalProps {
   open: boolean;
@@ -12,22 +12,49 @@ interface DemoModalProps {
 const DemoModal: React.FC<DemoModalProps> = ({ open, onOpenChange }) => {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl px-0 rounded-xl bg-background shadow-2xl animate-fade-in">
-        <DialogHeader className="flex items-center justify-between px-6 pt-4">
-          <DialogTitle className="text-xl font-semibold flex items-center gap-2">
-            <Play className="h-5 w-5 text-brand-500" />
-            Interactive Live Demo
+      <DialogContent className="sm:max-w-2xl">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Play className="h-5 w-5" />
+            VoiceSeller Demo
           </DialogTitle>
-          <DialogClose asChild>
-            <Button variant="ghost" size="icon" aria-label="Close Demo">
-              <X className="h-4 w-4" />
-            </Button>
-          </DialogClose>
+          <DialogDescription>
+            Watch how VoiceSeller helps sales professionals practice and improve their conversation skills.
+          </DialogDescription>
         </DialogHeader>
-        <div className="px-6 pb-6">
+        
+        <div className="space-y-4">
           <div className="aspect-video bg-muted rounded-lg flex items-center justify-center">
-            {/* Placeholder for demo video or live playground */}
-            <span className="text-muted-foreground text-base">[Demo goes here – e.g., video, playground, code preview]</span>
+            <div className="text-center">
+              <Play className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+              <p className="text-muted-foreground">Demo video coming soon</p>
+              <p className="text-sm text-muted-foreground mt-2">
+                In the meantime, try our practice sessions to experience VoiceSeller firsthand!
+              </p>
+            </div>
+          </div>
+          
+          <div className="space-y-3">
+            <h3 className="font-semibold">What you'll see in the demo:</h3>
+            <ul className="space-y-2 text-sm text-muted-foreground">
+              <li>• Real-time voice conversation with AI clients</li>
+              <li>• Instant feedback on your sales approach</li>
+              <li>• Progress tracking and skill development</li>
+              <li>• Multiple scenario types and difficulty levels</li>
+            </ul>
+          </div>
+          
+          <div className="flex justify-end gap-2 pt-4">
+            <Button variant="outline" onClick={() => onOpenChange(false)}>
+              Close
+            </Button>
+            <Button onClick={() => {
+              onOpenChange(false);
+              // Navigate to practice page
+              window.location.href = '/practice';
+            }}>
+              Try Practice Session
+            </Button>
           </div>
         </div>
       </DialogContent>
