@@ -21,6 +21,11 @@ export class SecurityEventLogger {
     details: Record<string, any> = {},
     severity: SecurityEvent['severity'] = 'medium'
   ): void {
+    // Ensure the log array is initialized
+    if (!SecurityEventLogger.securityLog) {
+      SecurityEventLogger.securityLog = [];
+    }
+
     const event: SecurityEvent = {
       type,
       timestamp: Date.now(),
@@ -32,11 +37,11 @@ export class SecurityEventLogger {
       severity
     };
 
-    this.securityLog.push(event);
+    SecurityEventLogger.securityLog.push(event);
 
     // Keep log size manageable
-    if (this.securityLog.length > this.MAX_LOG_ENTRIES) {
-      this.securityLog.shift();
+    if (SecurityEventLogger.securityLog.length > SecurityEventLogger.MAX_LOG_ENTRIES) {
+      SecurityEventLogger.securityLog.shift();
     }
 
     // Log to console for development
@@ -45,21 +50,24 @@ export class SecurityEventLogger {
     }
 
     // In production, you would send this to your security monitoring service
-    this.sendToSecurityMonitoring(event);
+    SecurityEventLogger.sendToSecurityMonitoring(event);
   }
 
   /**
    * Get recent security events
    */
   static getSecurityEvents(limit: number = 50): SecurityEvent[] {
-    return this.securityLog.slice(-limit);
+    if (!SecurityEventLogger.securityLog) {
+      SecurityEventLogger.securityLog = [];
+    }
+    return SecurityEventLogger.securityLog.slice(-limit);
   }
 
   /**
    * Clear security log
    */
   static clearSecurityLog(): void {
-    this.securityLog = [];
+    SecurityEventLogger.securityLog = [];
   }
 
   /**

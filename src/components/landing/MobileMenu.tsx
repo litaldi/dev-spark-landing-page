@@ -1,3 +1,4 @@
+
 import React, { useRef, useEffect } from "react";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import NavLinks from "./NavLinks";
@@ -65,7 +66,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
 
         <div className="flex-1 overflow-auto">
           <nav className="space-y-2" aria-label="Mobile navigation menu">
-            <NavLinks isMobile={true} onLinkClick={onMenuClose} />
+            <NavLinks onItemClick={onMenuClose} />
           </nav>
 
           <Separator className="my-6" />
