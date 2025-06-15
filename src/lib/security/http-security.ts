@@ -236,8 +236,10 @@ export class HttpSecurity {
   }
 }
 
-// Legacy exports for backward compatibility
-export const applySecurityDefenses = HttpSecurity.applySecurityDefenses;
-export const logSecurityEvent = HttpSecurity.logSecurityEvent;
-export const applySecurityHeaders = HttpSecurity.getSecurityHeaders;
-export const validateURL = HttpSecurity.validateUrl;
+// Legacy exports for backward compatibility - fixed to properly call static methods
+export const applySecurityDefenses = () => HttpSecurity.applySecurityDefenses();
+export const logSecurityEvent = (type: string, details: Record<string, any> = {}, severity: SecurityEvent['severity'] = 'medium') => 
+  HttpSecurity.logSecurityEvent(type, details, severity);
+export const applySecurityHeaders = (existingHeaders?: Record<string, string>) => 
+  HttpSecurity.getSecurityHeaders(existingHeaders);
+export const validateURL = (url: string) => HttpSecurity.validateUrl(url);
