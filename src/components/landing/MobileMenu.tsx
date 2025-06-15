@@ -1,7 +1,6 @@
-
 import React, { useRef, useEffect } from "react";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
-import { NavLinks } from "./NavLinks";
+import NavLinks from "./NavLinks";
 import GetStartedButton from "./GetStartedButton";
 import AuthButtons from "./AuthButtons";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
