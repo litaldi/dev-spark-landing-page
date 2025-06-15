@@ -233,7 +233,7 @@ const PracticePage: React.FC = () => {
       <ConsolidatedLayout
         title="Practice Sessions - VoiceSeller"
         description="Practice sales conversations with AI"
-        variant="app"
+        variant="default"
       >
         <div className="container mx-auto px-4 py-8">
           <Alert className="mb-8">
@@ -251,7 +251,7 @@ const PracticePage: React.FC = () => {
     <ConsolidatedLayout
       title="Practice Sessions - VoiceSeller"
       description="Practice sales conversations with AI"
-      variant="app"
+      variant="default"
     >
       <div className="container mx-auto px-4 py-8 max-w-6xl">
         <div className="mb-8">
