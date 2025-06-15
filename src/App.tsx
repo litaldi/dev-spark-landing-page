@@ -1,5 +1,6 @@
 
 import React from "react";
+import { BrowserRouter } from "react-router-dom";
 import { AppErrorBoundary } from "@/components/error/EnhancedErrorBoundary";
 import { Toaster } from "@/components/ui/toaster";
 import { SkipNavLink } from "@/components/a11y/skip-nav";
@@ -36,7 +37,7 @@ function AppContent() {
     trackCSRFViolations: true
   });
 
-  // Get authentication state
+  // Get authentication state (now inside Router context)
   const { isAuthenticated } = useUnifiedAuth();
 
   return (
@@ -57,7 +58,9 @@ function App() {
     <AppErrorBoundary>
       <QueryClientProvider client={queryClient}>
         <ThemeProvider defaultTheme="system" storageKey="ui-theme">
-          <AppContent />
+          <BrowserRouter>
+            <AppContent />
+          </BrowserRouter>
         </ThemeProvider>
         {process.env.NODE_ENV === 'development' && (
           <ReactQueryDevtools initialIsOpen={false} />
