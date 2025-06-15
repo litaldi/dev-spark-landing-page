@@ -1,10 +1,10 @@
+
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Mic, Play } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
 import DemoModal from "./DemoModal";
-import { Play } from "lucide-react";
 
 const HeroSection: React.FC = () => {
   const navigate = useNavigate();
@@ -16,7 +16,7 @@ const HeroSection: React.FC = () => {
   const [demoOpen, setDemoOpen] = React.useState(false);
 
   const handleGetStarted = () => {
-    navigate("/auth/register");
+    navigate("/practice");
   };
 
   const handleDashboard = () => {
@@ -40,10 +40,10 @@ const HeroSection: React.FC = () => {
             id="hero-heading" 
             className="text-2xl sm:text-3xl md:text-4xl lg:text-6xl font-bold text-brand-800 dark:text-white mb-3 sm:mb-4 md:mb-5 leading-tight tracking-tight"
           >
-            Your First Dev Job <span className="text-brand-500 dark:text-brand-400">Starts Here</span>
+            Master Sales with <span className="text-brand-500 dark:text-brand-400">AI Voice Training</span>
           </h1>
           <p className="text-base sm:text-lg md:text-xl text-gray-700 dark:text-gray-300 mb-5 sm:mb-6 md:mb-8 max-w-2xl mx-auto leading-relaxed">
-            Practice code, build your resume, and get interview-ready — all powered by AI.
+            Practice real sales conversations with AI-powered client simulations. Get instant feedback and build confidence through personalized coaching.
           </p>
           
           <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 md:gap-6 animate-fade-in">
@@ -63,9 +63,10 @@ const HeroSection: React.FC = () => {
                   size="lg" 
                   className={`rounded-full bg-brand-500 hover:bg-brand-600 text-white px-4 sm:px-6 md:px-8 py-3 sm:py-4 md:py-5 text-sm sm:text-base transform transition-all duration-300 hover:scale-105 shadow-md hover:shadow-lg ${isMobile ? "w-full" : ""}`}
                   onClick={handleGetStarted}
-                  aria-label="Sign up for an account"
+                  aria-label="Start practicing sales conversations"
                 >
-                  Get Started for Free
+                  <Mic className="mr-2 h-4 w-4" />
+                  Start Practice Session
                   <ArrowRight className="ml-1 h-4 w-4" />
                 </Button>
                 <Button 
@@ -86,7 +87,7 @@ const HeroSection: React.FC = () => {
           <DemoModal open={demoOpen} onOpenChange={setDemoOpen} />
           
           <p className="mt-3 sm:mt-4 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-            No credit card required · Start for free
+            No credit card required · Start practicing immediately
           </p>
         </div>
       </div>

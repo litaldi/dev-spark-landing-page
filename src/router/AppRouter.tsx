@@ -11,6 +11,7 @@ interface AppRouterProps {
 
 export function AppRouter({ isAuthenticated }: AppRouterProps) {
   const HomePage = routes.home;
+  const PracticePage = routes.practice;
   const LoginPage = routes.login;
   const RegisterPage = routes.register;
   const DashboardPage = routes.dashboard;
@@ -23,6 +24,7 @@ export function AppRouter({ isAuthenticated }: AppRouterProps) {
         <Routes>
           {/* Public routes */}
           <Route path="/" element={<HomePage />} />
+          <Route path="/practice" element={<PracticePage />} />
           <Route 
             path="/auth/login" 
             element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <LoginPage />} 

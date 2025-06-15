@@ -8,6 +8,9 @@ export const routes = {
   login: lazy(() => import('@/pages/auth/Login')),
   register: lazy(() => import('@/pages/auth/Register')),
   
+  // VoiceSeller routes
+  practice: lazy(() => import('@/pages/PracticePage')),
+  
   // Protected routes
   dashboard: lazy(() => import('@/pages/dashboard/DashboardPage')),
   onboarding: lazy(() => import('@/pages/auth/OnboardingPage')),
