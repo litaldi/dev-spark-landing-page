@@ -1,36 +1,65 @@
 
-import DOMPurify from 'dompurify';
+/**
+ * Input validation and sanitization utilities
+ */
 
 /**
- * Sanitize HTML input to prevent XSS attacks
+ * Sanitize user input to prevent XSS attacks
  */
 export function sanitizeInput(input: string): string {
   if (typeof input !== 'string') {
     return '';
   }
-  
-  try {
-    return DOMPurify.sanitize(input, {
-      ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'a'],
-      ALLOWED_ATTR: ['href', 'target'],
-      ALLOW_DATA_ATTR: false
-    });
-  } catch (error) {
-    console.error('Error sanitizing input:', error);
-    return input.replace(/<[^>]*>/g, ''); // Fallback: strip all HTML tags
-  }
+
+  return input
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;')
+    .replace(/\//g, '&#x2F;')
+    .replace(/&/g, '&amp;');
 }
 
 /**
- * Validate form inputs for security issues
+ * Validate email format
  */
-export function validateFormSecurity(inputs: Record<string, any>): Record<string, string> {
+export function isValidEmail(email: string): boolean {
+  if (!email || typeof email !== 'string') {
+    return false;
+  }
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email.trim());
+}
+
+/**
+ * Validate password strength
+ */
+export function isStrongPassword(password: string): boolean {
+  if (!password || typeof password !== 'string') {
+    return false;
+  }
+
+  // At least 8 characters, with uppercase, lowercase, number, and special character
+  const minLength = password.length >= 8;
+  const hasUppercase = /[A-Z]/.test(password);
+  const hasLowercase = /[a-z]/.test(password);
+  const hasNumber = /\d/.test(password);
+  const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+
+  return minLength && hasUppercase && hasLowercase && hasNumber && hasSpecialChar;
+}
+
+/**
+ * Validate form data for security threats
+ */
+export function validateFormSecurity(formData: Record<string, any>): Record<string, string> {
   const errors: Record<string, string> = {};
-  
-  Object.entries(inputs).forEach(([key, value]) => {
+
+  for (const [key, value] of Object.entries(formData)) {
     if (typeof value === 'string') {
-      // Check for script tags
-      if (/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi.test(value)) {
+      // Check for script injection
+      if (/<script[^>]*>.*?<\/script>/gi.test(value)) {
         errors[key] = 'Invalid content detected';
       }
       
@@ -39,65 +68,12 @@ export function validateFormSecurity(inputs: Record<string, any>): Record<string
         errors[key] = 'Invalid content detected';
       }
       
-      // Check for extremely long inputs (potential DoS)
+      // Check for excessive length (DoS prevention)
       if (value.length > 1000) {
-        errors[key] = 'Input too long';
+        errors[key] = 'Content too long';
       }
     }
-  });
-  
+  }
+
   return errors;
-}
-
-/**
- * Validate email format
- */
-export function validateEmail(email: string): boolean {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email);
-}
-
-// Export with expected test names
-export const isValidEmail = validateEmail;
-
-/**
- * Validate password strength - Updated to require 12+ characters
- */
-export function validatePassword(password: string): {
-  isValid: boolean;
-  errors: string[];
-} {
-  const errors: string[] = [];
-  
-  if (password.length < 12) {
-    errors.push('Password must be at least 12 characters long');
-  }
-  
-  if (!/[A-Z]/.test(password)) {
-    errors.push('Password must contain at least one uppercase letter');
-  }
-  
-  if (!/[a-z]/.test(password)) {
-    errors.push('Password must contain at least one lowercase letter');
-  }
-  
-  if (!/\d/.test(password)) {
-    errors.push('Password must contain at least one number');
-  }
-  
-  if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
-    errors.push('Password must contain at least one special character');
-  }
-  
-  return {
-    isValid: errors.length === 0,
-    errors
-  };
-}
-
-/**
- * Check if password is strong (simplified boolean version for tests)
- */
-export function isStrongPassword(password: string): boolean {
-  return validatePassword(password).isValid;
 }

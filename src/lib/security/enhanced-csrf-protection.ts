@@ -1,228 +1,136 @@
 
 /**
- * Enhanced CSRF protection with automatic token management
+ * Enhanced CSRF protection with token rotation and validation
  */
 
-interface CSRFConfig {
-  tokenName: string;
-  headerName: string;
-  cookieName: string;
-  secure: boolean;
-  sameSite: 'strict' | 'lax' | 'none';
-}
+export class EnhancedCSRFProtection {
+  private static readonly TOKEN_KEY = 'csrf-token';
+  private static readonly TOKEN_TIMESTAMP_KEY = 'csrf-token-timestamp';
+  private static readonly TOKEN_LIFETIME = 60 * 60 * 1000; // 1 hour
+  private static readonly ROTATION_INTERVAL = 15 * 60 * 1000; // 15 minutes
 
-class EnhancedCSRFProtection {
-  private static readonly DEFAULT_CONFIG: CSRFConfig = {
-    tokenName: 'csrf-token',
-    headerName: 'X-CSRF-Token',
-    cookieName: 'csrf-token',
-    secure: window.location.protocol === 'https:',
-    sameSite: 'strict'
-  };
-
-  private static config: CSRFConfig = this.DEFAULT_CONFIG;
-  private static currentToken: string | null = null;
-
-  /**
-   * Initialize CSRF protection
-   */
-  static initialize(customConfig?: Partial<CSRFConfig>): string {
-    this.config = { ...this.DEFAULT_CONFIG, ...customConfig };
+  static initialize(): string {
+    const existingToken = this.getToken();
     
-    let token = this.getStoredToken();
-    if (!token || !this.isTokenValid(token)) {
-      token = this.generateToken();
-      this.storeToken(token);
+    if (existingToken && this.isTokenValid()) {
+      return existingToken;
     }
-    
-    this.currentToken = token;
-    this.setupFormInterception();
-    this.setupFetchInterception();
-    
-    return token;
+
+    return this.generateNewToken();
   }
 
-  /**
-   * Generate a cryptographically secure CSRF token
-   */
-  private static generateToken(): string {
-    const array = new Uint8Array(32);
-    crypto.getRandomValues(array);
-    return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
-  }
-
-  /**
-   * Validate token format and expiry
-   */
-  private static isTokenValid(token: string): boolean {
-    if (!token || token.length !== 64) return false;
-    
-    // Check if token was generated recently (within 24 hours)
-    const tokenTimestamp = sessionStorage.getItem(`${this.config.tokenName}_timestamp`);
-    if (tokenTimestamp) {
-      const age = Date.now() - parseInt(tokenTimestamp);
-      return age < 24 * 60 * 60 * 1000; // 24 hours
-    }
-    
-    return true; // If no timestamp, assume valid for now
-  }
-
-  /**
-   * Store token securely
-   */
-  private static storeToken(token: string): void {
+  static getToken(): string | null {
     try {
-      sessionStorage.setItem(this.config.tokenName, token);
-      sessionStorage.setItem(`${this.config.tokenName}_timestamp`, Date.now().toString());
-      
-      // Also store in a meta tag for easier access
-      let metaTag = document.querySelector(`meta[name="${this.config.tokenName}"]`) as HTMLMetaElement;
-      if (!metaTag) {
-        metaTag = document.createElement('meta');
-        metaTag.name = this.config.tokenName;
-        document.head.appendChild(metaTag);
-      }
-      metaTag.content = token;
+      return sessionStorage.getItem(this.TOKEN_KEY);
     } catch (error) {
-      console.error('Failed to store CSRF token:', error);
-    }
-  }
-
-  /**
-   * Get stored token
-   */
-  private static getStoredToken(): string | null {
-    try {
-      return sessionStorage.getItem(this.config.tokenName) ||
-             document.querySelector(`meta[name="${this.config.tokenName}"]`)?.getAttribute('content') ||
-             null;
-    } catch (error) {
-      console.error('Failed to retrieve CSRF token:', error);
+      console.warn('Could not retrieve CSRF token:', error);
       return null;
     }
   }
 
-  /**
-   * Get current CSRF token
-   */
-  static getToken(): string {
-    if (!this.currentToken) {
-      this.currentToken = this.initialize();
+  static generateNewToken(): string {
+    try {
+      const array = new Uint8Array(32);
+      crypto.getRandomValues(array);
+      const token = Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
+      
+      sessionStorage.setItem(this.TOKEN_KEY, token);
+      sessionStorage.setItem(this.TOKEN_TIMESTAMP_KEY, Date.now().toString());
+      
+      return token;
+    } catch (error) {
+      console.error('Failed to generate CSRF token:', error);
+      throw new Error('CSRF token generation failed');
     }
-    return this.currentToken;
   }
 
-  /**
-   * Validate a token against the current token
-   */
   static validateToken(token: string): boolean {
-    const currentToken = this.getToken();
-    return currentToken === token && this.isTokenValid(token);
-  }
-
-  /**
-   * Add CSRF token to form data
-   */
-  static addToFormData(formData: FormData): FormData {
-    const token = this.getToken();
-    formData.append(this.config.tokenName, token);
-    return formData;
-  }
-
-  /**
-   * Add CSRF token to headers
-   */
-  static addToHeaders(headers: Record<string, string> = {}): Record<string, string> {
-    const token = this.getToken();
-    return {
-      ...headers,
-      [this.config.headerName]: token,
-    };
-  }
-
-  /**
-   * Intercept form submissions to add CSRF tokens
-   */
-  private static setupFormInterception(): void {
-    document.addEventListener('submit', (event) => {
-      const form = event.target as HTMLFormElement;
-      
-      // Only intercept forms that modify state (POST, PUT, DELETE, PATCH)
-      const method = (form.method || 'GET').toUpperCase();
-      if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(method)) {
-        // Check if CSRF token is already present
-        const existingToken = form.querySelector(`input[name="${this.config.tokenName}"]`) as HTMLInputElement;
-        
-        if (!existingToken) {
-          // Add hidden input with CSRF token
-          const tokenInput = document.createElement('input');
-          tokenInput.type = 'hidden';
-          tokenInput.name = this.config.tokenName;
-          tokenInput.value = this.getToken();
-          form.appendChild(tokenInput);
-        } else {
-          // Update existing token
-          existingToken.value = this.getToken();
-        }
-      }
-    });
-  }
-
-  /**
-   * Intercept fetch requests to add CSRF tokens
-   */
-  private static setupFetchInterception(): void {
-    const originalFetch = window.fetch;
+    const storedToken = this.getToken();
     
-    window.fetch = async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
-      const request = new Request(input, init);
-      const method = request.method.toUpperCase();
+    if (!storedToken || !token) {
+      return false;
+    }
+
+    if (!this.isTokenValid()) {
+      return false;
+    }
+
+    // Constant-time comparison to prevent timing attacks
+    return this.constantTimeCompare(token, storedToken);
+  }
+
+  static isTokenValid(): boolean {
+    try {
+      const timestamp = sessionStorage.getItem(this.TOKEN_TIMESTAMP_KEY);
       
-      // Add CSRF token to state-changing requests
-      if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(method)) {
-        // Only add to same-origin requests
-        const url = new URL(request.url, window.location.origin);
-        if (url.origin === window.location.origin) {
-          const headers = new Headers(request.headers);
-          headers.set(this.config.headerName, this.getToken());
-          
-          return originalFetch(new Request(request, { headers }));
-        }
+      if (!timestamp) {
+        return false;
       }
+
+      const tokenAge = Date.now() - parseInt(timestamp, 10);
+      return tokenAge < this.TOKEN_LIFETIME;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  static shouldRotateToken(): boolean {
+    try {
+      const timestamp = sessionStorage.getItem(this.TOKEN_TIMESTAMP_KEY);
       
-      return originalFetch(request);
-    };
+      if (!timestamp) {
+        return true;
+      }
+
+      const tokenAge = Date.now() - parseInt(timestamp, 10);
+      return tokenAge > this.ROTATION_INTERVAL;
+    } catch (error) {
+      return true;
+    }
   }
 
-  /**
-   * Refresh the CSRF token
-   */
-  static refreshToken(): string {
-    const newToken = this.generateToken();
-    this.storeToken(newToken);
-    this.currentToken = newToken;
-    return newToken;
+  static rotateTokenIfNeeded(): string {
+    if (this.shouldRotateToken()) {
+      return this.generateNewToken();
+    }
+
+    return this.getToken() || this.generateNewToken();
   }
 
-  /**
-   * Clear CSRF token
-   */
   static clearToken(): void {
     try {
-      sessionStorage.removeItem(this.config.tokenName);
-      sessionStorage.removeItem(`${this.config.tokenName}_timestamp`);
-      
-      const metaTag = document.querySelector(`meta[name="${this.config.tokenName}"]`);
-      if (metaTag) {
-        metaTag.remove();
-      }
-      
-      this.currentToken = null;
+      sessionStorage.removeItem(this.TOKEN_KEY);
+      sessionStorage.removeItem(this.TOKEN_TIMESTAMP_KEY);
     } catch (error) {
-      console.error('Failed to clear CSRF token:', error);
+      console.warn('Could not clear CSRF token:', error);
     }
   }
-}
 
-export { EnhancedCSRFProtection };
-export type { CSRFConfig };
+  static addToHeaders(headers: Record<string, string>): Record<string, string> {
+    const token = this.rotateTokenIfNeeded();
+    
+    return {
+      ...headers,
+      'X-CSRF-Token': token,
+      'X-Requested-With': 'XMLHttpRequest'
+    };
+  }
+
+  static addToFormData(formData: FormData): void {
+    const token = this.rotateTokenIfNeeded();
+    formData.append('csrf-token', token);
+  }
+
+  private static constantTimeCompare(a: string, b: string): boolean {
+    if (a.length !== b.length) {
+      return false;
+    }
+
+    let result = 0;
+    for (let i = 0; i < a.length; i++) {
+      result |= a.charCodeAt(i) ^ b.charCodeAt(i);
+    }
+
+    return result === 0;
+  }
+}

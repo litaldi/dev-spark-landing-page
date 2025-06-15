@@ -1,187 +1,243 @@
 /**
- * HTTP security utilities for web application protection
+ * HTTP security utilities and headers management
  */
 
-/**
- * Validate URL to prevent SSRF attacks
- */
-export function validateURL(url: string): boolean {
-  try {
-    const parsedUrl = new URL(url);
-    
-    // Block private/internal network addresses
-    const hostname = parsedUrl.hostname.toLowerCase();
-    
-    // Block localhost and private IPs
-    if (
-      hostname === 'localhost' ||
-      hostname === '127.0.0.1' ||
-      hostname === '::1' ||
-      hostname.startsWith('192.168.') ||
-      hostname.startsWith('10.') ||
-      hostname.startsWith('172.16.') ||
-      hostname.startsWith('172.17.') ||
-      hostname.startsWith('172.18.') ||
-      hostname.startsWith('172.19.') ||
-      hostname.startsWith('172.2') ||
-      hostname.startsWith('172.30.') ||
-      hostname.startsWith('172.31.')
-    ) {
-      return false;
-    }
-    
-    // Only allow HTTP and HTTPS protocols
-    if (!['http:', 'https:'].includes(parsedUrl.protocol)) {
-      return false;
-    }
-    
-    return true;
-  } catch {
-    return false;
-  }
+interface SecurityEvent {
+  type: string;
+  timestamp: number;
+  details: Record<string, any>;
+  severity: 'low' | 'medium' | 'high' | 'critical';
 }
 
-/**
- * Apply security headers to fetch requests
- */
-export function applySecurityHeaders(headers: Record<string, string> = {}): Record<string, string> {
-  return {
-    ...headers,
-    'X-Content-Type-Options': 'nosniff',
-    'X-Frame-Options': 'DENY',
-    'X-XSS-Protection': '1; mode=block',
-    'Referrer-Policy': 'strict-origin-when-cross-origin',
-  };
-}
+export class HttpSecurity {
+  private static securityLog: SecurityEvent[] = [];
+  private static readonly MAX_LOG_ENTRIES = 1000;
 
-/**
- * Secure fetch wrapper with built-in protections
- */
-export async function secureFetch(
-  url: string, 
-  options: RequestInit = {}
-): Promise<Response> {
-  // Validate URL
-  if (!validateURL(url)) {
-    throw new Error('Invalid or potentially unsafe URL');
+  /**
+   * Apply comprehensive security headers
+   */
+  static getSecurityHeaders(existingHeaders: Record<string, string> = {}): Record<string, string> {
+    return {
+      ...existingHeaders,
+      // Prevent MIME type sniffing
+      'X-Content-Type-Options': 'nosniff',
+      
+      // Prevent clickjacking
+      'X-Frame-Options': 'DENY',
+      
+      // XSS protection
+      'X-XSS-Protection': '1; mode=block',
+      
+      // Referrer policy
+      'Referrer-Policy': 'strict-origin-when-cross-origin',
+      
+      // Content Security Policy (basic)
+      'Content-Security-Policy': [
+        "default-src 'self'",
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+        "style-src 'self' 'unsafe-inline'",
+        "img-src 'self' data: https:",
+        "font-src 'self' data:",
+        "connect-src 'self' https:",
+        "media-src 'self'",
+        "object-src 'none'",
+        "base-uri 'self'",
+        "form-action 'self'"
+      ].join('; '),
+      
+      // Strict Transport Security (for HTTPS)
+      'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload',
+      
+      // Permissions Policy
+      'Permissions-Policy': [
+        'camera=()',
+        'microphone=()',
+        'geolocation=()',
+        'payment=()',
+        'usb=()',
+        'screen-wake-lock=()'
+      ].join(', ')
+    };
   }
-  
-  // Apply security headers
-  const secureHeaders = applySecurityHeaders(
-    options.headers as Record<string, string>
-  );
-  
-  // Add timeout to prevent hanging requests
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 10000); // 10 second timeout
-  
-  try {
-    const response = await fetch(url, {
-      ...options,
-      headers: secureHeaders,
-      signal: controller.signal,
-    });
-    
-    clearTimeout(timeout);
-    return response;
-  } catch (error) {
-    clearTimeout(timeout);
-    throw error;
-  }
-}
 
-/**
- * Enhanced Content Security Policy configuration - More restrictive
- */
-export const CSPDirectives = {
-  defaultSrc: ["'self'"],
-  scriptSrc: ["'self'"],
-  styleSrc: ["'self'", "'unsafe-inline'"], // Keep for Tailwind CSS
-  imgSrc: ["'self'", "data:", "https:"],
-  fontSrc: ["'self'", "https:", "data:"],
-  connectSrc: ["'self'", "https:"],
-  frameSrc: ["'none'"],
-  objectSrc: ["'none'"],
-  baseUri: ["'self'"],
-  formAction: ["'self'"],
-  upgradeInsecureRequests: [],
-};
-
-/**
- * Generate CSP header value
- */
-export function generateCSPHeader(): string {
-  return Object.entries(CSPDirectives)
-    .map(([directive, sources]) => {
-      const kebabDirective = directive.replace(/([A-Z])/g, '-$1').toLowerCase();
-      if (sources.length === 0) {
-        return kebabDirective; // Directives without sources
+  /**
+   * Validate URL to prevent SSRF attacks
+   */
+  static validateUrl(url: string): boolean {
+    try {
+      const parsed = new URL(url);
+      
+      // Only allow HTTP and HTTPS
+      if (!['http:', 'https:'].includes(parsed.protocol)) {
+        return false;
       }
-      return `${kebabDirective} ${sources.join(' ')}`;
-    })
-    .join('; ');
-}
-
-/**
- * Security event logging for monitoring
- */
-export function logSecurityEvent(eventType: string, details: Record<string, any> = {}): void {
-  if (process.env.NODE_ENV === 'development') {
-    console.warn(`[SECURITY EVENT] ${eventType}:`, details);
+      
+      // Block local/private IP ranges
+      const hostname = parsed.hostname.toLowerCase();
+      
+      // Block localhost
+      if (['localhost', '127.0.0.1', '0.0.0.0', '::1'].includes(hostname)) {
+        return false;
+      }
+      
+      // Block private IP ranges
+      if (this.isPrivateIP(hostname)) {
+        return false;
+      }
+      
+      return true;
+    } catch {
+      return false;
+    }
   }
-  
-  // In production, this would send to a monitoring service
-  // For now, we'll just track in session storage for debugging
-  try {
-    const events = JSON.parse(sessionStorage.getItem('security-events') || '[]');
-    events.push({
+
+  /**
+   * Check if IP is in private range
+   */
+  private static isPrivateIP(hostname: string): boolean {
+    const ipv4Regex = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/;
+    const match = hostname.match(ipv4Regex);
+    
+    if (!match) {
+      return false;
+    }
+    
+    const [, a, b, c, d] = match.map(Number);
+    
+    // Check private ranges
+    return (
+      // 10.0.0.0/8
+      a === 10 ||
+      // 172.16.0.0/12
+      (a === 172 && b >= 16 && b <= 31) ||
+      // 192.168.0.0/16
+      (a === 192 && b === 168) ||
+      // Link-local
+      (a === 169 && b === 254)
+    );
+  }
+
+  /**
+   * Log security events
+   */
+  static logSecurityEvent(
+    type: string, 
+    details: Record<string, any> = {},
+    severity: SecurityEvent['severity'] = 'medium'
+  ): void {
+    const event: SecurityEvent = {
+      type,
       timestamp: Date.now(),
-      type: eventType,
-      details,
-    });
-    
-    // Keep only the last 50 events
-    if (events.length > 50) {
-      events.splice(0, events.length - 50);
-    }
-    
-    sessionStorage.setItem('security-events', JSON.stringify(events));
-  } catch (error) {
-    console.error('Failed to log security event:', error);
-  }
-}
+      details: {
+        userAgent: navigator.userAgent,
+        url: window.location.href,
+        ...details
+      },
+      severity
+    };
 
-/**
- * Apply comprehensive security defenses
- */
-export function applySecurityDefenses(): void {
-  try {
-    // Set CSP via meta tag if not already set
-    if (!document.querySelector('meta[http-equiv="Content-Security-Policy"]')) {
-      const meta = document.createElement('meta');
-      meta.httpEquiv = 'Content-Security-Policy';
-      meta.content = generateCSPHeader();
-      document.head.appendChild(meta);
+    this.securityLog.push(event);
+
+    // Keep log size manageable
+    if (this.securityLog.length > this.MAX_LOG_ENTRIES) {
+      this.securityLog.shift();
     }
-    
-    // Log security initialization
-    logSecurityEvent('SECURITY_INIT', { timestamp: Date.now() });
-    
-    // Disable right-click context menu in production (optional)
-    if (process.env.NODE_ENV === 'production') {
+
+    // Log to console for development
+    if (import.meta.env.DEV) {
+      console.warn(`Security Event [${severity.toUpperCase()}]:`, event);
+    }
+
+    // In production, you would send this to your security monitoring service
+    this.sendToSecurityMonitoring(event);
+  }
+
+  /**
+   * Get recent security events
+   */
+  static getSecurityEvents(limit: number = 50): SecurityEvent[] {
+    return this.securityLog.slice(-limit);
+  }
+
+  /**
+   * Clear security log
+   */
+  static clearSecurityLog(): void {
+    this.securityLog = [];
+  }
+
+  /**
+   * Apply security defenses to the application
+   */
+  static applySecurityDefenses(): void {
+    // Disable right-click context menu in production
+    if (!import.meta.env.DEV) {
       document.addEventListener('contextmenu', (e) => {
         e.preventDefault();
-        logSecurityEvent('CONTEXT_MENU_BLOCKED', { timestamp: Date.now() });
+      });
+
+      // Disable common developer shortcuts
+      document.addEventListener('keydown', (e) => {
+        if (
+          (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'C' || e.key === 'J')) ||
+          (e.key === 'F12')
+        ) {
+          e.preventDefault();
+          this.logSecurityEvent('DEV_TOOLS_ATTEMPT', {
+            key: e.key,
+            ctrlKey: e.ctrlKey,
+            shiftKey: e.shiftKey
+          }, 'low');
+        }
       });
     }
-    
-    // Prevent frame embedding
-    if (window !== window.top) {
-      logSecurityEvent('FRAME_EMBEDDING_DETECTED', { timestamp: Date.now() });
-      window.top!.location = window.location;
+
+    // Monitor for potential XSS attempts
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.type === 'childList') {
+          mutation.addedNodes.forEach((node) => {
+            if (node.nodeType === Node.ELEMENT_NODE) {
+              const element = node as Element;
+              if (element.tagName === 'SCRIPT' && !element.hasAttribute('data-approved')) {
+                this.logSecurityEvent('UNAUTHORIZED_SCRIPT', {
+                  innerHTML: element.innerHTML,
+                  src: element.getAttribute('src')
+                }, 'high');
+              }
+            }
+          });
+        }
+      });
+    });
+
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
+  }
+
+  /**
+   * Send security events to monitoring service (placeholder)
+   */
+  private static sendToSecurityMonitoring(event: SecurityEvent): void {
+    // In a real application, you would send this to your security monitoring service
+    // For now, we'll just store it locally
+    try {
+      const existingEvents = JSON.parse(localStorage.getItem('security-events') || '[]');
+      existingEvents.push(event);
+      
+      // Keep only recent events
+      const recentEvents = existingEvents.slice(-100);
+      localStorage.setItem('security-events', JSON.stringify(recentEvents));
+    } catch (error) {
+      console.warn('Could not store security event:', error);
     }
-  } catch (error) {
-    console.warn('Could not apply all security defenses:', error);
-    logSecurityEvent('SECURITY_INIT_ERROR', { error: error?.toString() });
   }
 }
+
+// Legacy exports for backward compatibility
+export const applySecurityDefenses = HttpSecurity.applySecurityDefenses;
+export const logSecurityEvent = HttpSecurity.logSecurityEvent;
+export const applySecurityHeaders = HttpSecurity.getSecurityHeaders;
+export const validateURL = HttpSecurity.validateUrl;

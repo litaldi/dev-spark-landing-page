@@ -2,252 +2,197 @@
 /**
  * Enhanced input validation with comprehensive security checks
  */
-import DOMPurify from 'dompurify';
 
-interface ValidationRule {
+export interface ValidationResult {
+  isValid: boolean;
+  sanitizedValue: string;
+  errors: string[];
+  warnings: string[];
+}
+
+export interface ValidationOptions {
   required?: boolean;
   minLength?: number;
   maxLength?: number;
+  allowHtml?: boolean;
+  allowSpecialChars?: boolean;
   pattern?: RegExp;
-  customValidator?: (value: string) => boolean;
 }
 
-interface ValidationResult {
-  isValid: boolean;
-  errors: string[];
-  sanitizedValue: string;
-}
-
-class EnhancedInputValidator {
-  private static readonly MAX_INPUT_LENGTH = 10000;
+export class EnhancedInputValidator {
   private static readonly DANGEROUS_PATTERNS = [
-    /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
+    /<script[^>]*>.*?<\/script>/gi,
     /javascript:/gi,
     /on\w+\s*=/gi,
-    /data:text\/html/gi,
-    /vbscript:/gi,
-    /<iframe/gi,
-    /<object/gi,
-    /<embed/gi,
-    /<link/gi,
-    /<meta/gi,
+    /data:\s*text\/html/gi,
+    /<iframe[^>]*>.*?<\/iframe>/gi,
+    /<object[^>]*>.*?<\/object>/gi,
+    /<embed[^>]*>/gi,
+    /<link[^>]*>/gi,
+    /<meta[^>]*>/gi,
+    /expression\s*\(/gi,
+    /url\s*\(/gi,
+    /import\s+/gi,
+    /eval\s*\(/gi,
+    /setTimeout\s*\(/gi,
+    /setInterval\s*\(/gi
   ];
 
-  /**
-   * Comprehensive input validation
-   */
-  static validateInput(input: string, rules: ValidationRule = {}): ValidationResult {
-    const errors: string[] = [];
-    let sanitizedValue = input;
+  private static readonly SQL_INJECTION_PATTERNS = [
+    /(\b(SELECT|INSERT|UPDATE|DELETE|DROP|CREATE|ALTER|EXEC|UNION)\b)/gi,
+    /(\b(OR|AND)\s+\d+\s*=\s*\d+)/gi,
+    /([\'\"](\s*;\s*|\s*--|\s*\/\*))/gi,
+    /(\b(SCRIPT|JAVASCRIPT|VBSCRIPT)\b)/gi
+  ];
 
-    // Basic type check
-    if (typeof input !== 'string') {
-      return {
-        isValid: false,
-        errors: ['Input must be a string'],
-        sanitizedValue: ''
-      };
+  static validateInput(input: string, options: ValidationOptions = {}): ValidationResult {
+    const result: ValidationResult = {
+      isValid: true,
+      sanitizedValue: input,
+      errors: [],
+      warnings: []
+    };
+
+    // Check if input is required
+    if (options.required && (!input || input.trim() === '')) {
+      result.isValid = false;
+      result.errors.push('This field is required');
+      return result;
     }
 
-    // Required check
-    if (rules.required && (!input || input.trim().length === 0)) {
-      errors.push('This field is required');
+    // Length validation
+    if (options.minLength && input.length < options.minLength) {
+      result.isValid = false;
+      result.errors.push(`Minimum length is ${options.minLength} characters`);
     }
 
-    // Length checks
-    if (rules.minLength && input.length < rules.minLength) {
-      errors.push(`Minimum length is ${rules.minLength} characters`);
-    }
-
-    if (rules.maxLength && input.length > rules.maxLength) {
-      errors.push(`Maximum length is ${rules.maxLength} characters`);
-    }
-
-    // Global max length check (DoS prevention)
-    if (input.length > this.MAX_INPUT_LENGTH) {
-      errors.push(`Input exceeds maximum allowed length`);
+    if (options.maxLength && input.length > options.maxLength) {
+      result.isValid = false;
+      result.errors.push(`Maximum length is ${options.maxLength} characters`);
     }
 
     // Pattern validation
-    if (rules.pattern && !rules.pattern.test(input)) {
-      errors.push('Input format is invalid');
+    if (options.pattern && !options.pattern.test(input)) {
+      result.isValid = false;
+      result.errors.push('Invalid format');
     }
 
     // Security checks
-    const securityErrors = this.checkSecurityThreats(input);
-    errors.push(...securityErrors);
-
-    // Custom validation
-    if (rules.customValidator && !rules.customValidator(input)) {
-      errors.push('Input does not meet custom requirements');
+    const securityCheck = this.performSecurityCheck(input);
+    if (!securityCheck.isSafe) {
+      result.isValid = false;
+      result.errors.push(...securityCheck.threats);
+      result.warnings.push(...securityCheck.warnings);
     }
 
     // Sanitize input
-    try {
-      sanitizedValue = this.sanitizeInput(input);
-    } catch (error) {
-      errors.push('Input contains unsafe content');
-      sanitizedValue = '';
-    }
+    result.sanitizedValue = this.sanitizeInput(input, options);
 
-    return {
-      isValid: errors.length === 0,
-      errors,
-      sanitizedValue
-    };
+    return result;
   }
 
-  /**
-   * Enhanced sanitization
-   */
-  static sanitizeInput(input: string): string {
-    if (typeof input !== 'string') {
-      return '';
-    }
-
-    try {
-      // First pass: DOMPurify with strict settings
-      let sanitized = DOMPurify.sanitize(input, {
-        ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u'],
-        ALLOWED_ATTR: [],
-        ALLOW_DATA_ATTR: false,
-        ALLOW_UNKNOWN_PROTOCOLS: false,
-        SANITIZE_DOM: true,
-        KEEP_CONTENT: true,
-      });
-
-      // Second pass: Remove any remaining dangerous patterns
-      this.DANGEROUS_PATTERNS.forEach(pattern => {
-        sanitized = sanitized.replace(pattern, '');
-      });
-
-      // Third pass: Normalize whitespace
-      sanitized = sanitized.replace(/\s+/g, ' ').trim();
-
-      return sanitized;
-    } catch (error) {
-      console.error('Sanitization failed:', error);
-      return input.replace(/<[^>]*>/g, ''); // Fallback: strip all HTML
-    }
-  }
-
-  /**
-   * Check for security threats
-   */
-  private static checkSecurityThreats(input: string): string[] {
-    const threats: string[] = [];
-
-    // Check for script injection
-    if (this.DANGEROUS_PATTERNS.some(pattern => pattern.test(input))) {
-      threats.push('Potentially dangerous content detected');
-    }
-
-    // Check for SQL injection patterns
-    const sqlPatterns = [
-      /(\b(SELECT|INSERT|UPDATE|DELETE|DROP|UNION|ALTER)\b)/gi,
-      /(;|\|\||&&)/g,
-      /('|('')|(\-\-)|(\#))/g
-    ];
-
-    if (sqlPatterns.some(pattern => pattern.test(input))) {
-      threats.push('Potentially unsafe database query detected');
-    }
-
-    // Check for path traversal
-    if (input.includes('../') || input.includes('..\\')) {
-      threats.push('Path traversal attempt detected');
-    }
-
-    // Check for null bytes
-    if (input.includes('\0')) {
-      threats.push('Null byte injection detected');
-    }
-
-    return threats;
-  }
-
-  /**
-   * Validate email with enhanced security
-   */
   static validateEmail(email: string): ValidationResult {
-    const emailPattern = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
-    
+    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     return this.validateInput(email, {
       required: true,
-      maxLength: 254, // RFC 5321 limit
-      pattern: emailPattern,
-      customValidator: (value) => {
-        // Additional email security checks
-        const domain = value.split('@')[1];
-        return domain && !domain.includes('..') && !domain.startsWith('.') && !domain.endsWith('.');
-      }
+      maxLength: 254,
+      pattern: emailPattern
     });
   }
 
-  /**
-   * Validate password with enhanced security
-   */
   static validatePassword(password: string): ValidationResult {
-    return this.validateInput(password, {
+    const result = this.validateInput(password, {
       required: true,
-      minLength: 12, // Increased from 8
-      maxLength: 128,
-      customValidator: (value) => {
-        // Enhanced password requirements
-        const hasLowercase = /[a-z]/.test(value);
-        const hasUppercase = /[A-Z]/.test(value);
-        const hasNumbers = /\d/.test(value);
-        const hasSpecialChars = /[!@#$%^&*(),.?":{}|<>]/.test(value);
-        const noCommonPatterns = !/(.)\1{2,}/.test(value); // No 3+ repeated chars
-        
-        return hasLowercase && hasUppercase && hasNumbers && hasSpecialChars && noCommonPatterns;
-      }
-    });
-  }
-
-  /**
-   * Validate URL with SSRF protection
-   */
-  static validateURL(url: string): ValidationResult {
-    const result = this.validateInput(url, {
-      required: true,
-      maxLength: 2048
+      minLength: 8,
+      maxLength: 128
     });
 
-    if (!result.isValid) return result;
+    // Additional password strength checks
+    const hasUppercase = /[A-Z]/.test(password);
+    const hasLowercase = /[a-z]/.test(password);
+    const hasNumbers = /\d/.test(password);
+    const hasSpecialChars = /[!@#$%^&*(),.?":{}|<>]/.test(password);
 
-    try {
-      const parsedUrl = new URL(url);
-      const hostname = parsedUrl.hostname.toLowerCase();
-
-      // Block private/internal networks
-      const dangerousHosts = [
-        'localhost', '127.0.0.1', '::1',
-        '0.0.0.0', '169.254.', '10.',
-        '192.168.', '172.16.', '172.17.',
-        '172.18.', '172.19.', '172.2',
-        '172.30.', '172.31.'
-      ];
-
-      if (dangerousHosts.some(host => hostname.includes(host))) {
-        result.isValid = false;
-        result.errors.push('URL points to restricted network');
-      }
-
-      // Only allow HTTP/HTTPS
-      if (!['http:', 'https:'].includes(parsedUrl.protocol)) {
-        result.isValid = false;
-        result.errors.push('Only HTTP and HTTPS protocols are allowed');
-      }
-
-    } catch (error) {
+    if (!hasUppercase) {
+      result.errors.push('Password must contain at least one uppercase letter');
       result.isValid = false;
-      result.errors.push('Invalid URL format');
+    }
+
+    if (!hasLowercase) {
+      result.errors.push('Password must contain at least one lowercase letter');
+      result.isValid = false;
+    }
+
+    if (!hasNumbers) {
+      result.errors.push('Password must contain at least one number');
+      result.isValid = false;
+    }
+
+    if (!hasSpecialChars) {
+      result.errors.push('Password must contain at least one special character');
+      result.isValid = false;
     }
 
     return result;
   }
-}
 
-export { EnhancedInputValidator };
-export type { ValidationRule, ValidationResult };
+  private static performSecurityCheck(input: string): {
+    isSafe: boolean;
+    threats: string[];
+    warnings: string[];
+  } {
+    const threats: string[] = [];
+    const warnings: string[] = [];
+
+    // Check for XSS patterns
+    for (const pattern of this.DANGEROUS_PATTERNS) {
+      if (pattern.test(input)) {
+        threats.push('Potentially dangerous content detected');
+        break;
+      }
+    }
+
+    // Check for SQL injection patterns
+    for (const pattern of this.SQL_INJECTION_PATTERNS) {
+      if (pattern.test(input)) {
+        threats.push('Potential SQL injection attempt detected');
+        break;
+      }
+    }
+
+    // Check for excessive length (DoS prevention)
+    if (input.length > 10000) {
+      warnings.push('Input is unusually long');
+    }
+
+    // Check for suspicious character sequences
+    if (/[<>]{3,}/.test(input)) {
+      warnings.push('Suspicious character sequence detected');
+    }
+
+    return {
+      isSafe: threats.length === 0,
+      threats,
+      warnings
+    };
+  }
+
+  private static sanitizeInput(input: string, options: ValidationOptions): string {
+    let sanitized = input;
+
+    if (!options.allowHtml) {
+      // Remove HTML tags
+      sanitized = sanitized.replace(/<[^>]*>/g, '');
+    }
+
+    if (!options.allowSpecialChars) {
+      // Remove potentially dangerous characters
+      sanitized = sanitized.replace(/[<>'"&]/g, '');
+    }
+
+    // Always remove null bytes and control characters
+    sanitized = sanitized.replace(/[\x00-\x1F\x7F]/g, '');
+
+    return sanitized.trim();
+  }
+}
